@@ -1,0 +1,303 @@
+{
+  "entries": [
+    {
+      "category": "condition",
+      "value": "asthma_copd",
+      "terms": ["asthma", "copd", "wheeze", "saans ki bimari", "dama", "दमा"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "condition",
+      "value": "heart",
+      "terms": ["heart", "cardiac", "dil", "दिल", "हृदय"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "condition",
+      "value": "pregnancy",
+      "terms": ["pregnant", "expecting", "garbhvati", "गर्भवती"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "mode",
+      "value": "car",
+      "terms": ["car", "drive", "gaadi"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "mode",
+      "value": "two_wheeler",
+      "terms": ["bike", "scooter", "scooty", "two wheeler", "motorcycle"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "mode",
+      "value": "metro_rail",
+      "terms": ["metro", "local train", "train"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "mode",
+      "value": "bus",
+      "terms": ["bus"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "mode",
+      "value": "auto",
+      "terms": ["auto", "rickshaw"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "mode",
+      "value": "walk",
+      "terms": ["walk", "paidal", "पैदल"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "mode",
+      "value": "cycle",
+      "terms": ["cycle", "bicycle"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "routine",
+      "value": "school_run",
+      "terms": ["school", "स्कूल"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "routine",
+      "value": "outdoor_play",
+      "terms": ["play", "khel", "खेल", "cricket", "football", "park"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "routine",
+      "value": "sport",
+      "terms": ["run", "jog", "gym", "sport", "exercise", "yoga", "badminton"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "routine",
+      "value": "walk",
+      "terms": ["walk", "sair", "टहल", "morning walk"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "routine",
+      "value": "commute",
+      "terms": ["office", "work", "commute", "kaam"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "routine",
+      "value": "errand",
+      "terms": ["market", "shopping", "bazaar", "sabzi"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "age",
+      "value": "infant",
+      "terms": ["baby", "infant"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "age",
+      "value": "under5",
+      "terms": ["baby", "son", "daughter", "beta", "beti", "बेटा", "बेटी"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "age",
+      "value": "child",
+      "terms": ["son", "daughter", "beta", "beti", "बेटा", "बेटी"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "age",
+      "value": "teen",
+      "terms": ["son", "daughter", "beta", "beti", "बेटा", "बेटी"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "age",
+      "value": "adult",
+      "terms": ["mother", "father", "maa", "papa", "माँ", "मां", "पापा"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "age",
+      "value": "older",
+      "terms": [
+        "mother",
+        "father",
+        "maa",
+        "papa",
+        "माँ",
+        "मां",
+        "पापा",
+        "dadi",
+        "nani",
+        "grandmother",
+        "grandfather",
+        "दादी",
+        "नानी"
+      ],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "reassurance",
+      "value": "en",
+      "terms": [
+        "safe",
+        "no risk",
+        "fine to",
+        "okay to",
+        "ok to",
+        "go ahead",
+        "nothing to worry",
+        "no need to worry",
+        "good time to go out"
+      ],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "reassurance",
+      "value": "hi",
+      "terms": ["सुरक्षित", "कोई खतरा नहीं", "चिंता की बात नहीं"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    {
+      "category": "reassurance",
+      "value": "hinglish",
+      "terms": ["safe hai", "koi dikkat nahi", "koi khatra nahi", "chinta mat"],
+      "source": {
+        "id": "saans-vocabulary",
+        "title": "Saans vocabulary",
+        "url": "",
+        "status": "APP"
+      }
+    }
+  ]
+}
