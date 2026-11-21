@@ -18,6 +18,7 @@ import {
   makeHousehold,
   makePlan,
   makeRoutine,
+  windowOf,
 } from '../helpers/plan-doubles';
 import { CLAIMS_SAFE, DASHES, UNFILLED } from '../helpers/text';
 
@@ -106,7 +107,10 @@ describe('walking and cycling', () => {
       a.id.endsWith('short-walk-cycle'),
     );
     expect(walk?.reason.text).toContain('Moderately polluted or better');
-    expect(walk?.reason.source.quote).toBe('Walk or use cycles for small distances.');
+    expect(walk?.reason.text).toContain('more air through the lungs per kilometre');
+    // The charter wording is not recorded verbatim, so the row claims no quote.
+    expect(walk?.reason.source.status).toBe('P-FETCH');
+    expect(walk?.reason.source.quote).toBeUndefined();
   });
 });
 
@@ -189,8 +193,25 @@ describe('combining errands', () => {
 });
 
 describe('which trips get alternatives', () => {
-  it('skips routines that are not on the plan day, have no mode, or are not trips', () => {
-    expect(alternatives({ advice: { scheduled: false } })).toEqual([]);
+  it('considers a trip that is not on the plan day, because trips are weekly habits', () => {
+    const list = alternatives({ advice: { scheduled: false, level: null, pm25: null } });
+    expect(ids(list)).toContain('no-idling');
+    expect(list[0]?.impact.text).toContain('on 5 days a week');
+  });
+
+  it('uses the plan day level for a trip that is not on the plan day', () => {
+    const off = { scheduled: false, level: null, pm25: null } as const;
+    const at = (worst: Band, pm25: number) =>
+      buildAlternatives({
+        household: makeHousehold({ routines: [makeRoutine({ km: 1.5 })] }),
+        plan: makePlan({ routines: [makeAdvice(off)], worst: windowOf(worst, pm25) }),
+      });
+    expect(ids(at('moderate', 80))).toContain('short-walk-cycle');
+    expect(ids(at('severe', 300))).not.toContain('short-walk-cycle');
+    expect(ids(at('poor', 110))).not.toContain('short-walk-cycle');
+  });
+
+  it('skips routines that have no mode or are not trips', () => {
     const noMode = makeAdvice({ mode: undefined });
     expect(
       buildAlternatives({

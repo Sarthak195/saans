@@ -1,5 +1,5 @@
 {
-  "intro": "At this AQI, GRAP Stage {stage} measures apply in Delhi NCR. Check caqm.nic.in for the stage in force.",
+  "intro": "At this AQI the GRAP schedule lists Stage {stage} for Delhi NCR. CAQM decides which stage is in force and can act earlier, so check caqm.nic.in.",
   "stages": [
     {
       "stage": 1,
@@ -11,8 +11,7 @@
         "id": "caqm-grap-stage-1-trigger",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage I",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "DELHI AQI ranging between 201-300",
-        "status": "P-READ"
+        "status": "P-FETCH"
       },
       "source": {
         "id": "caqm-grap-stage-1-charter",
@@ -32,15 +31,13 @@
         "id": "caqm-grap-stage-2-trigger",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage II",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "DELHI AQI ranging between 301-400",
-        "status": "P-READ"
+        "status": "P-FETCH"
       },
       "source": {
         "id": "caqm-grap-stage-2-heaters",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage II actions",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "Resident Welfare Associations to necessarily provide electric heaters to staff engaged in security, sanitation, horticulture and other miscellaneous services to avoid open Bio-Mass/ MSW burning during winters.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -53,14 +50,13 @@
         "id": "caqm-grap-stage-3-trigger",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage III",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "DELHI AQI ranging between 401-450",
-        "status": "P-READ"
+        "status": "P-FETCH"
       },
       "source": {
         "id": "caqm-grap-stage-3-schools",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage III actions",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "mandatorily conduct classes in schools for children up to class V in a \"Hybrid\" mode i.e., both in physical and online mode (wherever online mode is feasible) [...] The option to exercise the online mode of education, wherever available, shall vest with the students and their guardians.",
+        "quote": "The option to exercise the online mode of education, wherever available, shall vest with the students and their guardians.",
         "status": "P-READ"
       }
     },
@@ -74,8 +70,7 @@
         "id": "caqm-grap-stage-4-trigger",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage IV",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "DELHI AQI > 450",
-        "status": "P-READ"
+        "status": "P-FETCH"
       },
       "source": {
         "id": "caqm-grap-stage-4-charter",

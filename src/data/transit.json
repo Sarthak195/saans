@@ -474,8 +474,8 @@
       },
       "then": {
         "title": "Walk or cycle this short trip",
-        "body": "At {km} km each way this trip is short enough to walk or cycle. Today the air is {levelLabel}, so it is a reasonable day for it. Keep to quieter lanes away from heavy traffic where you can.",
-        "reason": "The GRAP citizens charter, written for Delhi NCR, asks people to walk or cycle for small distances. Saans suggests it only when the air is Moderately polluted or better, because in a Delhi study people on foot breathed more fine particles per minute than people inside vehicles.",
+        "body": "At {km} km each way this trip is short enough to walk or cycle. On the day of this plan the air is {levelLabel}, so it is a reasonable day for it. Keep to quieter lanes away from heavy traffic where you can.",
+        "reason": "The GRAP citizens charter, written for Delhi NCR, asks people to walk or cycle for small distances. Saans suggests it only when the air is Moderately polluted or better, because walking and cycling put more air through the lungs per kilometre than a seated ride, so the same air costs more dose.",
         "impact": {
           "kind": "distance",
           "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
@@ -492,8 +492,7 @@
         "id": "grap-walk-cycle",
         "title": "CAQM Graded Response Action Plan, citizens charter (revision 21.11.2025)",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "Walk or use cycles for small distances.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -524,8 +523,7 @@
         "id": "mohfw-public-transport",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 20",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Use public transport whenever possible to reduce air pollution.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -556,8 +554,7 @@
         "id": "mohfw-public-transport",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 20",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Use public transport whenever possible to reduce air pollution.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -588,8 +585,7 @@
         "id": "mohfw-public-transport",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 20",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Use public transport whenever possible to reduce air pollution.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -618,8 +614,7 @@
         "id": "grap-share-ride",
         "title": "CAQM Graded Response Action Plan, citizens charter (revision 21.11.2025)",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "Choose a cleaner commute. Share a ride to work or use public transport.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -679,8 +674,7 @@
         "id": "grap-combine-errands",
         "title": "CAQM Graded Response Action Plan, citizens charter (revision 21.11.2025)",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "Combine errands and reduce trips.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     }
   ]

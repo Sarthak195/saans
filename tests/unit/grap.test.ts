@@ -21,11 +21,15 @@ describe('grapNote stages', () => {
 
   it('says what applies at this AQI and never claims the stage in force', () => {
     const note = grapNote(DELHI, aqiOk(320));
-    expect(note?.text.startsWith('At this AQI, GRAP Stage II measures apply in Delhi NCR.')).toBe(
-      true,
+    expect(
+      note?.text.startsWith('At this AQI the GRAP schedule lists Stage II for Delhi NCR.'),
+    ).toBe(true);
+    expect(note?.text).toContain('CAQM decides which stage is in force and can act earlier');
+    expect(note?.text).toContain('check caqm.nic.in.');
+    expect(note?.text).not.toMatch(
+      /Stage [IV]+ (measures )?(is|are) (now )?(in force|applied|on)\b/i,
     );
-    expect(note?.text).toContain('Check caqm.nic.in for the stage in force.');
-    expect(note?.text).not.toMatch(/\b(is|are) (now )?in force\b/i);
+    expect(note?.text).not.toMatch(/\bapply\b|\bapplies\b/i);
     expect(note?.text).toContain('housing societies');
   });
 
@@ -33,8 +37,10 @@ describe('grapNote stages', () => {
     for (const stage of [1, 2, 3, 4] as const) {
       const note = grapNote(DELHI, aqiOk([250, 350, 420, 480][stage - 1] ?? 250));
       expect(note?.stage).toBe(stage);
-      expect(note?.source.status).toBe('P-READ');
-      expect(note?.source.quote).toBeTruthy();
+      // A row keeps its quote only where the exact words are on record; otherwise it is a paraphrase.
+      if (note?.source.status === 'P-READ') expect(note.source.quote).toBeTruthy();
+      else expect(note?.source.quote).toBeUndefined();
+      expect(note?.source.url).toMatch(/^https:/);
     }
   });
 

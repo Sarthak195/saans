@@ -1,9 +1,9 @@
 {
-  "context": "One Delhi route of about 8 km, morning rush hour, January to May 2014. Ratios are the fine particle level inside or on the mode compared with the roadside level at the same time.",
+  "context": "One Delhi route of about 8 km, morning rush hour, January to May 2014. Ratios are the fine particle level inside or on the mode compared with the ambient level measured at the same time.",
   "minimumReportedPercent": 10,
   "exposureNote": " On the Delhi route studied in the morning rush, the air breathed {toPhrase} had about {less}% fewer fine particles than {fromPhrase}.",
-  "caveat": "The comparison comes from one Delhi route measured at morning rush hour in 2014, so treat it as a guide, not a promise for your route. On a bus ride more than half of the particles breathed in, and on a metro ride up to 80%, are breathed in while walking and waiting outside the vehicle.",
-  "carNote": "If your car runs with windows shut and the air conditioning on recirculate, the same study found about half the roadside level inside, so for you the gain here is fewer car-km rather than cleaner air on the trip.",
+  "caveat": "The comparison comes from one Delhi route measured at morning rush hour in 2014, so treat it as a guide, not a promise for your route. On a bus ride more than half of the particles breathed in, and on a metro ride up to 80%, are breathed in while walking and waiting outside the vehicle. Walking and cycling also put more air through the lungs per kilometre, so the same air costs more dose than a seated ride.",
+  "carNote": "If your car runs with the windows shut and the air conditioning on, the same study found about half the ambient level inside, so for you the gain here is fewer car-km rather than cleaner air on the trip.",
   "modes": [
     {
       "mode": "walk",
@@ -13,7 +13,7 @@
         "id": "goel-2015-walk",
         "title": "Goel et al. 2015, On-road PM2.5 pollution exposure in multiple transport microenvironments in Delhi, Atmospheric Environment 123",
         "url": "https://urbanemissions.info/wp-content/uploads/docs/2015-12-AE-Delhi-On-Road-Exposures.pdf",
-        "quote": "exceeded the ambient measurements by an average of 40% for walking",
+        "quote": "on-road PM2.5 concentrations exceeded the ambient measurements by an average of",
         "status": "P-READ"
       }
     },
@@ -25,7 +25,7 @@
         "id": "goel-2015-cycle",
         "title": "Goel et al. 2015, On-road PM2.5 pollution exposure in multiple transport microenvironments in Delhi, Atmospheric Environment 123",
         "url": "https://urbanemissions.info/wp-content/uploads/docs/2015-12-AE-Delhi-On-Road-Exposures.pdf",
-        "quote": "10% for cycle",
+        "quote": "on-road PM2.5 concentrations exceeded the ambient measurements by an average of",
         "status": "P-READ"
       }
     },
@@ -37,7 +37,7 @@
         "id": "goel-2015-two-wheeler",
         "title": "Goel et al. 2015, On-road PM2.5 pollution exposure in multiple transport microenvironments in Delhi, Atmospheric Environment 123",
         "url": "https://urbanemissions.info/wp-content/uploads/docs/2015-12-AE-Delhi-On-Road-Exposures.pdf",
-        "quote": "30% for motorised two wheeler (2W)",
+        "quote": "on-road PM2.5 concentrations exceeded the ambient measurements by an average of",
         "status": "P-READ"
       }
     },
@@ -49,7 +49,7 @@
         "id": "goel-2015-car",
         "title": "Goel et al. 2015, On-road PM2.5 pollution exposure in multiple transport microenvironments in Delhi, Atmospheric Environment 123",
         "url": "https://urbanemissions.info/wp-content/uploads/docs/2015-12-AE-Delhi-On-Road-Exposures.pdf",
-        "quote": "30% for open-windowed (OW) car",
+        "quote": "on-road PM2.5 concentrations exceeded the ambient measurements by an average of",
         "status": "P-READ"
       }
     },
@@ -61,7 +61,7 @@
         "id": "goel-2015-auto",
         "title": "Goel et al. 2015, On-road PM2.5 pollution exposure in multiple transport microenvironments in Delhi, Atmospheric Environment 123",
         "url": "https://urbanemissions.info/wp-content/uploads/docs/2015-12-AE-Delhi-On-Road-Exposures.pdf",
-        "quote": "30% for auto rickshaw",
+        "quote": "on-road PM2.5 concentrations exceeded the ambient measurements by an average of",
         "status": "P-READ"
       }
     },
@@ -73,7 +73,7 @@
         "id": "goel-2015-bus",
         "title": "Goel et al. 2015, On-road PM2.5 pollution exposure in multiple transport microenvironments in Delhi, Atmospheric Environment 123",
         "url": "https://urbanemissions.info/wp-content/uploads/docs/2015-12-AE-Delhi-On-Road-Exposures.pdf",
-        "quote": "20% for air-conditioned as well as for OW bus",
+        "quote": "on-road PM2.5 concentrations exceeded the ambient measurements by an average of",
         "status": "P-READ"
       }
     },
@@ -85,7 +85,7 @@
         "id": "goel-2015-metro",
         "title": "Goel et al. 2015, On-road PM2.5 pollution exposure in multiple transport microenvironments in Delhi, Atmospheric Environment 123",
         "url": "https://urbanemissions.info/wp-content/uploads/docs/2015-12-AE-Delhi-On-Road-Exposures.pdf",
-        "quote": "concentrations were lower by 50% inside air-conditioned (AC) car and 20% inside the metro rail carriage",
+        "quote": "AC car has the lowest average value of 0.5, followed by metro's 0.8, and for all other microenvironments, average values vary from 1.1 to 1.4.",
         "status": "P-READ"
       }
     }

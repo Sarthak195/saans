@@ -4,9 +4,10 @@ import type { TransitOption } from '@/core/alternatives/cities';
 import { EXPOSURE, exposureLessPercent } from '@/core/alternatives/exposure';
 import { TRIP_RULES } from '@/core/alternatives/rules';
 import type { AlternativeThen, TripFacts } from '@/core/alternatives/rules';
+import { planLevel } from '@/core/advice/level';
 import { BAND_LABEL } from '@/core/aqi';
 import { fillTemplate, oneDecimal } from '@/core/format';
-import type { Alternative, Impact, Plan, RoutineAdvice } from '@/core/plan/types';
+import type { Alternative, Impact, Plan } from '@/core/plan/types';
 import { allMatches } from '@/core/rules/evaluate';
 import type { Rule } from '@/core/rules/evaluate';
 import type { Household, Mode, Routine, RoutineKind } from '@/core/types';
@@ -47,14 +48,13 @@ interface Transit {
 /** The facts and the words a trip's rules need; km-based values exist only when the trip has a length. */
 function tripVars(
   routine: Routine,
-  advice: RoutineAdvice,
   mode: Mode,
   transit: Transit,
   facts: TripFacts,
 ): Record<string, string | number> {
   const vars: Record<string, string | number> = {
     vehicle: VEHICLE_NAME[mode],
-    levelLabel: advice.level === null ? '' : BAND_LABEL[advice.level],
+    levelLabel: facts.level === 'unknown' ? '' : BAND_LABEL[facts.level],
     exposureNote: '',
     links: '',
   };
@@ -125,18 +125,18 @@ export function buildAlternatives(input: { household: Household; plan: Plan }): 
   for (const advice of plan.routines) {
     const routine = household.routines.find((r) => r.id === advice.routineId);
     const mode = advice.mode;
-    if (!routine || mode === undefined || !advice.scheduled || !TRIP_KINDS.includes(advice.kind)) {
-      continue;
-    }
+    // A trip is a weekly habit, so it is considered whatever the plan day's weekday is. A trip not on
+    // the plan day has no hours of its own to read, so the plan day's level stands in for it.
+    if (!routine || mode === undefined || !TRIP_KINDS.includes(advice.kind)) continue;
     const facts: TripFacts = {
       band: bandOf(routine.km),
       mode,
-      level: advice.level ?? 'unknown',
+      level: advice.scheduled ? (advice.level ?? 'unknown') : planLevel(plan),
       kind: advice.kind,
       rail: transit.rail,
       repeats: routine.days.length >= 2,
     };
-    const vars = tripVars(routine, advice, mode, transit, facts);
+    const vars = tripVars(routine, mode, transit, facts);
 
     for (const rule of allMatches(TRIP_RULES, facts)) {
       const { then } = rule;

@@ -27,7 +27,7 @@
       "body": "Of your outdoor slots, the cleaner time is {start} to {end}, at about {pm25} micrograms per cubic metre of fine particles. Hold assembly, sport or play then if you can.",
       "poor": {
         "title": "Least bad outdoor time: {start} to {end}",
-        "body": "The air is poor all day. If an activity cannot move indoors or to another day, {start} to {end} is the least bad time among your slots, at about {pm25} micrograms per cubic metre of fine particles. Keep it short and light."
+        "body": "The air is poor even in the cleanest of your slots. If an activity cannot move indoors or to another day, {start} to {end} is the least bad time among your slots, at about {pm25} micrograms per cubic metre of fine particles. Keep it short and light."
       },
       "reason": "Saans compares the forecast for each of your outdoor slots and the hours around it, and picks the lowest. It follows the same limits as the family plan: on poor days nothing before 10:00 or after 19:00.",
       "source": {
@@ -95,8 +95,7 @@
         "id": "mohfw-school-wet-mop",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 4 item v",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "To adopt wet mopping for floor cleaning in school or before students arrive to school",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -115,8 +114,7 @@
         "id": "mohfw-school-display-aqi",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 5 item i",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "To display, if possible, to students/ teachers of AQI levels and alert",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -136,8 +134,7 @@
         "id": "pib-caqm-advisory-18",
         "title": "Press Information Bureau, Commission for Air Quality Management, 30th meeting, Advisory No. 18",
         "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2316597",
-        "quote": "physical sports competitions scheduled in NCR during November-December should be appropriately rescheduled, keeping in view the air quality trends prevailing in the area, particularly in the interest of protecting the health of students",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -156,8 +153,7 @@
         "id": "mohfw-school-ventilation",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 4 item iii",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Ensure proper classroom ventilation by opening windows properly or installing exhaust fans",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -175,8 +171,7 @@
         "id": "mohfw-school-markers",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 4 item vi",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Marker pens may be used for writing on board instead of chalks.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -194,8 +189,7 @@
         "id": "mohfw-school-transport",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 3",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Public transport (to encourage) [...] Car-pooling (to encourage)",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -215,8 +209,7 @@
         "id": "caqm-grap-rwa-heaters",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage II actions",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "Resident Welfare Associations to necessarily provide electric heaters to staff engaged in security, sanitation, horticulture and other miscellaneous services to avoid open Bio-Mass/ MSW burning during winters.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -236,8 +229,7 @@
         "id": "caqm-grap-wfh",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage III citizens charter",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "People, whose positions allow working from home, may work from home.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -256,7 +248,7 @@
         "id": "mohfw-recirculate",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I section III item 3",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "When operating air conditioners in buildings or vehicle, use in \"re-circulate\" mode to avoid contact with outside air.",
+        "quote": "re-circulate",
         "status": "P-READ"
       }
     },
@@ -294,8 +286,7 @@
         "id": "caqm-grap-report-apps",
         "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage I citizens charter",
         "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-        "quote": "Report air polluting activities through 311 App, Green Delhi App, SAMEER App etc.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -311,8 +302,7 @@
         "id": "mohfw-open-burning",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 6",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Avoid burning in open any form of wood, leaves, crop residues, & waste.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -330,8 +320,7 @@
         "id": "mohfw-public-transport",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 20",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Use public transport whenever possible to reduce air pollution.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -364,8 +353,7 @@
         "id": "mohfw-check-aqi",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 34",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Do check the AQI before planning your outdoor activities for the day.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -374,15 +362,14 @@
       "then": {
         "priority": 60,
         "title": "Tell people what to do if they feel unwell",
-        "body": "Put up a notice asking anyone with breathlessness, giddiness, cough, chest discomfort or pain, or red or watery eyes to see a doctor.",
-        "reason": "The health ministry advises consulting a doctor for these symptoms."
+        "body": "Put up a notice asking anyone with breathlessness, giddiness, cough, chest discomfort or pain, or red or watery eyes to consult the nearest doctor. For severe breathlessness or chest pain, get urgent medical help. This is general guidance, not medical advice.",
+        "reason": "The health ministry advises consulting the nearest doctor for these symptoms."
       },
       "source": {
         "id": "mohfw-symptoms",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 12",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Consult the nearest doctor in case of breathlessness, giddiness, cough, chest discomfort or pain",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     }
   ]
