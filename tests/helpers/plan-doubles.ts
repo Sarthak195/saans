@@ -1,5 +1,5 @@
 import type { AqiToday, Band } from '@/core/aqi';
-import { bandOfIndex } from '@/core/aqi';
+import { bandOfIndex, pm25Level } from '@/core/aqi';
 import type { Plan, RoutineAdvice, Window } from '@/core/plan/types';
 import type { Home, Household, Member, Mode, Place, Routine } from '@/core/types';
 
@@ -142,4 +142,20 @@ export function makeHousehold(
     lang: 'en',
     ...rest,
   };
+}
+
+/** Hourly PM2.5 from 06:00 to 22:00 of one day, from a function of the hour (null leaves a gap). */
+export function hourlyOf(
+  date: string,
+  pm25: (hour: number) => number | null,
+): Plan['air']['hourly'] {
+  return Array.from({ length: 17 }, (_, i) => {
+    const hour = i + 6;
+    const value = pm25(hour);
+    return {
+      hour: `${date}T${String(hour).padStart(2, '0')}:00`,
+      pm25: value,
+      level: value === null ? null : pm25Level(value),
+    };
+  });
 }

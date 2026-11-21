@@ -1,0 +1,385 @@
+{
+  "maxActions": 6,
+  "aggregate": {
+    "roundTripKm": 6,
+    "daysPerWeek": 5,
+    "text": "If {households} households each replace one {roundTripKm} km car round trip a day, that is about {carKm} fewer car-km a week. This assumes {roundTripKm} km for the whole round trip and {daysPerWeek} days a week, which are Saans assumptions and not measured figures.",
+    "source": {
+      "id": "community-aggregate",
+      "title": "Saans rule: a household replaces one 6 km car round trip a day, 5 days a week",
+      "url": "",
+      "status": "APP"
+    }
+  },
+  "window": {
+    "earliest": "10:00",
+    "latest": "19:00",
+    "guardSource": {
+      "id": "mohfw-morning-evening",
+      "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 1",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "quote": "Avoid outdoor morning and late evening walk, run, jog and physical exercise",
+      "status": "P-READ"
+    },
+    "action": {
+      "id": "best-window",
+      "title": "Hold outdoor time from {start} to {end}",
+      "body": "Of your outdoor slots, the cleaner time is {start} to {end}, at about {pm25} micrograms per cubic metre of fine particles. Hold assembly, sport or play then if you can.",
+      "reason": "Saans compares the forecast for each of your outdoor slots and the hours around it, and picks the lowest. It follows the same limits as the family plan: on poor days nothing before 10:00 or after 19:00.",
+      "source": {
+        "id": "community-best-window",
+        "title": "Saans rule: pick the outdoor slot and time with the lowest forecast fine particles",
+        "url": "",
+        "status": "APP"
+      }
+    }
+  },
+  "rows": [
+    {
+      "id": "school-limit-outdoor",
+      "when": {
+        "kind": ["school"],
+        "level": ["poor", "very_poor", "severe"]
+      },
+      "then": {
+        "priority": 10,
+        "title": "Limit outdoor activity and postpone running and sports",
+        "body": "On days like this, keep break times indoors and avoid or postpone running, jogging and games outdoors. Move the physical education period inside or to a later day.",
+        "reason": "The health ministry advises schools to limit outdoor activity on poor-air days and to avoid or postpone running, jogging and playing."
+      },
+      "source": {
+        "id": "mohfw-school-outdoor",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 5 item iv",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Physical activities like running, jogging, playing may be avoided or postponed",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "school-windows-shut",
+      "when": {
+        "kind": ["school"],
+        "level": ["poor", "very_poor", "severe"]
+      },
+      "then": {
+        "priority": 11,
+        "title": "Keep classroom windows shut",
+        "body": "Close classroom windows while the air is poor. Open them again when the air improves, and use exhaust fans where there are any.",
+        "reason": "The health ministry advises schools to close windows when the air quality is poor and above."
+      },
+      "source": {
+        "id": "mohfw-school-windows",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 4 item iv",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "To close windows if air quality level is poor and above",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "school-wet-mop",
+      "when": {
+        "kind": ["school"],
+        "level": ["moderate", "unknown", "poor", "very_poor", "severe"]
+      },
+      "then": {
+        "priority": 12,
+        "title": "Wet mop the floors before students arrive",
+        "body": "Mop floors with a damp cloth before children come in, rather than sweeping while they are in the building.",
+        "reason": "The health ministry advises wet mopping for floor cleaning in schools or before students arrive."
+      },
+      "source": {
+        "id": "mohfw-school-wet-mop",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 4 item v",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "To adopt wet mopping for floor cleaning in school or before students arrive to school",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "school-display-aqi",
+      "when": {
+        "kind": ["school"],
+        "level": ["poor", "very_poor", "severe"]
+      },
+      "then": {
+        "priority": 13,
+        "title": "Show today's AQI where students and teachers can see it",
+        "body": "Put the day's AQI on a notice board or at the gate, so students and teachers know why outdoor time is limited.",
+        "reason": "The health ministry advises schools to display the AQI to students and teachers when it is poor and above."
+      },
+      "source": {
+        "id": "mohfw-school-display-aqi",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 5 item i",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "To display, if possible, to students/ teachers of AQI levels and alert",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "school-sports-reschedule",
+      "when": {
+        "kind": ["school"],
+        "level": ["moderate", "unknown", "poor", "very_poor", "severe"],
+        "ncr": [true]
+      },
+      "then": {
+        "priority": 14,
+        "title": "Reschedule sports competitions in November and December",
+        "body": "If a sports day or match is planned in November or December, check the air forecast and be ready to move it to a cleaner day.",
+        "reason": "CAQM Advisory No. 18 asks for sports competitions in the NCR during November and December to be rescheduled when the air quality trends call for it."
+      },
+      "source": {
+        "id": "pib-caqm-advisory-18",
+        "title": "Press Information Bureau, Commission for Air Quality Management, 30th meeting, Advisory No. 18",
+        "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2316597",
+        "quote": "physical sports competitions scheduled in NCR during November-December should be appropriately rescheduled, keeping in view the air quality trends prevailing in the area, particularly in the interest of protecting the health of students",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "school-ventilation",
+      "when": {
+        "kind": ["school"],
+        "level": ["good", "satisfactory", "moderate", "unknown"]
+      },
+      "then": {
+        "priority": 20,
+        "title": "Keep classrooms ventilated while the air is clean",
+        "body": "Open classroom windows properly, or use exhaust fans, while the air outside is not poor. Close them if the air turns poor.",
+        "reason": "The health ministry advises proper classroom ventilation, and closing windows when the air quality is poor and above."
+      },
+      "source": {
+        "id": "mohfw-school-ventilation",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 4 item iii",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Ensure proper classroom ventilation by opening windows properly or installing exhaust fans",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "school-markers",
+      "when": {
+        "kind": ["school"]
+      },
+      "then": {
+        "priority": 55,
+        "title": "Use marker pens instead of chalk",
+        "body": "Switching from chalk to marker pens on the board keeps chalk dust out of the classroom air.",
+        "reason": "The health ministry suggests marker pens for writing on the board instead of chalk."
+      },
+      "source": {
+        "id": "mohfw-school-markers",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 4 item vi",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Marker pens may be used for writing on board instead of chalks.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "school-transport",
+      "when": {
+        "kind": ["school"]
+      },
+      "then": {
+        "priority": 56,
+        "title": "Encourage school buses and car-pooling for the school run",
+        "body": "Ask families to use school buses, public transport or shared rides, so fewer cars queue at the gate.",
+        "reason": "The health ministry advises schools to encourage public transport and car-pooling."
+      },
+      "source": {
+        "id": "mohfw-school-transport",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure IV section 3",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Public transport (to encourage) [...] Car-pooling (to encourage)",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "society-heaters",
+      "when": {
+        "kind": ["society"],
+        "ncr": [true],
+        "level": ["moderate", "unknown", "poor", "very_poor", "severe"]
+      },
+      "then": {
+        "priority": 15,
+        "title": "Give guards and staff electric heaters",
+        "body": "Resident welfare associations can provide electric heaters to security, sanitation and garden staff, so nobody burns waste or wood to keep warm in winter.",
+        "reason": "GRAP Stage II asks resident welfare associations in Delhi NCR to provide electric heaters to staff to avoid open burning in winter."
+      },
+      "source": {
+        "id": "caqm-grap-rwa-heaters",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage II actions",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Resident Welfare Associations to necessarily provide electric heaters to staff engaged in security, sanitation, horticulture and other miscellaneous services to avoid open Bio-Mass/ MSW burning during winters.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "office-work-from-home",
+      "when": {
+        "kind": ["office"],
+        "ncr": [true],
+        "level": ["very_poor", "severe"]
+      },
+      "then": {
+        "priority": 15,
+        "title": "Let people work from home where their job allows",
+        "body": "On the worst days, allow work from home for roles that can do it, and keep meetings that need travel to a minimum.",
+        "reason": "The GRAP citizens charter, written for Delhi NCR, says people whose positions allow it may work from home."
+      },
+      "source": {
+        "id": "caqm-grap-wfh",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage III citizens charter",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "People, whose positions allow working from home, may work from home.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "office-air-conditioning",
+      "when": {
+        "kind": ["office"],
+        "level": ["poor", "very_poor", "severe"]
+      },
+      "then": {
+        "priority": 16,
+        "title": "Run the air conditioning on recirculate",
+        "body": "On poor-air days set office air conditioning to recirculate, so it does not pull in outside air.",
+        "reason": "The health ministry advises recirculate mode for air conditioners in buildings and vehicles."
+      },
+      "source": {
+        "id": "mohfw-recirculate",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I section III item 3",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "When operating air conditioners in buildings or vehicle, use in \"re-circulate\" mode to avoid contact with outside air.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "reschedule-outdoor",
+      "when": {
+        "level": ["poor", "very_poor", "severe"]
+      },
+      "then": {
+        "priority": 17,
+        "title": "Move outdoor events to a cleaner day or hour, or indoors",
+        "body": "Reschedule outdoor activities for the day when the air is cleaner, and keep them indoors on poor and worse days.",
+        "reason": "The health ministry advises rescheduling outdoor activities as per the AQI and staying indoors on poor to severe days."
+      },
+      "source": {
+        "id": "mohfw-reschedule",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 9",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Reschedule outdoor activities as per AQI, and remain indoors on days with poor to severe AQI.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "report-polluters",
+      "when": {
+        "ncr": [true]
+      },
+      "then": {
+        "priority": 30,
+        "title": "Report open burning and polluting vehicles through the city apps",
+        "body": "If you see waste or leaves burning, or a vehicle with visible smoke, report it through the 311 App, the Green Delhi App or the SAMEER App.",
+        "reason": "The GRAP citizens charter asks people in Delhi NCR to report air-polluting activities through these apps."
+      },
+      "source": {
+        "id": "caqm-grap-report-apps",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage I citizens charter",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Report air polluting activities through 311 App, Green Delhi App, SAMEER App etc.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "no-open-burning",
+      "when": {},
+      "then": {
+        "priority": 35,
+        "title": "Do not burn waste, leaves or wood in the open",
+        "body": "Do not burn waste, leaves, crop residue or wood in the open, and ask maintenance and security staff not to light fires for warmth or to clear rubbish.",
+        "reason": "The health ministry advises against burning wood, leaves, crop residues and waste in the open."
+      },
+      "source": {
+        "id": "mohfw-open-burning",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 6",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Avoid burning in open any form of wood, leaves, crop residues, & waste.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "shared-transport",
+      "when": {
+        "kind": ["society", "office"]
+      },
+      "then": {
+        "priority": 40,
+        "title": "Encourage public transport and shared rides",
+        "body": "Share timetables and set up a ride-sharing group, so fewer people drive alone.",
+        "reason": "The health ministry advises using public transport whenever possible."
+      },
+      "source": {
+        "id": "mohfw-public-transport",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 20",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Use public transport whenever possible to reduce air pollution.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "no-idling",
+      "when": {},
+      "then": {
+        "priority": 45,
+        "title": "Ask drivers to switch the engine off while they wait",
+        "body": "Put up a sign at the gate or car park asking drivers to turn off the engine while they wait.",
+        "reason": "The GRAP citizens charter, written for Delhi NCR, asks drivers not to idle and to turn off the engine at red lights."
+      },
+      "source": {
+        "id": "caqm-grap-no-idling",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage I citizens charter",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Do not idle your vehicle, also turn off the engine at red lights.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "check-aqi",
+      "when": {},
+      "then": {
+        "priority": 50,
+        "title": "Check the day's AQI before planning outdoor events",
+        "body": "Look at the air forecast before you plan a function, a game or a morning assembly, and choose the cleaner hours.",
+        "reason": "The health ministry advises checking the AQI before planning outdoor activities."
+      },
+      "source": {
+        "id": "mohfw-check-aqi",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 34",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Do check the AQI before planning your outdoor activities for the day.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "symptoms",
+      "when": {},
+      "then": {
+        "priority": 60,
+        "title": "Tell people what to do if they feel unwell",
+        "body": "Put up a notice asking anyone with breathlessness, giddiness, cough, chest discomfort or pain, or red or watery eyes to see a doctor.",
+        "reason": "The health ministry advises consulting a doctor for these symptoms."
+      },
+      "source": {
+        "id": "mohfw-symptoms",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 12",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Consult the nearest doctor in case of breathlessness, giddiness, cough, chest discomfort or pain",
+        "status": "P-READ"
+      }
+    }
+  ]
+}
