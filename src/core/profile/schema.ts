@@ -126,6 +126,14 @@ export const householdSchema = z
     routines: z.array(routineSchema).max(MAX_ROUTINES),
     home: homeSchema,
     question: z.string().trim().max(MAX_TEXT).optional(),
+    questionTarget: z
+      .strictObject({
+        routineId: idSchema.optional(),
+        memberId: idSchema.optional(),
+        hour: z.number().int().min(0).max(23).optional(),
+        aboutToday: z.boolean().optional(),
+      })
+      .optional(),
     lang: z.enum(LANGUAGES),
     community: communitySchema.optional(),
   })
