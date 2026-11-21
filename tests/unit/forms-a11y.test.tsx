@@ -14,15 +14,16 @@ import { violationsIn } from '../helpers/axe';
 // axe walks the whole document, which is slow for a long form on a busy machine.
 vi.setConfig({ testTimeout: 30_000 });
 
-// The location button reads the router, which only exists inside a running app.
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
-
 describe('home page components', () => {
   it('have no accessibility violations: sample list, live strip and own-words form', async () => {
     const cards = SAMPLES.map(({ id, title, summary }) => ({ id, title, summary }));
     expect(await violationsIn(<SampleList samples={cards} />)).toEqual([]);
     const html = renderToStaticMarkup(<SampleList samples={cards} />);
     expect(html.match(/href="\/plan\/sample\/s\d"/g)).toHaveLength(6);
+    // A compact list: a link and one line each, with no heading per sample.
+    expect(html).not.toContain('<h3');
+    expect(html.match(/<li>/g)).toHaveLength(6);
+    expect(html.match(/class="sample-summary"/g)).toHaveLength(6);
 
     const now = { kind: 'now', aqi: 312, band: 'very_poor', dataHour: '2026-11-21T21:00' } as const;
     expect(await violationsIn(<LiveStripView strip={now} />)).toEqual([]);
@@ -43,6 +44,7 @@ describe('home page components', () => {
     const now = { kind: 'now', aqi: 312, band: 'very_poor', dataHour: '2026-11-21T21:00' } as const;
     const text = renderToStaticMarkup(<LiveStripView strip={now} />).replace(/<[^>]+>/g, '');
     expect(text).toContain('Delhi now: AQI 312, Very Poor');
+    expect(text.match(/Delhi now/g)).toHaveLength(1);
     expect(text).toContain('CPCB 24-hour method, model estimate');
     expect(text).toContain('Data hour 21:00 IST');
     expect(text).toContain('Open-Meteo CAMS');
@@ -75,8 +77,19 @@ describe('household form', () => {
       { name: 'Rampur', admin1: 'Himachal Pradesh', lat: 31.5, lon: 77.6 },
     ];
     const chooser = (
-      <ChoosePlace options={options} action="/ask" formToken="a.b" text="hello" keep={{}} />
+      <ChoosePlace
+        options={options}
+        action="/ask"
+        formToken="a.b"
+        draft="sealed"
+        text="hello"
+        keep={{}}
+      />
     );
     expect(await violationsIn(chooser)).toEqual([]);
+    const html = renderToStaticMarkup(chooser);
+    expect(html).toContain(`value="1" name="option"`);
+    expect(html).toContain(`name="draft" value="sealed"`);
+    expect(html).not.toMatch(/placeName|placeLat|placeLon|placeAdmin1/);
   });
 });

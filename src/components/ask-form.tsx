@@ -6,11 +6,6 @@ import { LocationButton } from './location-button';
 export interface AskDefaults {
   text: string;
   place: string;
-  /** A rounded device location with no listed place near it; sent as it is. */
-  lat?: string;
-  lon?: string;
-  /** What to tell the visitor about the location they shared. */
-  locationNote?: string;
 }
 
 /** The front door: a family describes their day in their own words and Gemini reads it. */
@@ -31,12 +26,6 @@ export function AskForm({
       </h2>
       <form method="post" action="/ask">
         <input type="hidden" name="formToken" value={formToken} />
-        {defaults.lat === undefined || defaults.lon === undefined ? null : (
-          <>
-            <input type="hidden" name="lat" value={defaults.lat} />
-            <input type="hidden" name="lon" value={defaults.lon} />
-          </>
-        )}
         <div className="field">
           <label htmlFor="ask-own-words">Describe who goes out, where and when</label>
           <p id="ask-own-words-hint" className="small">
@@ -74,11 +63,6 @@ export function AskForm({
         <p className="actions">
           <LocationButton />
         </p>
-        {defaults.locationNote === undefined ? null : (
-          <p role="status" className="small">
-            {defaults.locationNote}
-          </p>
-        )}
         <p>
           <button className="button" type="submit">
             Make my plan

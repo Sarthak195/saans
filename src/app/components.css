@@ -221,10 +221,18 @@ button.link-button {
 }
 
 .routine,
-.advice > li,
-.samples > li {
+.advice > li {
   padding: var(--space-4) 0;
   border-top: 1px solid var(--color-border);
+}
+
+/* A compact list: the link, then one line under it. */
+.samples > li {
+  padding: var(--space-2) 0;
+}
+
+.sample-summary {
+  display: block;
 }
 
 .routine--off {
@@ -548,7 +556,7 @@ input[type='checkbox'] {
 }
 
 /* Links that stand alone in a list are touch targets too. */
-.samples h3 a,
+.samples a,
 .plain-list a {
   display: inline-flex;
   align-items: center;

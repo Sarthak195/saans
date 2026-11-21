@@ -9,7 +9,13 @@ import { clockOf, dateLabel } from './format';
 export function LiveStripView({ strip }: { readonly strip: LiveStrip }): ReactElement {
   return (
     <section className="live-strip" aria-labelledby="live-title">
-      <h2 id="live-title">Delhi now</h2>
+      {strip.kind === 'now' ? (
+        <h2 id="live-title" className="aqi-line">
+          Delhi now: AQI {String(strip.aqi)}, <BandBadge band={strip.band} />
+        </h2>
+      ) : (
+        <h2 id="live-title">Delhi&apos;s air</h2>
+      )}
       {strip.kind === 'unavailable' ? (
         <p>
           The live air data for Delhi is not reachable right now. Try again in a few minutes, or
@@ -27,9 +33,6 @@ export function LiveStripView({ strip }: { readonly strip: LiveStrip }): ReactEl
         </>
       ) : (
         <>
-          <p className="aqi-line">
-            Delhi now: AQI {String(strip.aqi)}, <BandBadge band={strip.band} />
-          </p>
           <p className="small">
             CPCB 24-hour method, model estimate. Data hour {clockOf(strip.dataHour)} IST. Open-Meteo
             CAMS.

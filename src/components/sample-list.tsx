@@ -15,10 +15,8 @@ export function SampleList({ samples }: { readonly samples: readonly SampleCard[
       <ul className="samples">
         {samples.map((sample) => (
           <li key={sample.id}>
-            <h3>
-              <a href={`/plan/sample/${sample.id}`}>{sample.title}</a>
-            </h3>
-            <p>{sample.summary}</p>
+            <a href={`/plan/sample/${sample.id}`}>{sample.title}</a>
+            <span className="sample-summary">{sample.summary}</span>
           </li>
         ))}
       </ul>
