@@ -539,7 +539,13 @@
         "impact": {
           "kind": "distance",
           "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
-          "numbers": ["weekKm", "km", "days"]
+          "numbers": ["weekKm", "km", "days"],
+          "source": {
+            "id": "saans-weekly-km",
+            "title": "Saans rule: car-km avoided a week is your trip length one way, times 2 for the way back, times the days you listed",
+            "url": "",
+            "status": "APP"
+          }
         }
       },
       "source": {
@@ -564,7 +570,13 @@
         "impact": {
           "kind": "distance",
           "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
-          "numbers": ["weekKm", "km", "days"]
+          "numbers": ["weekKm", "km", "days"],
+          "source": {
+            "id": "saans-weekly-km",
+            "title": "Saans rule: car-km avoided a week is your trip length one way, times 2 for the way back, times the days you listed",
+            "url": "",
+            "status": "APP"
+          }
         },
         "exposure": "transit"
       },
@@ -590,7 +602,13 @@
         "impact": {
           "kind": "distance",
           "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
-          "numbers": ["weekKm", "km", "days"]
+          "numbers": ["weekKm", "km", "days"],
+          "source": {
+            "id": "saans-weekly-km",
+            "title": "Saans rule: car-km avoided a week is your trip length one way, times 2 for the way back, times the days you listed",
+            "url": "",
+            "status": "APP"
+          }
         },
         "exposure": "transit"
       },
@@ -616,7 +634,13 @@
         "impact": {
           "kind": "distance",
           "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
-          "numbers": ["weekKm", "km", "days"]
+          "numbers": ["weekKm", "km", "days"],
+          "source": {
+            "id": "saans-weekly-km",
+            "title": "Saans rule: car-km avoided a week is your trip length one way, times 2 for the way back, times the days you listed",
+            "url": "",
+            "status": "APP"
+          }
         },
         "exposure": "transit"
       },
@@ -641,7 +665,13 @@
         "impact": {
           "kind": "distance",
           "text": "Your car would do about {halfKm} fewer km each week, half of the {weekKm} km it does now ({km} km one way, there and back, on {days} days a week).",
-          "numbers": ["halfKm", "weekKm", "km", "days"]
+          "numbers": ["halfKm", "weekKm", "km", "days"],
+          "source": {
+            "id": "saans-carpool-half",
+            "title": "Saans rule: sharing a ride with one other household and taking turns halves your own car-km",
+            "url": "",
+            "status": "APP"
+          }
         }
       },
       "source": {
@@ -696,7 +726,13 @@
         "impact": {
           "kind": "distance",
           "text": "About {saved} fewer km by {vehicle} each week: {tripsSaved} fewer trips of {km} km one way, there and back. This assumes everything fits into one trip.",
-          "numbers": ["saved", "tripsSaved", "km"]
+          "numbers": ["saved", "tripsSaved", "km"],
+          "source": {
+            "id": "saans-weekly-km",
+            "title": "Saans rule: car-km avoided a week is your trip length one way, times 2 for the way back, times the days you listed",
+            "url": "",
+            "status": "APP"
+          }
         }
       },
       "source": {

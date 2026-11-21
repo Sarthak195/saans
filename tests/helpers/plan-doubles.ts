@@ -1,7 +1,7 @@
 import type { AqiToday, Band } from '@/core/aqi';
 import { bandOfIndex } from '@/core/aqi';
 import type { Plan, RoutineAdvice, Window } from '@/core/plan/types';
-import type { Home, Household, Member, Place, Routine } from '@/core/types';
+import type { Home, Household, Member, Mode, Place, Routine } from '@/core/types';
 
 // Small hand-built plans, so the home, alternatives and community tests do not depend on the plan engine.
 
@@ -73,15 +73,18 @@ export function makePlan(options: PlanOptions = {}): Plan {
   };
 }
 
-export function makeAdvice(overrides: Partial<RoutineAdvice> = {}): RoutineAdvice {
-  return {
+/** `mode: undefined` means a routine with no mode given, which the strict optional type does not allow directly. */
+export function makeAdvice(
+  overrides: Omit<Partial<RoutineAdvice>, 'mode'> & { mode?: Mode | undefined } = {},
+): RoutineAdvice {
+  const { mode, ...rest } = overrides;
+  const advice: RoutineAdvice = {
     ref: 'routine_1',
     routineId: 'r1',
     memberId: 'm1',
     memberRef: 'member_1',
     memberLabel: 'Parent',
     kind: 'commute',
-    mode: 'car',
     slot: 'morning',
     start: '08:30',
     minutes: 45,
@@ -96,8 +99,14 @@ export function makeAdvice(overrides: Partial<RoutineAdvice> = {}): RoutineAdvic
     },
     protection: [],
     impact: { kind: 'none', text: 'none', numbers: [] },
-    ...overrides,
+    ...rest,
   };
+  if ('mode' in overrides) {
+    if (mode !== undefined) advice.mode = mode;
+  } else {
+    advice.mode = 'car';
+  }
+  return advice;
 }
 
 export const PARENT: Member = { id: 'm1', label: 'Parent', ageBand: 'adult', conditions: [] };
@@ -121,7 +130,7 @@ export function makeRoutine(overrides: Partial<Routine> = {}): Routine {
 export const BARE_HOME: Home = { cooking: 'lpg_png', habits: [], heating: 'none' };
 
 export function makeHousehold(
-  overrides: Partial<Household> & { home?: Partial<Home> } = {},
+  overrides: Omit<Partial<Household>, 'home'> & { home?: Partial<Home> } = {},
 ): Household {
   const { home, ...rest } = overrides;
   return {
