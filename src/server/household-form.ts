@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { M3H_PER_CFM } from '@/core/home/purifier';
 import {
   AGE_BANDS,
   COOKING,
@@ -84,6 +85,21 @@ function numberField(
     return undefined;
   }
   return n;
+}
+
+/** The purifier rating in cfm, converted from m3/h when that is the unit chosen. */
+function purifierCfm(values: FormValues, errors: FormError[]): number | undefined {
+  const perHour = values.purifierUnit === 'm3h';
+  const factor = perHour ? M3H_PER_CFM : 1;
+  const rating = numberField(
+    values,
+    'purifierCadrCfm',
+    { min: 1, max: Math.round(2000 * factor), what: 'Purifier air flow' },
+    errors,
+  );
+  return rating === undefined
+    ? undefined
+    : Math.min(2000, Math.max(1, Math.round(rating / factor)));
 }
 
 function members(values: FormValues, errors: FormError[]): { rows: number[]; list: Member[] } {
@@ -207,12 +223,7 @@ export function parseHouseholdForm(
     { min: 6, max: 30, what: 'Ceiling height' },
     errors,
   );
-  const cadr = numberField(
-    values,
-    'purifierCadrCfm',
-    { min: 1, max: 2000, what: 'Purifier air flow' },
-    errors,
-  );
+  const cadr = purifierCfm(values, errors);
   const cooking = pick(COOKING, values.cooking) ?? 'lpg_png';
   const heating = pick(HEATING, values.heating) ?? 'none';
   const habits = list(values.habits).flatMap((h) => {

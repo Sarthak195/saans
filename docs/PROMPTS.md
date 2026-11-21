@@ -18,7 +18,7 @@ computed. What fails a check is dropped, and the family sees a labelled fallback
 
 ## Reader
 
-- File: `prompts/reader.ts`. Version: `reader-1`.
+- File: `prompts/reader.ts`. Version: `reader-2`.
 - Purpose: turn a family's own words (English, Hinglish or Hindi) into a household profile.
 - Settings: temperature 0, thinking `low`, up to 3000 output tokens, JSON reply that fits a schema.
 - Gemini does: reads the text, names the place, members, routines, home and question, and quotes
@@ -94,6 +94,7 @@ prompt, bump its version, record again.
 | Date       | Prompt   | Version    | Change                                                                                                                                                                                                  |
 | ---------- | -------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-11-22 | reader   | reader-1   | First version. Every value carries a verbatim quote; the text is marked as data; times are read in code.                                                                                                |
+| 2026-11-22 | reader   | reader-2   | An age quote must carry its year word; the purifier rating can be in cfm or m3/h, so its quote carries the unit and a bare rating is left out and asked for.                                            |
 | 2026-11-22 | question | question-1 | First version. Sorts one question into an intent, a target and a new time or mode, each with a quote.                                                                                                   |
 | 2026-11-22 | briefing | briefing-1 | First version. Placeholders only, 24-hour times, no reassurance, English or Hindi. Hindi gets structure without English prose after a first recording copied the English sentences into the Hindi text. |
 | 2026-11-22 | notice   | notice-1   | First version. Community facts only, no reassurance.                                                                                                                                                    |

@@ -52,6 +52,29 @@ describe('household form values', () => {
     });
   });
 
+  it('turns a purifier rating in m3/h into cfm, and keeps one in cfm as it is', () => {
+    const place = { name: 'Pune', admin1: 'Maharashtra', lat: 18.5, lon: 73.9 };
+    const cfmOf = (extra: Record<string, string>): number | undefined => {
+      const parsed = parseHouseholdForm(
+        { m1_label: 'Me', m1_age: 'adult', purifierCadrCfm: '340', ...extra },
+        place,
+      );
+      if (!('household' in parsed)) throw new Error(JSON.stringify(parsed.errors));
+      return parsed.household.home.purifierCadrCfm;
+    };
+    expect(cfmOf({ purifierUnit: 'm3h' })).toBe(200);
+    expect(cfmOf({ purifierUnit: 'cfm' })).toBe(340);
+    expect(cfmOf({})).toBe(340);
+    expect(cfmOf({ purifierUnit: 'm3h', purifierCadrCfm: '3398' })).toBe(2000);
+    const tooBig = parseHouseholdForm(
+      { m1_label: 'Me', m1_age: 'adult', purifierCadrCfm: '3400', purifierUnit: 'm3h' },
+      place,
+    );
+    expect('errors' in tooBig && tooBig.errors[0]?.message).toBe(
+      'Purifier air flow must be a number from 1 to 3398.',
+    );
+  });
+
   it('asks for at least one person', () => {
     const place = { name: 'Pune', admin1: 'Maharashtra', lat: 18.5, lon: 73.9 };
     const result = parseHouseholdForm({}, place);

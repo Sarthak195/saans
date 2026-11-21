@@ -2,7 +2,7 @@ import type { ReactElement } from 'react';
 
 import { CheckGroup, ErrorSummary, SelectField, TextField } from './form-fields';
 import type { FormState } from '@/server/household-form';
-import { COOKING, HABITS, HEATING } from './form-options';
+import { COOKING, HABITS, HEATING, PURIFIER_UNITS } from './form-options';
 import { MemberRow, RoutineRow, rows } from './household-rows';
 
 const MEMBER_ROWS = 6;
@@ -161,10 +161,18 @@ export function HouseholdForm({
             inputMode="decimal"
             step="any"
           />
+          <SelectField
+            state={state}
+            name="purifierUnit"
+            label="Unit of the purifier's clean air delivery rate (CADR)"
+            options={PURIFIER_UNITS}
+            fallback="cfm"
+          />
           <TextField
             state={state}
             name="purifierCadrCfm"
-            label="Air purifier clean air delivery rate in cubic feet per minute, if you have one"
+            label="Air purifier clean air delivery rate, if you have one"
+            hint="Check the box or the label: it is given in cfm or in m3/h. Choose that unit above."
             type="number"
             inputMode="numeric"
           />

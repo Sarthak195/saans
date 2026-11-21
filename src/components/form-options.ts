@@ -41,6 +41,10 @@ export const HEATING: Choices = [
   ['angithi_coal', 'Angithi or coal'],
   ['gas', 'Gas heater'],
 ];
+export const PURIFIER_UNITS: Choices = [
+  ['cfm', 'cfm (cubic feet per minute)'],
+  ['m3h', 'm3/h (cubic metres per hour)'],
+];
 export const HABITS: Choices = [
   ['incense', 'Incense or dhoop'],
   ['mosquito_coil', 'Mosquito coils'],
