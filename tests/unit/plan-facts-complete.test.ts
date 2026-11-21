@@ -4,10 +4,10 @@ import { buildAlternatives, grapNote } from '@/core/alternatives';
 import { buildCommunity } from '@/core/community';
 import { buildHomeAdvice } from '@/core/home';
 import { buildPlan } from '@/core/plan/build-plan';
-import { planFacts } from '@/core/plan/facts';
+import { writtenAllowance } from '@/core/plan/facts';
 import type { Impact, Plan, Reason } from '@/core/plan/types';
 import { SAMPLES } from '@/core/profile/samples';
-import { extractNumbers } from '@/core/text';
+import { checkNumbers } from '@/core/text/numbers';
 import { fetchRecordedSeries } from '@/server/air/recorded';
 import { at } from '../helpers/plan';
 
@@ -61,9 +61,13 @@ describe('planFacts covers everything the app shows', () => {
           const alternatives = buildAlternatives({ household, plan });
           const community = buildCommunity({ household, plan });
           const grap = grapNote(household.place, plan.air.aqi);
-          const facts = new Set(
-            planFacts(plan, { home: homeAdvice, alternatives, community, grap }),
-          );
+          const allowance = writtenAllowance(plan, {
+            home: homeAdvice,
+            alternatives,
+            community,
+            grap,
+          });
+          const facts = new Set(allowance.numbers);
 
           const strings = [
             ...visibleStrings(plan),
@@ -85,9 +89,9 @@ describe('planFacts covers everything the app shows', () => {
           ];
           const where = `${sample.id} ${day} at ${time}`;
           for (const text of strings) {
-            for (const n of extractNumbers(text)) {
-              expect(facts.has(n), `${where}: ${String(n)} in "${text}"`).toBe(true);
-            }
+            // A place name or label keeps its own numbers, but only inside the exact string.
+            const checked = checkNumbers(text, allowance.numbers, { masks: allowance.names });
+            expect(checked.unknown, `${where}: in "${text}"`).toEqual([]);
           }
 
           const impacts = [

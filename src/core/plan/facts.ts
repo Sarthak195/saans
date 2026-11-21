@@ -11,7 +11,7 @@ import type {
   Window,
 } from '@/core/plan/types';
 import { PM25_NAME_NUMBER } from '@/core/plan/words';
-import { extractNumbers } from '@/core/text';
+import { splitClockNumbers } from '@/core/text';
 
 export interface PlanExtras {
   home?: HomeAdvice[] | undefined;
@@ -20,21 +20,40 @@ export interface PlanExtras {
   grap?: GrapNote | null | undefined;
 }
 
+/** What a written text may state: numbers, which of them are only clock readings, and names. */
+export interface WrittenAllowance {
+  /** Every number a text may state, sorted, without repeats. */
+  numbers: number[];
+  /** Those numbers that appear in the facts only as an hour or minute of the day. */
+  clockOnly: number[];
+  /** The place name and member labels, shown as written. Their numbers are allowed only inside them. */
+  names: string[];
+}
+
 /**
  * Every number a person can see in the plan and its extras: readings, times, minutes, percentages,
  * counts and the numbers inside each generated sentence. A briefing may state only these (anything
- * else is a number the model made up), so the list is the allowed set for the Gemini number check.
+ * else is a number the model made up), so this is the allowed set for the Gemini number check.
+ * A number that is in the plan only as an hour or minute (the 20 of 20:00) may be written only as
+ * a time, so it is listed in clockOnly. Numbers inside the place name and member labels are not
+ * in the set: those are text the family chose, so they are allowed only as part of the exact name.
  */
-export function planFacts(plan: Plan, extras: PlanExtras = {}): number[] {
-  const found = new Set<number>([PM25_NAME_NUMBER]);
+export function writtenAllowance(plan: Plan, extras: PlanExtras = {}): WrittenAllowance {
+  const names = [plan.place.name, ...plan.members.map((m) => m.label)].filter((n) =>
+    /\p{L}/u.test(n),
+  );
+  const plain = new Set<number>([PM25_NAME_NUMBER]);
+  const clockSet = new Set<number>();
   const add = (...values: number[]): void => {
-    for (const value of values) found.add(value);
+    for (const value of values) plain.add(value);
   };
   const text = (sentence: string): void => {
-    add(...extractNumbers(sentence));
+    const parts = splitClockNumbers(sentence, names);
+    add(...parts.plain);
+    for (const value of parts.clock) clockSet.add(value);
   };
   const clock = (hhmm: string): void => {
-    add(...clockNumbers(hhmm));
+    for (const value of clockNumbers(hhmm)) clockSet.add(value);
   };
   // 'YYYY-MM-DDTHH:MM' stamps show their time of day.
   const stamp = (value: string): void => {
@@ -56,9 +75,6 @@ export function planFacts(plan: Plan, extras: PlanExtras = {}): number[] {
   };
 
   for (const day of [plan.day, ...plan.days]) text(day.label);
-  // A place such as 'Sector 62' or a label such as 'Parent 2' is shown as written.
-  text(plan.place.name);
-  for (const member of plan.members) text(member.label);
   for (let n = 1; n <= Math.max(plan.routines.length, plan.members.length); n += 1) add(n);
 
   const { air } = plan;
@@ -130,5 +146,15 @@ export function planFacts(plan: Plan, extras: PlanExtras = {}): number[] {
     impact(extras.community.aggregate);
   }
 
-  return [...found].sort((a, b) => a - b);
+  const sorted = (values: Iterable<number>): number[] => [...values].sort((a, b) => a - b);
+  return {
+    numbers: sorted(new Set([...plain, ...clockSet])),
+    clockOnly: sorted([...clockSet].filter((n) => !plain.has(n))),
+    names,
+  };
+}
+
+/** Every number a written text may state, clock readings included. See writtenAllowance. */
+export function planFacts(plan: Plan, extras: PlanExtras = {}): number[] {
+  return writtenAllowance(plan, extras).numbers;
 }

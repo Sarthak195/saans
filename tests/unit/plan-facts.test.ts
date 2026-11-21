@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildPlan } from '@/core/plan/build-plan';
-import { planFacts } from '@/core/plan/facts';
+import { planFacts, writtenAllowance } from '@/core/plan/facts';
+import { checkNumbers } from '@/core/text';
 import type { Alternative, CommunityPlan, HomeAdvice, Reason } from '@/core/plan/types';
 import { at, household, member, routine, seriesOf } from '../helpers/plan';
 
@@ -43,15 +44,48 @@ describe('planFacts', () => {
     expect(planFacts(plan)).toEqual(expect.arrayContaining([23, 21, 2026, 11, 28.6, 77.2]));
   });
 
-  it('keeps the numbers in a place name and a member label, as they are shown', () => {
+  it('does not widen the allowed numbers with those in a place name or a member label', () => {
     const plan = planWith(seriesOf(() => 100));
     const named = {
       ...plan,
       place: { ...plan.place, name: 'Sector 62' },
-      members: plan.members.map((m) => ({ ...m, label: 'Parent 7' })),
+      members: plan.members.map((m) => ({ ...m, label: 'Kid 50' })),
     };
-    expect(planFacts(plan)).not.toContain(62);
-    expect(planFacts(named)).toEqual(expect.arrayContaining([62, 7]));
+    const allowance = writtenAllowance(named);
+    expect(allowance.names).toEqual(['Sector 62', 'Kid 50', 'Kid 50']);
+    expect(planFacts(named)).not.toContain(62);
+    expect(planFacts(named)).not.toContain(50);
+    // The name itself is fine, the number on its own is not.
+    const check = (text: string) =>
+      checkNumbers(text, allowance.numbers, { masks: allowance.names }).unknown;
+    expect(check('Air near Sector 62 is poor.')).toEqual([]);
+    expect(check('AQI is 62 near Sector 62.')).toEqual([62]);
+    expect(check('Kid 50 should stay in. AQI 50.')).toEqual([50]);
+  });
+
+  it('keeps a number inside a generated sentence out of the set when it is a label number', () => {
+    const plan = planWith(seriesOf(() => 100));
+    const named = {
+      ...plan,
+      glance: { ...plan.glance, topAction: 'Keep Kid 50 indoors until 12:00.' },
+      members: plan.members.map((m) => ({ ...m, label: 'Kid 50' })),
+    };
+    expect(planFacts(named)).not.toContain(50);
+  });
+
+  it('lists a number that is only an hour or minute of the day as clock only', () => {
+    const plan = planWith(seriesOf(() => 100));
+    const { numbers, clockOnly } = writtenAllowance(plan);
+    // 17:30 and 06:15 are in the plan; 90 and 40 minutes are counts.
+    expect(clockOnly).toEqual(expect.arrayContaining([17, 15, 19, 30]));
+    expect(clockOnly).not.toContain(90);
+    expect(clockOnly).not.toContain(100);
+    expect(numbers).toEqual(expect.arrayContaining(clockOnly));
+    expect(clockOnly.every((n) => numbers.includes(n))).toBe(true);
+    const check = (text: string) => checkNumbers(text, numbers, { clockOnly }).unknown;
+    expect(check('Go at 17:30 or at 5:30 pm, around 06:15.')).toEqual([]);
+    expect(check('The AQI is 19 today.')).toEqual([19]);
+    expect(check('About 17 people are outside.')).toEqual([17]);
   });
 
   it('copes with an AQI that cannot be computed', () => {

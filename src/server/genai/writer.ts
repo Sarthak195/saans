@@ -12,7 +12,7 @@ import {
 } from '@/core/briefing';
 import { grapNote } from '@/core/alternatives';
 import type { Alternative, CommunityPlan, HomeAdvice, Plan } from '@/core/plan/types';
-import { planFacts } from '@/core/plan/facts';
+import { writtenAllowance } from '@/core/plan/facts';
 import type { Household, Language } from '@/core/types';
 import { AppError, type AppErrorKind } from '@/server/errors';
 import { cacheKey } from '@/server/genai/cache';
@@ -97,11 +97,13 @@ export async function briefingWithDeps(
   deps: GenaiDeps,
 ): Promise<WrittenText> {
   const { plan, lang } = input;
-  const allowedNumbers = planFacts(plan, {
+  const allowance = writtenAllowance(plan, {
     home: input.home,
     alternatives: input.alternatives,
     grap: grapNote(plan.place, plan.air.aqi),
   });
+  // A general "all fine" line contradicts a plan that moves anything, or a severe day.
+  const noReassurance = plan.severe || plan.routines.some((r) => r.decision !== 'keep');
   const refs = polarityRefs(plan);
   const guards = memberGuards(plan);
   const written = await writeChecked(
@@ -112,7 +114,15 @@ export async function briefingWithDeps(
       facts: briefingFacts(input, lang === 'en'),
       lang,
       check: (text) =>
-        checkWritten(text, { lang, allowedNumbers, refs, memberGuards: guards }).reasons,
+        checkWritten(text, {
+          lang,
+          allowedNumbers: allowance.numbers,
+          clockOnly: allowance.clockOnly,
+          names: allowance.names,
+          refs,
+          memberGuards: guards,
+          noReassurance,
+        }).reasons,
     },
     deps,
   );
@@ -132,7 +142,10 @@ export async function noticeWithDeps(
   deps: GenaiDeps,
 ): Promise<WrittenText> {
   const { plan, community, lang } = input;
-  const allowedNumbers = planFacts(plan, { community, grap: grapNote(plan.place, plan.air.aqi) });
+  const allowance = writtenAllowance(plan, {
+    community,
+    grap: grapNote(plan.place, plan.air.aqi),
+  });
   const written = await writeChecked(
     {
       audience: 'community',
@@ -141,7 +154,14 @@ export async function noticeWithDeps(
       facts: noticeFacts(input),
       lang,
       check: (text) =>
-        checkWritten(text, { lang, allowedNumbers, refs: [], noReassurance: true }).reasons,
+        checkWritten(text, {
+          lang,
+          allowedNumbers: allowance.numbers,
+          clockOnly: allowance.clockOnly,
+          names: allowance.names,
+          refs: [],
+          noReassurance: true,
+        }).reasons,
     },
     deps,
   );

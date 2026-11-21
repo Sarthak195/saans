@@ -104,6 +104,50 @@ describe('checking what the model wrote', () => {
     expect(written.by).toBe('template');
   });
 
+  it('rejects a general reassuring sentence when the plan moves a routine', async () => {
+    const { written } = await attempt(
+      'Sat 21 Nov has Very Poor air with an AQI of 302. Do routine_1 indoors at 06:30. Do routine_2 indoors at 17:00. Outdoor time is safe for everyone today.',
+    );
+    expect(written.by).toBe('template');
+    const calm = await attempt(
+      'Sat 21 Nov has Very Poor air with an AQI of 302. Do routine_1 indoors at 06:30. Do routine_2 indoors at 17:00. There is nothing to worry about.',
+    );
+    expect(calm.written.by).toBe('template');
+  });
+
+  it('rejects a link or an address in the text', async () => {
+    const base =
+      'Sat 21 Nov has Very Poor air with an AQI of 302. Do routine_1 indoors at 06:30. Do routine_2 indoors at 17:00.';
+    for (const extra of [
+      'Read more at https://example.org/air.',
+      'See www.example.org for details.',
+      'Details are on cpcb.gov today.',
+      'Write to help@example.org now.',
+    ]) {
+      expect((await attempt(`${base} ${extra}`)).written.by).toBe('template');
+    }
+  });
+
+  it('refuses an hour of the day used as a reading', async () => {
+    // 20 is only the hour of an evening reading in the plan, so it is not an AQI.
+    const { written } = await attempt(
+      'Sat 21 Nov has Very Poor air with an AQI of 20. Do routine_1 indoors at 06:30. Do routine_2 indoors at 17:00.',
+    );
+    expect(written.by).toBe('template');
+  });
+
+  it('allows an hour written as a time, including the Hindi digits', async () => {
+    const hindi =
+      'Sat २१ Nov पर हवा बहुत खराब है और AQI ३०२ है। routine_1 को ०६:३० पर घर के अंदर करें। routine_2 को १७:०० पर घर के अंदर करें।';
+    expect((await briefingWithDeps({ ...family, lang: 'hi' }, depsWith(reply(hindi)))).by).toBe(
+      'gemini',
+    );
+    const bare = hindi.replace('AQI ३०२', 'AQI २०');
+    expect((await briefingWithDeps({ ...family, lang: 'hi' }, depsWith(reply(bare)))).by).toBe(
+      'template',
+    );
+  });
+
   it('allows a warning that uses the word safe', async () => {
     const { written } = await attempt(
       'Sat 21 Nov has Very Poor air with an AQI of 302. Do routine_1 indoors at 06:30. Playing outside for routine_2 at 17:00 is not safe today.',
@@ -184,5 +228,24 @@ describe('checking what the model wrote', () => {
     );
     expect(written.by).toBe('gemini');
     expect(written.text).toContain("Routine_9 and 77's walk");
+  });
+
+  it('does not let a label widen the numbers the model may print', async () => {
+    const labelled = {
+      ...family,
+      plan: {
+        ...family.plan,
+        members: family.plan.members.map((m) => ({ ...m, label: 'Kid 47' })),
+      },
+    };
+    const written = await briefingWithDeps(
+      { ...labelled, lang: 'en' },
+      depsWith(
+        reply(
+          'Sat 21 Nov has Very Poor air with an AQI of 47. Do routine_1 indoors at 06:30. Do routine_2 indoors at 17:00.',
+        ),
+      ),
+    );
+    expect(written.by).toBe('template');
   });
 });

@@ -12,6 +12,17 @@ const DEVANAGARI = /\p{Script=Devanagari}/gu;
 const LETTERS = /\p{L}/gu;
 const SENTENCE_BREAK = /(?<!\d)\.|\.(?!\d)|[!?।॥\n\r]+/;
 const MARKUP = /[{}<>`]/;
+// Not markup, but a family would read it as a link or an address to follow.
+const URL_LIKE = new RegExp(
+  [
+    '://',
+    String.raw`(?:^|[^\p{L}\p{N}])www\.`,
+    String.raw`[\p{L}\p{N}-]@[\p{L}\p{N}]`,
+    String.raw`(?:^|[^\p{L}\p{N}])(?:wa\.me|bit\.ly|t\.me|goo\.gl|nic\.in)`,
+    String.raw`[\p{L}\p{N}-]\.(?:com|org|net|edu|gov|info|biz|io|app|dev|xyz|top|site|online|link|page|shop|store|news|live|club)(?![\p{L}\p{N}])`,
+  ].join('|'),
+  'iu',
+);
 // Built from code points so this file does not itself contain the characters it removes.
 const EN_DASH = String.fromCodePoint(0x2013);
 const EM_DASH = String.fromCodePoint(0x2014);
@@ -88,7 +99,8 @@ export function memberGuards(plan: Plan): PolarityRef[] {
 }
 
 /**
- * Decides whether written text may be shown. Every number must be one the plan computed, every
+ * Decides whether written text may be shown. Every number must be one the plan computed (an hour
+ * or minute only when written as a time), every
  * routine the plan changes must be named and not reassured about, no placeholder may be made up,
  * and the text must be in the language asked for and free of markup.
  */
@@ -100,12 +112,17 @@ export function checkWritten(
     refs: readonly PolarityRef[];
     memberGuards?: readonly PolarityRef[];
     noReassurance?: boolean;
+    /** Allowed numbers that are in the facts only as an hour or minute: fine as a time, not as a count. */
+    clockOnly?: readonly number[];
+    /** Place name and labels: numbers inside them are fine, but only as part of the exact string. */
+    names?: readonly string[];
   },
 ): CheckResult {
   const reasons: string[] = [];
   if (text.trim() === '') return { ok: false, reasons: ['empty'] };
   if (text.length > MAX_CHARS) reasons.push('too long');
   if (MARKUP.test(text)) reasons.push('markup');
+  if (URL_LIKE.test(text)) reasons.push('link');
   const sentences = sentenceCount(text);
   if (sentences < MIN_SENTENCES || sentences > MAX_SENTENCES) reasons.push('sentence count');
 
@@ -114,7 +131,10 @@ export function checkWritten(
   // A Hindi text that drops an English sentence in the middle is not Hindi throughout.
   if (options.lang === 'hi' && hasEnglishSentence(text)) reasons.push('English sentence');
 
-  const numbers = checkNumbers(text, options.allowedNumbers);
+  const numbers = checkNumbers(text, options.allowedNumbers, {
+    ...(options.clockOnly === undefined ? {} : { clockOnly: options.clockOnly }),
+    ...(options.names === undefined ? {} : { masks: options.names }),
+  });
   if (!numbers.ok) reasons.push(`unknown numbers ${numbers.unknown.join(' ')}`);
 
   const polarity = checkPolarity(text, options.refs);
