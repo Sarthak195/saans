@@ -43,6 +43,17 @@ describe('planFacts', () => {
     expect(planFacts(plan)).toEqual(expect.arrayContaining([23, 21, 2026, 11, 28.6, 77.2]));
   });
 
+  it('keeps the numbers in a place name and a member label, as they are shown', () => {
+    const plan = planWith(seriesOf(() => 100));
+    const named = {
+      ...plan,
+      place: { ...plan.place, name: 'Sector 62' },
+      members: plan.members.map((m) => ({ ...m, label: 'Parent 7' })),
+    };
+    expect(planFacts(plan)).not.toContain(62);
+    expect(planFacts(named)).toEqual(expect.arrayContaining([62, 7]));
+  });
+
   it('copes with an AQI that cannot be computed', () => {
     const sparse = seriesOf((date, hour) => (date === '2026-11-21' && hour < 6 ? 100 : null));
     const plan = planWith(sparse);

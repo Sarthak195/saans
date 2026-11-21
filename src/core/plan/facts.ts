@@ -3,6 +3,7 @@ import { clockNumbers } from '@/core/plan/clock';
 import type {
   Alternative,
   CommunityPlan,
+  GrapNote,
   HomeAdvice,
   Impact,
   Plan,
@@ -16,6 +17,7 @@ export interface PlanExtras {
   home?: HomeAdvice[] | undefined;
   alternatives?: Alternative[] | undefined;
   community?: CommunityPlan | undefined;
+  grap?: GrapNote | null | undefined;
 }
 
 /**
@@ -54,6 +56,9 @@ export function planFacts(plan: Plan, extras: PlanExtras = {}): number[] {
   };
 
   for (const day of [plan.day, ...plan.days]) text(day.label);
+  // A place such as 'Sector 62' or a label such as 'Parent 2' is shown as written.
+  text(plan.place.name);
+  for (const member of plan.members) text(member.label);
   for (let n = 1; n <= Math.max(plan.routines.length, plan.members.length); n += 1) add(n);
 
   const { air } = plan;
@@ -114,6 +119,7 @@ export function planFacts(plan: Plan, extras: PlanExtras = {}): number[] {
     reason(item.reason);
     impact(item.impact);
   }
+  if (extras.grap) text(extras.grap.text);
   if (extras.community) {
     for (const action of extras.community.actions) {
       text(action.title);
