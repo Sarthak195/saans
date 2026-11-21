@@ -1,5 +1,5 @@
 import { fillImpact } from '@/core/advice/format';
-import { clockOf, displayPm25, fillTemplate, oneDecimal } from '@/core/format';
+import { clockOf, fillTemplate, oneDecimal, roundToFive } from '@/core/format';
 import type { Vars } from '@/core/format';
 import { HOME_RULES, INDOOR } from '@/core/home/data';
 import { homeFacts } from '@/core/home/facts';
@@ -17,10 +17,10 @@ function variablesFor(household: Household, plan: Plan): Vars {
   if (airing.kind === 'window') {
     vars.start = airing.start;
     vars.end = airing.end;
-    vars.pm25 = displayPm25(airing.pm25);
+    vars.pm25 = roundToFive(airing.pm25);
   } else if (airing.kind === 'keep_shut') {
     vars.hour = clockOf(airing.leastBadHour);
-    vars.pm25 = displayPm25(airing.pm25);
+    vars.pm25 = roundToFive(airing.pm25);
   }
 
   const check = checkPurifier(home);

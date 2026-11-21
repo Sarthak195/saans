@@ -7,6 +7,8 @@ import { sourceRefSchema } from '@/core/source';
 
 const DATA_DIR = path.join(process.cwd(), 'src', 'data');
 const STATUSES = new Set(['P-READ', 'P-FETCH', 'APP']);
+// A row that names its source under one of these keys is checked even when its status is missing or misspelt.
+const SOURCE_KEYS = new Set(['source', 'trigger', 'guardSource', 'alsoSource']);
 
 function dataFiles(): string[] {
   // The recordings are API snapshots, not sourced rows: they carry their own provenance block.
@@ -15,15 +17,15 @@ function dataFiles(): string[] {
     .sort();
 }
 
-/** Every object in the tree that looks like a source (it has a known `status`), with where it sits. */
-function sourcesIn(node: unknown, at: string): { at: string; value: unknown }[] {
-  if (Array.isArray(node)) return node.flatMap((item, i) => sourcesIn(item, `${at}[${String(i)}]`));
+/** Every object in the tree that looks like a source (a known `status`, or under a source key), with where it sits. */
+function sourcesIn(node: unknown, at: string, key = ''): { at: string; value: unknown }[] {
+  if (Array.isArray(node))
+    return node.flatMap((item, i) => sourcesIn(item, `${at}[${String(i)}]`, key));
   if (typeof node !== 'object' || node === null) return [];
   const record = node as Record<string, unknown>;
-  if (typeof record.status === 'string' && STATUSES.has(record.status)) {
-    return [{ at, value: record }];
-  }
-  return Object.entries(record).flatMap(([key, child]) => sourcesIn(child, `${at}.${key}`));
+  const known = typeof record.status === 'string' && STATUSES.has(record.status);
+  if (known || SOURCE_KEYS.has(key)) return [{ at, value: record }];
+  return Object.entries(record).flatMap(([name, child]) => sourcesIn(child, `${at}.${name}`, name));
 }
 
 describe('every data file', () => {

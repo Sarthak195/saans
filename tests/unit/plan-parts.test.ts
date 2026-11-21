@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { BAND_LABEL, pm25Level } from '@/core/aqi';
-import { displayPm25, fillTemplate } from '@/core/format';
+import { displayPm25, fillTemplate as fill } from '@/core/format';
 import {
   INDOORS_TEXT,
   breathingRate,
@@ -212,8 +212,8 @@ describe('protection for trips that stay', () => {
 
 describe('wording helpers', () => {
   it('fills placeholders and refuses an unknown one', () => {
-    expect(fillTemplate('The air is {level}.', { level: 'Poor' })).toBe('The air is Poor.');
-    expect(() => fillTemplate('Hello {who}', {})).toThrow('{who}');
+    expect(fill('The air is {level}.', { level: 'Poor' })).toBe('The air is Poor.');
+    expect(() => fill('Hello {who}', {})).toThrow('{who}');
   });
 
   it('reads the numbers in a sentence but not the 2.5 in PM2.5', () => {
