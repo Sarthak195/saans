@@ -43,7 +43,13 @@ export function parseEnv(source: Readonly<Record<string, string | undefined>>): 
   // A blank line such as `OPENAQ_API_KEY=` means "not set", not "set to nothing".
   const present = Object.fromEntries(Object.entries(source).filter(([, value]) => value !== ''));
   const result = envSchema.safeParse(present);
-  if (result.success) return result.data;
+  if (result.success) {
+    // One value for both jobs would make a leak of either key a leak of both, so it is refused.
+    if (result.data.SEAL_KEY.equals(result.data.FORM_KEY)) {
+      throw new EnvError('Invalid environment. FORM_KEY: must differ from SEAL_KEY');
+    }
+    return result.data;
+  }
 
   const problems = result.error.issues.map(
     (issue) => `${issue.path.join('.') || 'environment'}: ${issue.message}`,

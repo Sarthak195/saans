@@ -89,6 +89,14 @@ describe('parseEnv', () => {
     expect(messageOf({ ...valid(), SEAL_KEY: `${key()}AAAA` })).toContain('SEAL_KEY');
   });
 
+  it('rejects one value used for both keys, without printing it', () => {
+    const same = key();
+    const message = messageOf({ SEAL_KEY: same, FORM_KEY: same });
+    expect(message).toContain('FORM_KEY');
+    expect(message).toContain('must differ from SEAL_KEY');
+    expect(message).not.toContain(same);
+  });
+
   it('rejects an unknown NODE_ENV', () => {
     expect(messageOf({ ...valid(), NODE_ENV: 'staging' })).toContain('NODE_ENV');
   });
