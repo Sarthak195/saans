@@ -37,7 +37,7 @@ export function weekdayOf(wallMs: number): Weekday {
   return day;
 }
 
-export function parseHour(h: HourStamp): number {
+function parseHour(h: HourStamp): number {
   const m = HOUR_STAMP.exec(h);
   if (!m) throw new RangeError(`Not an hour stamp (YYYY-MM-DDTHH:00): ${h}`);
   const [, y, mo, d, hh] = m;

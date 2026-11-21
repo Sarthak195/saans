@@ -16,7 +16,7 @@ import type { PlanDay } from '@/core/time';
 import { hoursOf } from '@/core/time';
 import type { Member, Routine } from '@/core/types';
 
-export interface DayContext {
+interface DayContext {
   day: PlanDay;
   pm: PmIndex;
   /** The plan day as a whole is Poor or worse. */
@@ -36,7 +36,7 @@ export interface Evaluated {
   moveFailed: boolean;
 }
 
-export function slotOf(start: string): DaySlot {
+function slotOf(start: string): DaySlot {
   const minutes = toMinutes(start);
   return minutes < 12 * 60 ? 'morning' : minutes < 17 * 60 ? 'afternoon' : 'evening';
 }

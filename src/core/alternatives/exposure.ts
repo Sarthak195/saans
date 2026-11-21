@@ -28,7 +28,7 @@ export const EXPOSURE = exposureSchema.parse(exposureJson);
 
 type ModeRow = (typeof EXPOSURE.modes)[number];
 
-export function exposureRow(mode: Mode): ModeRow {
+function exposureRow(mode: Mode): ModeRow {
   const row = EXPOSURE.modes.find((r) => r.mode === mode);
   if (!row) throw new Error(`No commute exposure ratio for ${mode}`);
   return row;

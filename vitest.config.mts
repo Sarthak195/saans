@@ -15,6 +15,8 @@ export default defineConfig({
   test: {
     // Node by default; a test that needs a DOM opts in with a `@vitest-environment jsdom` comment.
     environment: 'node',
+    // The first ESLint run in lint-rules.test.ts parses the project cold, which can pass 5 s on a busy machine.
+    testTimeout: 20_000,
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.test.{ts,tsx}'],
     coverage: {

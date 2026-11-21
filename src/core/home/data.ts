@@ -69,7 +69,7 @@ const indoorSchema = z.strictObject({
 // Parsed once at load: a typo in the data fails every test instead of misleading a family.
 export const INDOOR = indoorSchema.parse(indoorJson);
 
-export type HomeThen = z.infer<typeof thenSchema>;
+type HomeThen = z.infer<typeof thenSchema>;
 
 /** Rows are ordered by priority at build time, so the file order only breaks ties. */
 export const HOME_RULES: readonly Rule<HomeFacts, HomeThen>[] = INDOOR.rows;

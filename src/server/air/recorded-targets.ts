@@ -1,6 +1,6 @@
 import type { DateWindow } from '@/server/air/open-meteo-shape';
 
-export interface RecordingTarget {
+interface RecordingTarget {
   /** File name under src/data/recorded, and the id passed to fetchRecordedSeries. */
   id: string;
   lat: number;

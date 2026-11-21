@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const MAX_MEMBERS = 6;
 export const MAX_ROUTINES = 8;
-export const MAX_TEXT = 1500;
+const MAX_TEXT = 1500;
 export const MAX_LABEL = 40;
 const MAX_NAME = 80;
 

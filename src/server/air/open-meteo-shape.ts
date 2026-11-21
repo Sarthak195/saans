@@ -4,11 +4,13 @@ import type { AirSeries, HourSample } from '@/core/air/types';
 import { addHours, istParts } from '@/core/time';
 import { AppError } from '@/server/errors';
 
-// This file holds everything about the Open-Meteo response that needs no network: the request URL,
-// the shape check and the mapping to an AirSeries. The fetching adapter, the recorded-fixture
-// loader and the recording script all share it, so a recording is read exactly as a live reply is.
+// The recorder script and tests write instants through here, beside the URL they were fetched from.
+export { istIso } from '@/core/time';
 
-export const AIR_QUALITY_ENDPOINT = 'https://air-quality-api.open-meteo.com/v1/air-quality';
+// No network here: the live adapter, the recorded loader and the recording script share this,
+// so a recording is read exactly as a live reply is.
+
+const AIR_QUALITY_ENDPOINT = 'https://air-quality-api.open-meteo.com/v1/air-quality';
 const HOURLY = [
   'pm2_5',
   'pm10',
@@ -42,8 +44,6 @@ export function airUrl(lat: number, lon: number, window?: DateWindow): string {
   );
 }
 
-export { istIso } from '@/core/time';
-
 const hourlySeries = z.array(z.number().nullable());
 
 export const airBodySchema = z.object({
@@ -65,7 +65,7 @@ export const airBodySchema = z.object({
     ),
 });
 
-export type AirBody = z.infer<typeof airBodySchema>;
+type AirBody = z.infer<typeof airBodySchema>;
 
 /** Where a recording came from, so a reader can tell it from live data and re-record it. */
 export interface Provenance {
@@ -77,7 +77,7 @@ export interface Provenance {
   note?: string;
 }
 
-export interface MapContext {
+interface MapContext {
   source: AirSeries['source'];
   fetchedAt: string;
   /** When set, keep only the hours from 24 h before to 72 h after this instant. */

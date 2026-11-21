@@ -26,7 +26,7 @@ const lexiconSchema = z.strictObject({
   ),
 });
 
-export type LexiconEntry = z.infer<typeof lexiconSchema>['entries'][number];
+type LexiconEntry = z.infer<typeof lexiconSchema>['entries'][number];
 
 export const LEXICON_ENTRIES: readonly LexiconEntry[] = lexiconSchema.parse(lexiconData).entries;
 

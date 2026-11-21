@@ -26,7 +26,7 @@ const citySchema = z.strictObject({
   options: z.array(optionSchema).min(1),
 });
 
-export const transitSchema = z.strictObject({
+const transitSchema = z.strictObject({
   cities: z.array(citySchema).min(1),
   fallback: z.strictObject({
     id: z.string(),

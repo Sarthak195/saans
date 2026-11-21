@@ -28,10 +28,7 @@ function pick(candidates: Evaluated[], hour: number | undefined): Evaluated | un
 }
 
 /** By routine id, else by member and nearest start hour, else by hour alone. */
-export function matchRoutine(
-  evaluated: Evaluated[],
-  target: QuestionTarget,
-): Evaluated | undefined {
+function matchRoutine(evaluated: Evaluated[], target: QuestionTarget): Evaluated | undefined {
   const byId =
     target.routineId === undefined
       ? undefined

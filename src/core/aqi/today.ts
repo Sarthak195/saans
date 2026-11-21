@@ -27,10 +27,10 @@ export type AqiToday =
       windowEnd: HourStamp;
     };
 
-export const WINDOW_HOURS = 24;
-export const MIN_DAY_HOURS = 16;
-export const GAS_8H_HOURS = 8;
-export const MIN_GAS_8H_HOURS = 6;
+const WINDOW_HOURS = 24;
+const MIN_DAY_HOURS = 16;
+const GAS_8H_HOURS = 8;
+const MIN_GAS_8H_HOURS = 6;
 
 interface Mean {
   mean: number;

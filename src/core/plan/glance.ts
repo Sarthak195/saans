@@ -36,10 +36,7 @@ function toWindow(block: { start: number; mean: number }): Window {
 }
 
 /** Best and worst three hours between 06:00 and 22:00; the earlier block wins a tie. */
-export function bestAndWorst(
-  pm: PmIndex,
-  day: PlanDay,
-): { best: Window | null; worst: Window | null } {
+function bestAndWorst(pm: PmIndex, day: PlanDay): { best: Window | null; worst: Window | null } {
   const blocks = Array.from({ length: GLANCE_TO - GLANCE_FROM - BLOCK_HOURS + 1 }, (_, i) =>
     blockStarting(pm, day, GLANCE_FROM + i),
   ).filter((b) => b !== null);
@@ -75,7 +72,7 @@ export function planDayBand(series: AirSeries, pm: PmIndex, day: PlanDay): Band 
 }
 
 /** Open the windows in the cleanest hour from 12:00 to 16:00, and only on a Poor or worse day. */
-export function airingAdvice(pm: PmIndex, day: PlanDay, dayBand: Band | null): Airing {
+function airingAdvice(pm: PmIndex, day: PlanDay, dayBand: Band | null): Airing {
   if (!atLeast(dayBand, 'poor')) return { kind: 'normal' };
   let least: { hour: number; value: number } | null = null;
   for (let hour = AIRING.fromHour; hour < AIRING.toHour; hour += 1) {
@@ -95,7 +92,7 @@ export function airingAdvice(pm: PmIndex, day: PlanDay, dayBand: Band | null): A
   };
 }
 
-export function topActionFor(args: {
+function topActionFor(args: {
   day: PlanDay;
   severe: boolean;
   outcome: Outcome;

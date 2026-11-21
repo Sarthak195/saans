@@ -114,14 +114,14 @@ export interface GridFacts extends Record<string, FactValue> {
   intensity: Intensity;
   essential: boolean;
 }
-export interface GridOutcome {
+interface GridOutcome {
   decision: Decision;
   fallback?: Decision;
   text: string;
 }
 
 export type Outcome = Decision | 'none';
-export interface TopFacts extends Record<string, FactValue> {
+interface TopFacts extends Record<string, FactValue> {
   severe: boolean;
   outcome: Outcome;
   poorDay: boolean;
@@ -178,7 +178,7 @@ export const AIRING = {
   lengthSource: resolve(data.airing.lengthSource),
 };
 
-export interface ProtectionRow {
+interface ProtectionRow {
   id: string;
   modes: readonly (Mode | 'unspecified')[];
   ages: readonly AgeBand[];

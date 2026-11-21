@@ -9,7 +9,7 @@ const bandSchema = z.enum(BANDS);
 
 /** CPCB prints eight pollutants; the app reads air data for six of them. */
 export const TABLE_POLLUTANTS = ['pm10', 'pm25', 'no2', 'o3', 'co', 'so2', 'nh3', 'pb'] as const;
-export type TablePollutant = (typeof TABLE_POLLUTANTS)[number];
+type TablePollutant = (typeof TABLE_POLLUTANTS)[number];
 
 const bandRowSchema = z.object({
   band: bandSchema,
@@ -69,7 +69,7 @@ const naqiSchema = z.object({
 // Parsed once at load: a typo in the data fails every test instead of mis-scoring a day of air.
 export const NAQI = naqiSchema.parse(naqiJson);
 
-export type BandRow = z.infer<typeof bandRowSchema>;
+type BandRow = z.infer<typeof bandRowSchema>;
 
 export function breakpointsOf(pollutant: TablePollutant): readonly BandRow[] {
   const row = NAQI.breakpoints.find((entry) => entry.pollutant === pollutant);

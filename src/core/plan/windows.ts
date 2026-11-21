@@ -9,13 +9,13 @@ import type { PlanDay } from '@/core/time';
 import { hoursOf } from '@/core/time';
 import type { Member, Routine } from '@/core/types';
 
-export interface FoundWindow {
+interface FoundWindow {
   window: Window;
   /** Unrounded mean PM2.5 over the window; the shown value in `window.pm25` is rounded. */
   mean: number;
 }
 
-export interface WindowSearch {
+interface WindowSearch {
   routine: Routine;
   member: Member;
   day: PlanDay;

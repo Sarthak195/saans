@@ -64,6 +64,6 @@ const communitySchema = z.strictObject({
 // Parsed once at load: a typo in the data fails every test instead of misleading a community.
 export const COMMUNITY = communitySchema.parse(communityJson);
 
-export type CommunityThen = (typeof COMMUNITY.rows)[number]['then'];
+type CommunityThen = (typeof COMMUNITY.rows)[number]['then'];
 
 export const COMMUNITY_RULES: readonly Rule<CommunityFacts, CommunityThen>[] = COMMUNITY.rows;
