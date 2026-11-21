@@ -69,6 +69,17 @@ describe('airing the home', () => {
     expect(plan(flatSeries(80)).glance.airing).toEqual({ kind: 'normal' });
   });
 
+  it('is not normal when the day is clean on average but three hours of the waking day are Poor', () => {
+    const series = byHour({ 6: 100, 7: 100, 8: 100 }, 20);
+    const { glance } = plan(series);
+    expect(glance.worst?.level).toBe('poor');
+    expect(glance.airing.kind).toBe('window');
+    // Two Poor hours in a row are not a three-hour spell.
+    expect(plan(byHour({ 6: 100, 7: 100 }, 20)).glance.airing).toEqual({ kind: 'normal' });
+    // A Poor spell in the middle of the night is outside the waking day.
+    expect(plan(byHour({ 1: 100, 2: 100, 3: 100 }, 20)).glance.airing).toEqual({ kind: 'normal' });
+  });
+
   it('picks the cleanest hour from 12:00 to 16:00 on a Poor day', () => {
     const series = byHour({ 12: 105, 13: 80, 14: 100, 15: 90 }, 110);
     expect(plan(series).glance.airing).toEqual({
@@ -100,7 +111,7 @@ describe('severe days', () => {
     expect(p.air.aqi.kind === 'ok' && p.air.aqi.aqi).toBeGreaterThanOrEqual(301);
     expect(p.severe).toBe(true);
     expect(p.glance.topAction).toBe(
-      'Keep hard exercise and outdoor play indoors today, and wear a well-fitted N95 mask on any adult trip you cannot skip.',
+      'Keep hard exercise and outdoor play indoors today. If an adult has to make a trip, consider a well-fitted N95 or N99 mask; it may help on a short trip.',
     );
   });
 

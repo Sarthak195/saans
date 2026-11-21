@@ -1,12 +1,19 @@
 import { BAND_LABEL, pm25Level } from '@/core/aqi';
 import type { Decision } from '@/core/decision';
 import { indoorsImpact, intensityImpact, noChangeImpact, timingImpact } from '@/core/impact';
-import { displayPm25, fillTemplate, toMinutes } from '@/core/format';
+import { displayPm25, fillTemplate, fromMinutes, toMinutes } from '@/core/format';
 import { WEEKDAY_FULL } from '@/core/plan/clock';
 import { atLeast, meanOver } from '@/core/plan/pm25';
 import type { PmIndex } from '@/core/plan/pm25';
 import { protectionFor } from '@/core/plan/protection';
-import { ESSENTIAL_KINDS, GRID, NOT_SCHEDULED, NO_DATA, NO_WINDOW } from '@/core/plan/rules-data';
+import {
+  ESSENTIAL_KINDS,
+  GRID,
+  NOT_SCHEDULED,
+  NO_DATA,
+  NO_WINDOW,
+  POOR_DAY,
+} from '@/core/plan/rules-data';
 import type { DefaultRow } from '@/core/plan/rules-data';
 import { sensitivityOf } from '@/core/plan/sensitivity';
 import type { DaySlot, Impact, RoutineAdvice, Window } from '@/core/plan/types';
@@ -39,6 +46,14 @@ export interface Evaluated {
 function slotOf(start: string): DaySlot {
   const minutes = toMinutes(start);
   return minutes < 12 * 60 ? 'morning' : minutes < 17 * 60 ? 'afternoon' : 'evening';
+}
+
+const POOR_DAY_RULE_ID = 'poor-day-hours';
+
+/** The routine starts before, or runs past, the hours MoHFW leaves open for exercise on a poor day. */
+function outsideDayHours(routine: Routine): boolean {
+  const start = toMinutes(routine.start);
+  return start < POOR_DAY.earliestHour * 60 || start + routine.minutes > POOR_DAY.latestHour * 60;
 }
 
 const TRIP_STAYS =
@@ -110,15 +125,40 @@ export function adviseRoutine(
   if (usual === null) return plain(base, NO_DATA, NO_DATA.text);
 
   const level = pm25Level(usual);
+  const essential = ESSENTIAL_KINDS.includes(routine.kind);
   const rule = firstMatch(GRID, {
     level,
     sensitivity: sensitivityOf(member),
     intensity: routine.intensity,
-    essential: ESSENTIAL_KINDS.includes(routine.kind),
+    essential,
   });
   if (!rule) throw new Error(`No rule covers ${level} for routine ${routine.id}`);
 
+  const poorDay = ctx.poorDay || atLeast(level, 'poor');
+  const label = BAND_LABEL[level];
   let decision = rule.then.decision;
+  let fallback = rule.then.fallback;
+  let ruleId = rule.id;
+  let source = rule.source;
+  let text = fillTemplate(rule.then.text, { level: label });
+  // On a Poor or worse day the advice is no morning or late-evening exercise, so the routine's own
+  // hours count too, not only the hours offered instead.
+  const outside = poorDay && !essential && outsideDayHours(routine);
+  const lightOutside = outside && routine.intensity === 'light';
+  if (outside && !lightOutside) {
+    if (decision === 'keep' || decision === 'lighten') {
+      decision = 'move';
+      ruleId = POOR_DAY_RULE_ID;
+      source = POOR_DAY.adviceSource;
+      text = fillTemplate(POOR_DAY.moveText, {
+        level: label,
+        from: fromMinutes(POOR_DAY.earliestHour * 60),
+        to: fromMinutes(POOR_DAY.latestHour * 60),
+      });
+    }
+    if (decision === 'move') fallback = 'indoors';
+  }
+
   let window: Window | undefined;
   let moved: number | null = null;
   let moveFailed = false;
@@ -129,29 +169,33 @@ export function adviseRoutine(
       day: ctx.day,
       pm: ctx.pm,
       original: usual,
-      poorDay: ctx.poorDay || atLeast(level, 'poor'),
+      poorDay,
       notBefore: ctx.notBefore,
     });
     if (found) {
       window = found.window;
       moved = found.mean;
     } else {
-      decision = rule.then.fallback ?? 'indoors';
+      decision = fallback ?? 'indoors';
       moveFailed = true;
     }
   }
 
-  const note =
-    moveFailed && (decision === 'indoors' || decision === 'lighten') ? NO_WINDOW[decision] : '';
-  const text = fillTemplate(rule.then.text, { level: BAND_LABEL[level] });
+  const parts = [text];
+  if (lightOutside && (decision === 'keep' || decision === 'lighten' || decision === 'move')) {
+    parts.push(POOR_DAY.lightNote);
+  }
+  if (moveFailed && (decision === 'indoors' || decision === 'lighten')) {
+    parts.push(NO_WINDOW[decision]);
+  }
   const advice: RoutineAdvice = {
     ...base,
     pm25: displayPm25(usual),
     level,
     decision,
-    reason: { ruleId: rule.id, text: note === '' ? text : `${text} ${note}`, source: rule.source },
+    reason: { ruleId, text: parts.join(' '), source },
     ...(window ? { window } : {}),
-    protection: decision === 'essential' ? protectionFor(routine.mode, member.ageBand) : [],
+    protection: decision === 'essential' ? protectionFor(routine.mode, member.ageBand, level) : [],
     impact: impactFor(decision, member, routine, usual, moved),
   };
   return { advice, usual, planned: decision === 'indoors' ? 0 : (moved ?? usual), moveFailed };

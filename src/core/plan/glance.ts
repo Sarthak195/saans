@@ -71,9 +71,25 @@ export function planDayBand(series: AirSeries, pm: PmIndex, day: PlanDay): Band 
   return mean === null ? null : pm25Level(mean);
 }
 
-/** Open the windows in the cleanest hour from 12:00 to 16:00, and only on a Poor or worse day. */
+/** True when any three hours in a row between 06:00 and 22:00 are Poor or worse. */
+function hasPoorBlock(pm: PmIndex, day: PlanDay): boolean {
+  const starts = Array.from(
+    { length: GLANCE_TO - GLANCE_FROM - BLOCK_HOURS + 1 },
+    (_, i) => GLANCE_FROM + i,
+  );
+  return starts.some((hour) => {
+    const block = blockStarting(pm, day, hour);
+    return block !== null && atLeast(pm25Level(block.mean), 'poor');
+  });
+}
+
+/**
+ * Open the windows in the cleanest hour from 12:00 to 16:00. Ordinary airing is advised only when
+ * the day is not Poor or worse and no three hours in the waking day are either, because the poor
+ * spells are the morning and late-evening hours the advice is about.
+ */
 function airingAdvice(pm: PmIndex, day: PlanDay, dayBand: Band | null): Airing {
-  if (!atLeast(dayBand, 'poor')) return { kind: 'normal' };
+  if (!atLeast(dayBand, 'poor') && !hasPoorBlock(pm, day)) return { kind: 'normal' };
   let least: { hour: number; value: number } | null = null;
   for (let hour = AIRING.fromHour; hour < AIRING.toHour; hour += 1) {
     const value = pm.get(hourOfDay(day, hour));

@@ -39,7 +39,7 @@
       "id": "mohfw-advisory-2025",
       "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025, masks",
       "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-      "quote": "Masks should have proper fitting on users' mouth and nose.",
+      "quote": "disposable N95 or N99 is useful provided user instructions are followed. These masks may help provided the period of exposure is short.",
       "status": "P-READ"
     },
     "mohfw-airing": {
@@ -47,13 +47,6 @@
       "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025 (quote corrected for scan errors)",
       "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
       "quote": "Do not open external doors and windows during morning and late evening hours, it may ventilate if necessary, between 12 p.m. to 4 p.m. in afternoon",
-      "status": "P-READ"
-    },
-    "grap-iv-charter": {
-      "id": "caqm-grap-stage-iv-charter",
-      "title": "CAQM, Graded Response Action Plan schedule (revision 21.11.2025), Stage IV Citizens Charter",
-      "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
-      "quote": "Children, elderly and those with respiratory, cardiovascular, cerebrovascular or other chronic diseases to avoid outdoor activities and stay indoors, as much as possible. If required to move outdoors, they are advised to wear mask.",
       "status": "P-READ"
     },
     "epa-small-children": {
@@ -65,49 +58,49 @@
     "app-no-data": {
       "id": "saans-no-data",
       "title": "Saans rule: with no air data for the hours of a routine, leave it as planned and say so",
-      "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+      "url": "",
       "status": "APP"
     },
     "app-not-scheduled": {
       "id": "saans-not-scheduled",
       "title": "Saans rule: a routine that is not on the plan day's weekday is left as it is",
-      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "url": "",
       "status": "APP"
     },
     "app-essential-kinds": {
       "id": "saans-essential-kinds",
       "title": "Saans rule: a commute or a school run is a trip that cannot be dropped, so it gets protection instead of a cancellation",
-      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "url": "",
       "status": "APP"
     },
     "app-window-gain": {
       "id": "saans-window-gain",
-      "title": "Saans rule: offer another time only if it lowers the air quality level or cuts PM2.5 by at least 20 percent",
-      "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+      "title": "Saans rule: offer another time only if it lowers the air quality level or cuts PM2.5 by at least 20 percent, and only if that time is Moderately polluted or better for children, older adults and people with conditions (Poor or better for other adults)",
+      "url": "",
       "status": "APP"
     },
     "app-poor-day-hours": {
       "id": "saans-poor-day-hours",
-      "title": "Saans rule: on a Poor or worse day, offer no time before 10:00 or after 19:00 (MoHFW advises against outdoor exercise in the morning and late evening)",
-      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "title": "Saans rule: on a Poor or worse day, offer no time before 10:00 or after 19:00, and move a moderate or hard routine that falls outside those hours (MoHFW advises against outdoor exercise in the morning and late evening)",
+      "url": "",
       "status": "APP"
     },
     "app-child-hours": {
       "id": "saans-child-hours",
-      "title": "Saans rule: children and teenagers stay within 07:00 to 19:00 and, on weekdays, outside school hours (08:00 to 14:00) unless free hours are given",
-      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "title": "Saans rule: children, teenagers, infants, under-5s and older adults stay within 07:00 to 19:00, and children and teenagers also stay outside school hours on weekdays (08:00 to 14:00) unless free hours are given",
+      "url": "",
       "status": "APP"
     },
     "app-airing-length": {
       "id": "saans-airing-length",
       "title": "Saans rule: open the windows for one hour, in the cleanest hour between 12:00 and 16:00 (MoHFW names that window)",
-      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "url": "",
       "status": "APP"
     },
     "app-top-action": {
       "id": "saans-top-action",
       "title": "Saans rule: the one action at the top is the most serious thing the plan asks of the family that day",
-      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "url": "",
       "status": "APP"
     }
   },
@@ -121,9 +114,9 @@
       },
       "then": {
         "decision": "essential",
-        "text": "The air is {level}. Children, older adults and people with lung or heart conditions are advised to stay indoors as much as possible. If this trip cannot wait, protect against the air as below."
+        "text": "The air is {level}. Pregnant women, young children and older adults are advised to restrict outdoor movement as far as possible. If this trip cannot wait, protect against the air as below."
       },
-      "source": "grap-iv-charter"
+      "source": "mohfw-restrict"
     },
     {
       "id": "essential-severe-general",
@@ -223,9 +216,9 @@
       },
       "then": {
         "decision": "indoors",
-        "text": "The air is {level}. Children, older adults and people with lung or heart conditions are advised to stay indoors as much as possible."
+        "text": "The air is {level}. Pregnant women, young children and older adults are advised to restrict outdoor movement as far as possible, so stay indoors for this."
       },
-      "source": "grap-iv-charter"
+      "source": "mohfw-restrict"
     },
     {
       "id": "severe-general",
@@ -272,7 +265,7 @@
       "then": {
         "decision": "move",
         "fallback": "lighten",
-        "text": "The air is {level}, and time outdoors can cause respiratory illness. Choose a cleaner hour for this, or keep it short."
+        "text": "The air is {level}, and a long time outdoors can cause respiratory illness. Choose a cleaner hour for this, or keep it short."
       },
       "source": "cpcb:very_poor"
     },
@@ -286,7 +279,7 @@
       "then": {
         "decision": "move",
         "fallback": "indoors",
-        "text": "The air is {level}. Health advice is to avoid outdoor walks, runs and exercise now, so choose a cleaner hour or stay in."
+        "text": "The air is {level}. Health advice is to avoid outdoor walks, runs and exercise in the morning and late evening, so choose a cleaner hour or stay in."
       },
       "source": "mohfw-no-exercise"
     },
@@ -323,7 +316,7 @@
       },
       "then": {
         "decision": "move",
-        "fallback": "lighten",
+        "fallback": "indoors",
         "text": "The air is {level}. Running, jogging and playing outdoors are best moved to a cleaner hour."
       },
       "source": "mohfw-school"
@@ -336,7 +329,7 @@
       },
       "then": {
         "decision": "lighten",
-        "text": "The air is {level}. Keep this short and gentle, because a long time in it can cause breathing discomfort."
+        "text": "The air is {level}. Keep this short and gentle, because a long time in it can cause breathing discomfort. Keep time outdoors short; breaks are better indoors."
       },
       "source": "cpcb:poor"
     },
@@ -440,6 +433,18 @@
       "source": "cpcb:satisfactory"
     },
     {
+      "id": "keep-moderate-raised",
+      "when": {
+        "level": ["moderate"],
+        "sensitivity": ["raised"]
+      },
+      "then": {
+        "decision": "keep",
+        "text": "The air is {level} and can cause breathing discomfort to children. This is fine to go ahead; ease off if there is coughing or breathing trouble."
+      },
+      "source": "cpcb:moderate"
+    },
+    {
       "id": "keep-moderate",
       "when": {
         "level": ["moderate"]
@@ -479,7 +484,10 @@
     "poorDay": {
       "earliestHour": 10,
       "latestHour": 19,
-      "source": "app-poor-day-hours"
+      "source": "app-poor-day-hours",
+      "adviceSource": "mohfw-no-exercise",
+      "moveText": "The air is {level}. On days with poor air, health advice is to avoid outdoor walks, runs and exercise in the morning and late evening, so choose a cleaner hour between {from} and {to} or stay in.",
+      "lightNote": "Health advice on days with poor air is to avoid outdoor walks in the morning and late evening."
     },
     "childHours": {
       "bands": ["child", "teen"],
@@ -488,7 +496,8 @@
       "schoolFromHour": 8,
       "schoolToHour": 14,
       "schoolDays": ["mon", "tue", "wed", "thu", "fri"],
-      "source": "app-child-hours"
+      "source": "app-child-hours",
+      "daytimeBands": ["infant", "under5", "child", "teen", "older"]
     }
   },
   "airing": {
@@ -508,10 +517,24 @@
     {
       "id": "open-adult",
       "modes": ["two_wheeler", "cycle", "walk", "auto", "unspecified"],
-      "ages": ["teen", "adult", "older"],
+      "ages": ["adult", "older"],
+      "levels": ["poor", "very_poor", "severe"],
       "lines": [
-        "Wear a well-fitted N95 mask. It helps only when it seals around the nose and mouth.",
-        "Cloth, paper and scarf masks are not effective."
+        "Consider a well-fitted N95 or N99 mask; it may help on a short trip. It helps only when it seals around the nose and mouth.",
+        "Cloth, paper and scarf masks are not effective.",
+        "This is general guidance, not medical advice: if you have a lung or heart condition or are pregnant, ask your doctor before relying on a mask."
+      ],
+      "source": "mohfw-n95"
+    },
+    {
+      "id": "open-teen",
+      "modes": ["two_wheeler", "cycle", "walk", "auto", "unspecified"],
+      "ages": ["teen"],
+      "levels": ["poor", "very_poor", "severe"],
+      "lines": [
+        "Consider a well-fitted N95 or N99 mask if one fits snugly; it may help on a short trip. Ask an adult to check the fit.",
+        "Cloth, paper and scarf masks are not effective.",
+        "This is general guidance, not medical advice: if you have a lung or heart condition or are pregnant, ask your doctor before relying on a mask."
       ],
       "source": "mohfw-n95"
     },
@@ -519,6 +542,7 @@
       "id": "open-small",
       "modes": ["two_wheeler", "cycle", "walk", "auto", "unspecified"],
       "ages": ["infant", "under5", "child"],
+      "levels": ["poor", "very_poor", "severe"],
       "lines": [
         "Respirator masks are not made in small children's sizes, so do not rely on a mask for a child.",
         "Keep the trip as short as you can and choose quieter streets, away from traffic exhaust."
@@ -526,21 +550,77 @@
       "source": "epa-small-children"
     },
     {
+      "id": "open-low",
+      "modes": ["two_wheeler", "cycle", "walk", "auto", "unspecified"],
+      "ages": ["teen", "adult", "older"],
+      "levels": ["good", "satisfactory", "moderate"],
+      "lines": [
+        "Keep the trip as short as you can and choose quieter streets, away from traffic exhaust."
+      ],
+      "source": "app-essential-kinds"
+    },
+    {
+      "id": "open-small-low",
+      "modes": ["two_wheeler", "cycle", "walk", "auto", "unspecified"],
+      "ages": ["infant", "under5", "child"],
+      "levels": ["good", "satisfactory", "moderate"],
+      "lines": [
+        "Keep the trip as short as you can and choose quieter streets, away from traffic exhaust."
+      ],
+      "source": "app-essential-kinds"
+    },
+    {
       "id": "transit-adult",
       "modes": ["bus", "metro_rail"],
-      "ages": ["teen", "adult", "older"],
-      "lines": ["Wear a well-fitted N95 mask while you wait outside at the stop or platform."],
+      "ages": ["adult", "older"],
+      "levels": ["poor", "very_poor", "severe"],
+      "lines": [
+        "Consider a well-fitted N95 or N99 mask while you wait outside at the stop or platform; it may help for a short time.",
+        "This is general guidance, not medical advice: if you have a lung or heart condition or are pregnant, ask your doctor before relying on a mask."
+      ],
+      "source": "mohfw-n95"
+    },
+    {
+      "id": "transit-teen",
+      "modes": ["bus", "metro_rail"],
+      "ages": ["teen"],
+      "levels": ["poor", "very_poor", "severe"],
+      "lines": [
+        "Consider a well-fitted N95 or N99 mask while you wait outside at the stop or platform, if one fits snugly. Ask an adult to check the fit.",
+        "This is general guidance, not medical advice: if you have a lung or heart condition or are pregnant, ask your doctor before relying on a mask."
+      ],
       "source": "mohfw-n95"
     },
     {
       "id": "transit-small",
       "modes": ["bus", "metro_rail"],
       "ages": ["infant", "under5", "child"],
+      "levels": ["poor", "very_poor", "severe"],
       "lines": [
         "Respirator masks are not made in small children's sizes, so do not rely on a mask for a child.",
         "Wait away from the road and traffic exhaust where you can, and keep the trip as short as possible."
       ],
       "source": "epa-small-children"
+    },
+    {
+      "id": "transit-low",
+      "modes": ["bus", "metro_rail"],
+      "ages": ["teen", "adult", "older"],
+      "levels": ["good", "satisfactory", "moderate"],
+      "lines": [
+        "Wait away from the road and traffic exhaust where you can, and keep the trip as short as possible."
+      ],
+      "source": "app-essential-kinds"
+    },
+    {
+      "id": "transit-small-low",
+      "modes": ["bus", "metro_rail"],
+      "ages": ["infant", "under5", "child"],
+      "levels": ["good", "satisfactory", "moderate"],
+      "lines": [
+        "Wait away from the road and traffic exhaust where you can, and keep the trip as short as possible."
+      ],
+      "source": "app-essential-kinds"
     }
   ],
   "topActions": [
@@ -549,7 +629,7 @@
       "when": {
         "severe": [true]
       },
-      "then": "Keep hard exercise and outdoor play indoors {when}, and wear a well-fitted N95 mask on any adult trip you cannot skip.",
+      "then": "Keep hard exercise and outdoor play indoors {when}. If an adult has to make a trip, consider a well-fitted N95 or N99 mask; it may help on a short trip.",
       "source": "app-top-action"
     },
     {

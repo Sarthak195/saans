@@ -175,38 +175,61 @@ describe('impact', () => {
 });
 
 describe('protection for trips that stay', () => {
-  it('gives a car windows up and recirculation', () => {
-    expect(protectionFor('car', 'adult')).toEqual([
-      'Keep the car windows up and set the air conditioning to recirculate.',
-    ]);
-    expect(protectionFor('car', 'child')).toHaveLength(1);
+  it('gives a car windows up and recirculation at any level', () => {
+    for (const level of ['good', 'moderate', 'poor', 'severe'] as const) {
+      expect(protectionFor('car', 'adult', level)).toEqual([
+        'Keep the car windows up and set the air conditioning to recirculate.',
+      ]);
+    }
+    expect(protectionFor('car', 'child', 'poor')).toHaveLength(1);
   });
 
   it.each(['two_wheeler', 'cycle', 'walk', 'auto'] as const)(
-    'gives an adult on a %s trip a fitted N95',
+    'offers an adult on a %s trip a fitted N95 as something to consider, only at Poor or worse',
     (mode) => {
-      expect(protectionFor(mode, 'adult').join(' ')).toContain('well-fitted N95');
-      expect(protectionFor(mode, 'teen').join(' ')).toContain('N95');
+      for (const level of ['poor', 'very_poor', 'severe'] as const) {
+        const lines = protectionFor(mode, 'adult', level).join(' ');
+        expect(lines).toContain(
+          'Consider a well-fitted N95 or N99 mask; it may help on a short trip',
+        );
+        expect(lines).not.toMatch(/Wear/);
+      }
+      for (const level of ['good', 'satisfactory', 'moderate'] as const) {
+        expect(protectionFor(mode, 'adult', level).join(' ')).not.toMatch(/N95|mask/i);
+        expect(protectionFor(mode, 'adult', level)).not.toHaveLength(0);
+      }
     },
   );
 
+  it('asks a teenager to check the fit with an adult', () => {
+    const lines = protectionFor('walk', 'teen', 'poor').join(' ');
+    expect(lines).toContain('if one fits snugly');
+    expect(lines).toContain('Ask an adult to check the fit');
+  });
+
   it.each(['bus', 'metro_rail'] as const)(
-    'tells an adult on %s to mask while waiting outside',
+    'suggests a mask while waiting outside for an adult on %s, at Poor or worse',
     (mode) => {
-      expect(protectionFor(mode, 'older').join(' ')).toContain('while you wait outside');
+      expect(protectionFor(mode, 'older', 'very_poor').join(' ')).toContain(
+        'while you wait outside',
+      );
+      expect(protectionFor(mode, 'older', 'moderate').join(' ')).not.toMatch(/mask|N95/i);
     },
   );
 
   it.each(['infant', 'under5', 'child'] as const)('never tells a %s to wear an N95', (band) => {
     for (const mode of [undefined, 'walk', 'two_wheeler', 'auto', 'bus', 'metro_rail'] as const) {
-      const lines = protectionFor(mode, band).join(' ');
+      const lines = protectionFor(mode, band, 'poor').join(' ');
       expect(lines).not.toMatch(/N95/i);
       expect(lines).toContain('not made in small children');
+      for (const level of ['good', 'moderate'] as const) {
+        expect(protectionFor(mode, band, level).join(' ')).not.toMatch(/N95|mask/i);
+      }
     }
   });
 
   it('treats a trip with no mode as an open one', () => {
-    expect(protectionFor(undefined, 'adult').join(' ')).toContain('N95');
+    expect(protectionFor(undefined, 'adult', 'poor').join(' ')).toContain('N95');
   });
 });
 

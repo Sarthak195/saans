@@ -3,7 +3,14 @@ import { describe, expect, it } from 'vitest';
 import { BANDS } from '@/core/aqi/breakpoints';
 import type { Band } from '@/core/aqi';
 import type { Decision } from '@/core/decision';
-import { GRID, NO_WINDOW, PROTECTION, RULE_SOURCES, TOP_ACTIONS } from '@/core/plan/rules-data';
+import {
+  GRID,
+  NO_WINDOW,
+  POOR_DAY,
+  PROTECTION,
+  RULE_SOURCES,
+  TOP_ACTIONS,
+} from '@/core/plan/rules-data';
 import type { GridFacts } from '@/core/plan/rules-data';
 import { INHALATION } from '@/core/impact';
 import { firstMatch } from '@/core/rules/evaluate';
@@ -142,7 +149,9 @@ describe('rule data', () => {
 
   it.each(rows)('%s carries a complete source', (_id, source) => {
     expect(source.id).not.toBe('');
-    expect(source.url).toMatch(/^https:\/\//);
+    // A Saans rule is not a government statement, so it links to none.
+    if (source.status === 'APP') expect(source.url).toBe('');
+    else expect(source.url).toMatch(/^https:\/\//);
     if (source.status === 'P-READ') expect(source.quote?.length).toBeGreaterThan(0);
     // A secondary fetch is paraphrase, so it never claims verbatim words.
     if (source.status === 'P-FETCH') expect(source.quote).toBeUndefined();
@@ -173,5 +182,68 @@ describe('rule data', () => {
       expect(row.ages.includes('adult')).toBe(row.id === 'car');
       for (const line of row.lines) expect(line).not.toMatch(/N95/i);
     }
+  });
+});
+
+describe('rows changed after review', () => {
+  it('sends a child or teenager who cannot be moved at Poor indoors, not to a shorter game', () => {
+    const rule = decide('poor', 'raised', 'vigorous', false);
+    expect(rule.then.decision).toBe('move');
+    expect(rule.then.fallback).toBe('indoors');
+    expect(decide('poor', 'raised', 'light', false).then.text).toContain(
+      'Keep time outdoors short; breaks are better indoors.',
+    );
+  });
+
+  it('gives children at Moderate the CPCB wording and a way to ease off', () => {
+    const rule = decide('moderate', 'raised', 'light', false);
+    expect(rule.id).toBe('keep-moderate-raised');
+    expect(rule.then.decision).toBe('keep');
+    expect(rule.then.text).toContain('can cause breathing discomfort to children');
+    expect(rule.then.text).toContain('ease off if there is coughing or breathing trouble');
+    expect(rule.then.text).not.toContain('No change is needed');
+    expect(decide('moderate', 'general', 'light', false).id).toBe('keep-moderate');
+  });
+
+  it('does not cite the Stage IV charter for the Severe band, and names MoHFW instead', () => {
+    expect(Object.keys(RULE_SOURCES)).not.toContain('grap-iv-charter');
+    for (const sensitivity of SENSITIVITIES) {
+      for (const essential of [false, true]) {
+        const rule = decide('severe', sensitivity, 'light', essential);
+        expect(rule.source.id, rule.id).not.toMatch(/stage-iv|charter/);
+      }
+    }
+    expect(decide('severe', 'high', 'light', false).source.id).toBe('mohfw-advisory-2025');
+  });
+
+  it('limits the very poor advice to what the source says', () => {
+    expect(decide('very_poor', 'general', 'vigorous', false).then.text).toContain(
+      'in the morning and late evening',
+    );
+    expect(decide('very_poor', 'raised', 'light', false).then.text).toContain(
+      'a long time outdoors can cause respiratory illness',
+    );
+  });
+
+  it('words the mask lines as something to consider, and quotes the MoHFW sentence', () => {
+    for (const row of PROTECTION.filter((r) => r.lines.some((l) => l.includes('N95')))) {
+      expect(row.source.quote, row.id).toContain('These masks may help');
+      for (const line of row.lines) expect(line, row.id).not.toMatch(/^Wear\b/);
+    }
+    const masks = PROTECTION.filter((r) => r.lines.some((l) => l.includes('N95')));
+    expect(masks.length).toBeGreaterThan(0);
+    for (const row of masks) {
+      // Mask lines appear only at Poor or worse.
+      expect(row.levels, row.id).toEqual(['poor', 'very_poor', 'severe']);
+    }
+  });
+
+  it('keeps the poor day guard texts plain and fully filled', () => {
+    for (const text of [POOR_DAY.moveText, POOR_DAY.lightNote]) {
+      expect(text).not.toMatch(DASHES);
+      expect(text).not.toMatch(/\bsafe/i);
+      expect(text.replaceAll(/\{(level|from|to)\}/g, '')).not.toMatch(/[{}]/);
+    }
+    expect(POOR_DAY.adviceSource.status).toBe('P-READ');
   });
 });

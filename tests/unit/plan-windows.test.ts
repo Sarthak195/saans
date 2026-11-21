@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { buildPlan } from '@/core/plan/build-plan';
 import type { Plan, RoutineAdvice } from '@/core/plan/types';
 import { at, household, member, routine, seriesOf } from '../helpers/plan';
-import type { Routine } from '@/core/types';
+import type { Member, Routine } from '@/core/types';
 
 /** PM2.5 by hour of day, the same every day; hours not listed take `rest`. */
 function byHour(values: Record<number, number>, rest: number) {
@@ -11,7 +11,7 @@ function byHour(values: Record<number, number>, rest: number) {
 }
 
 function planFor(
-  kind: 'child' | 'adult' | 'older',
+  kind: Member['ageBand'],
   overrides: Partial<Routine>,
   series: ReturnType<typeof byHour>,
   now: Date,
@@ -72,7 +72,8 @@ describe('cleaner window guards', () => {
       SATURDAY_MORNING,
     );
     expect(advice.window).toBeUndefined();
-    expect(advice.decision).toBe('lighten');
+    // A child at Poor who cannot be moved stays in, since the school advice is to postpone running.
+    expect(advice.decision).toBe('indoors');
   });
 
   it('offers nothing before 10:00 or after 19:00 on a Poor day', () => {
@@ -196,5 +197,195 @@ describe('cleaner window guards', () => {
     expect(plan.glance.best).toBeNull();
     expect(plan.glance.airing).toEqual({ kind: 'normal' });
     expect(plan.severe).toBe(false);
+  });
+});
+
+describe('where a cleaner time may be offered', () => {
+  const NOW = at('2026-11-21', '03:00');
+  // The plan day is Saturday 21 Nov, so school hours do not come into it.
+
+  it('does not move a sensitive person from one Poor hour to a slightly less Poor one', () => {
+    // 119 to 95 is a cut of 20 percent, but both are Poor.
+    const poor = byHour({ 16: 95 }, 119);
+    const { advice } = planFor('older', { flexHours: 1, intensity: 'moderate' }, poor, NOW);
+    expect(advice.window).toBeUndefined();
+    expect(advice.decision).toBe('indoors');
+    expect(advice.reason.text).toContain('No cleaner time was found');
+
+    const moderate = byHour({ 16: 85 }, 119);
+    const found = planFor('older', { flexHours: 1, intensity: 'moderate' }, moderate, NOW).advice;
+    expect(found.window?.level).toBe('moderate');
+  });
+
+  it('does not move a child from Very Poor to Poor, but does from Poor to Moderate', () => {
+    const light = { flexHours: 1, intensity: 'light' as const };
+    const refused = planFor('child', light, byHour({ 16: 100 }, 200), NOW).advice;
+    expect(refused.window).toBeUndefined();
+    expect(refused.decision).toBe('lighten');
+
+    const poor = byHour({ 16: 80 }, 119);
+    const moved = planFor('child', { flexHours: 1, intensity: 'vigorous' }, poor, NOW).advice;
+    expect(moved.decision).toBe('move');
+    expect(moved.window?.level).toBe('moderate');
+  });
+
+  it('lets a healthy adult move from Very Poor to Poor but not to another Very Poor hour', () => {
+    const hard = { flexHours: 1, intensity: 'vigorous' as const };
+    // 200 to 150 is a cut of 25 percent, yet 150 is still Very Poor.
+    const stillVeryPoor = planFor('adult', hard, byHour({ 16: 150 }, 200), NOW).advice;
+    expect(stillVeryPoor.window).toBeUndefined();
+    expect(stillVeryPoor.decision).toBe('indoors');
+
+    const toPoor = planFor('adult', hard, byHour({ 16: 100 }, 200), NOW).advice;
+    expect(toPoor.window?.level).toBe('poor');
+  });
+
+  it('keeps the 20 percent rule as an extra condition inside an acceptable band', () => {
+    const hard = { flexHours: 1, intensity: 'vigorous' as const };
+    expect(planFor('adult', hard, byHour({ 16: 105 }, 119), NOW).advice.window).toBeUndefined();
+    expect(planFor('adult', hard, byHour({ 16: 95 }, 119), NOW).advice.window?.start).toBe('16:00');
+  });
+
+  it.each(['infant', 'under5', 'older'] as const)(
+    'keeps %s within 07:00 to 19:00 on a day that is not Poor',
+    (band) => {
+      const dark = byHour({ 4: 5, 5: 5, 6: 5, 20: 5, 21: 5 }, 70);
+      const { advice } = planFor(
+        band,
+        { start: '06:00', flexHours: 3, intensity: 'vigorous' },
+        dark,
+        NOW,
+      );
+      // The 06:00 routine is itself outside the band; no offered window may be.
+      if (advice.window) {
+        expect(advice.window.start >= '07:00').toBe(true);
+        expect(advice.window.end <= '19:00').toBe(true);
+      }
+      const late = planFor(
+        band,
+        { start: '19:00', flexHours: 3, intensity: 'vigorous' },
+        dark,
+        NOW,
+      );
+      if (late.advice.window) expect(late.advice.window.end <= '19:00').toBe(true);
+    },
+  );
+
+  it('keeps a child out of school hours when the free hours run backwards', () => {
+    const clean = byHour({ 9: 30, 10: 30, 11: 30, 15: 80 }, 100);
+    const { advice } = planFor(
+      'child',
+      { flexHours: 4, freeFrom: '15:00', freeTo: '12:00', start: '12:00' },
+      clean,
+      FRIDAY_MORNING,
+    );
+    // 09:00 to 11:00 are the cleanest hours but fall in school time.
+    expect(advice.window === undefined || advice.window.start >= '14:00').toBe(true);
+  });
+});
+
+describe('the poor day guard applies to the routine own hours', () => {
+  const NOW = at('2026-11-21', '03:00');
+  const poorDay = (rest = 100) => byHour({ 12: 50, 13: 50, 14: 50 }, rest);
+
+  it('moves a brisk early walk to the afternoon instead of lightening it', () => {
+    const { advice } = planFor(
+      'adult',
+      { kind: 'walk', start: '06:00', minutes: 45, intensity: 'moderate', flexHours: 7 },
+      poorDay(),
+      NOW,
+    );
+    expect(advice.decision).toBe('move');
+    expect(advice.reason.ruleId).toBe('poor-day-hours');
+    expect(advice.reason.source.id).toBe('mohfw-advisory-2025');
+    expect(advice.reason.text).toContain('morning and late evening');
+    expect(advice.window?.start).toBe('12:00');
+  });
+
+  it('falls back to indoors when no cleaner time is found', () => {
+    const { advice } = planFor(
+      'adult',
+      { kind: 'sport', start: '06:00', minutes: 45, intensity: 'vigorous', flexHours: 0 },
+      poorDay(),
+      NOW,
+    );
+    expect(advice.decision).toBe('indoors');
+    expect(advice.reason.text).toContain('No cleaner time was found');
+  });
+
+  it('applies to a routine that runs past 19:00, even in a Moderate hour on a Poor day', () => {
+    const late = planFor(
+      'adult',
+      { kind: 'sport', start: '18:30', minutes: 60, intensity: 'moderate', flexHours: 0 },
+      byHour({ 18: 80, 19: 80 }, 130),
+      NOW,
+    ).advice;
+    expect(late.level).toBe('moderate');
+    expect(late.decision).toBe('indoors');
+    expect(late.reason.ruleId).toBe('poor-day-hours');
+  });
+
+  it('leaves a routine inside 10:00 to 19:00 to the grid', () => {
+    const { advice } = planFor(
+      'adult',
+      { kind: 'walk', start: '11:00', minutes: 30, intensity: 'moderate', flexHours: 0 },
+      poorDay(),
+      NOW,
+    );
+    expect(advice.reason.ruleId).toBe('poor-general-easier');
+    expect(advice.decision).toBe('lighten');
+  });
+
+  it('keeps a light walk but adds the advice to avoid morning and late-evening walks', () => {
+    const { advice } = planFor(
+      'adult',
+      { kind: 'walk', start: '06:30', minutes: 30, intensity: 'light', flexHours: 0 },
+      poorDay(),
+      NOW,
+    );
+    expect(advice.decision).toBe('lighten');
+    expect(advice.reason.ruleId).toBe('poor-general-easier');
+    expect(advice.reason.text).toContain(
+      'Health advice on days with poor air is to avoid outdoor walks in the morning and late evening.',
+    );
+  });
+
+  it('does not add the note to a light walk inside the daytime hours', () => {
+    const { advice } = planFor(
+      'adult',
+      { kind: 'walk', start: '11:00', minutes: 30, intensity: 'light', flexHours: 0 },
+      poorDay(),
+      NOW,
+    );
+    expect(advice.reason.text).not.toContain('morning and late evening');
+  });
+
+  it('never turns an essential trip into a move', () => {
+    const { advice } = planFor(
+      'adult',
+      {
+        kind: 'commute',
+        mode: 'walk',
+        start: '07:00',
+        minutes: 30,
+        intensity: 'moderate',
+        flexHours: 2,
+      },
+      poorDay(),
+      NOW,
+    );
+    expect(advice.decision).toBe('essential');
+    expect(advice.window).toBeUndefined();
+  });
+
+  it('does not apply on a day that is not Poor', () => {
+    const { advice } = planFor(
+      'adult',
+      { kind: 'walk', start: '06:00', minutes: 45, intensity: 'moderate', flexHours: 0 },
+      byHour({}, 40),
+      NOW,
+    );
+    expect(advice.decision).toBe('keep');
+    expect(advice.reason.ruleId).not.toBe('poor-day-hours');
   });
 });

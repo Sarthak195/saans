@@ -53,9 +53,16 @@ const rulesSchema = z.strictObject({
       earliestHour: z.number().int().min(0).max(23),
       latestHour: z.number().int().min(1).max(24),
       source: sourceKey,
+      // Where the advice on a routine's own hours comes from, and the words for it.
+      adviceSource: sourceKey,
+      moveText: z.string().min(1),
+      lightNote: z.string().min(1),
     }),
     childHours: z.strictObject({
+      /** Children and teenagers: kept out of school hours as well as inside the daytime band. */
       bands: z.array(z.enum(AGE_BANDS)),
+      /** Everyone kept inside the daytime band, children and teenagers included. */
+      daytimeBands: z.array(z.enum(AGE_BANDS)),
       fromHour: z.number().int().min(0).max(23),
       toHour: z.number().int().min(1).max(24),
       schoolFromHour: z.number().int().min(0).max(23),
@@ -75,6 +82,8 @@ const rulesSchema = z.strictObject({
       id: z.string().min(1),
       modes: z.array(z.enum([...MODES, 'unspecified'])).min(1),
       ages: z.array(z.enum(AGE_BANDS)).min(1),
+      /** The levels the row applies at; absent means every level. */
+      levels: z.exactOptional(z.array(z.enum(BANDS)).min(1)),
       lines: z.array(z.string().min(1)).min(1),
       source: sourceKey,
     }),
@@ -161,9 +170,14 @@ export const NOT_SCHEDULED: DefaultRow = {
 const { guards } = data;
 export const ESSENTIAL_KINDS: readonly RoutineKind[] = guards.essentialKinds.kinds;
 export const WINDOW_GAIN = { ...guards.windowGain, source: resolve(guards.windowGain.source) };
-export const POOR_DAY = { ...guards.poorDay, source: resolve(guards.poorDay.source) };
+export const POOR_DAY = {
+  ...guards.poorDay,
+  source: resolve(guards.poorDay.source),
+  adviceSource: resolve(guards.poorDay.adviceSource),
+};
 export const CHILD_HOURS: {
   bands: readonly AgeBand[];
+  daytimeBands: readonly AgeBand[];
   fromHour: number;
   toHour: number;
   schoolFromHour: number;
@@ -182,6 +196,7 @@ interface ProtectionRow {
   id: string;
   modes: readonly (Mode | 'unspecified')[];
   ages: readonly AgeBand[];
+  levels?: readonly Band[];
   lines: readonly string[];
   source: SourceRef;
 }
