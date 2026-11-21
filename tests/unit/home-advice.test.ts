@@ -187,10 +187,11 @@ describe('festival row', () => {
 });
 
 describe('cooking, habits and cleaning', () => {
-  it('asks biomass and kerosene households to switch to LPG, PNG or electric', () => {
-    expect(advice({ cooking: 'biomass' }).find((a) => a.id === 'cooking-biomass')?.title).toContain(
-      'LPG, PNG or electric',
-    );
+  it('asks biomass and kerosene households to switch to LPG, PNG or electric, and never to cook shut in', () => {
+    const biomass = advice({ cooking: 'biomass' }).find((a) => a.id === 'cooking-biomass');
+    expect(biomass?.body).toContain('LPG, PNG or electric');
+    expect(biomass?.title).toContain('in a closed room');
+    expect(biomass?.body).toContain('Never cook in a closed room');
     expect(ids(advice({ cooking: 'kerosene' }))).toContain('cooking-kerosene');
     expect(ids(advice({ cooking: 'lpg_png' }))).not.toContain('cooking-biomass');
     expect(ids(advice({ cooking: 'electric' }))).not.toContain('cooking-kerosene');
@@ -308,5 +309,124 @@ describe('indoor data', () => {
       if (row.source.status === 'P-READ') expect(row.source.quote).toBeTruthy();
       if (row.source.status === 'APP') expect(row.source.title).toMatch(/^Saans rule: /);
     }
+  });
+});
+
+describe('cooking in a closed room', () => {
+  it.each(['biomass', 'kerosene'] as const)(
+    'flags %s cooking as a safety row that comes before every window row',
+    (cooking) => {
+      const list = advice({ cooking }, poorDay);
+      const id = 'cooking-' + cooking;
+      const row = list.find((a) => a.id === id);
+      expect(row?.safety).toBe(true);
+      expect(row?.priority).toBe(0);
+      expect(row?.body).toContain('Never cook in a closed room');
+      expect(ids(list).indexOf(id)).toBeLessThan(
+        ids(list).findIndex((id) => id.startsWith('airing-')),
+      );
+      // Saans extends the ministry warning here, and says so rather than quoting it.
+      expect(row?.reason.text).toContain('Saans extending');
+    },
+  );
+
+  it('rewrites the kitchen row to keep the exhaust fan on and open the window only if possible', () => {
+    const row = advice({}, poorDay).find((a) => a.id === 'kitchen-ventilate');
+    expect(row?.body).toBe(
+      'Always run the exhaust fan while you cook. On poor days, open the kitchen window in the 12:00 to 16:00 spell if you can. If you cook on wood, dung or kerosene, never cook in a closed room.',
+    );
+  });
+});
+
+describe('masks, doctors and children in the Diwali and mask rows', () => {
+  const rows = (): HomeAdvice[] =>
+    ['festival-diwali', 'myth-masks'].flatMap((id) =>
+      advice({}, { date: '2026-11-08' }).filter((a) => a.id === id),
+    );
+
+  it('limits the N95 advice to adults and teenagers and keeps children indoors', () => {
+    expect(rows()).toHaveLength(2);
+    for (const row of rows()) {
+      expect(row.body, row.id).toMatch(/adult or teenager/);
+      expect(row.body, row.id).toContain('not made in small children');
+      expect(row.body, row.id).toContain('may help');
+      expect(row.body, row.id).not.toMatch(/wear a/i);
+    }
+    const diwali = rows().find((r) => r.id === 'festival-diwali');
+    expect(diwali?.body).toContain('keep children indoors, away from the smoke');
+  });
+
+  it('uses the ministry wording for doctors and adds a general-guidance line', () => {
+    const diwali = rows().find((r) => r.id === 'festival-diwali');
+    expect(diwali?.body).not.toContain('at once');
+    expect(diwali?.body).toContain('Consult the nearest doctor');
+    expect(diwali?.body).toContain('get urgent medical help');
+    for (const row of rows()) {
+      expect(row.body, row.id).toContain('not medical advice');
+      expect(row.body, row.id).toContain('ask their doctor before relying on a mask');
+    }
+  });
+
+  it('says firecracker smoke is especially hard on people with asthma or lung disease', () => {
+    const diwali = rows().find((r) => r.id === 'festival-diwali');
+    expect(diwali?.body).toContain(
+      'Firecracker smoke is especially hard on people with asthma or lung disease.',
+    );
+    expect(diwali?.body).not.toContain('seriously affect');
+  });
+
+  it('only quotes the ministry words that are on record for Diwali', () => {
+    const diwali = rows().find((r) => r.id === 'festival-diwali');
+    expect(diwali?.reason.source.quote).toBe('Stay indoor during nights of Diwali');
+  });
+});
+
+describe('purifier units and titles', () => {
+  it('shows the cfm figure in m3/h too, so a box that lists m3/h can be compared', () => {
+    const none = advice({ roomSqft: 180 }, poorDay).find((a) => a.id === 'purifier-none');
+    expect(none?.body).toContain('choose 117 cfm or more, which is about 200 m3/h');
+  });
+
+  it('calls a big enough purifier big enough on paper, and a matching one about the right size', () => {
+    const spare = advice({ roomSqft: 180, purifierCadrCfm: 200 }, poorDay).find(
+      (a) => a.id === 'purifier-spare',
+    );
+    expect(spare?.title).toBe('Your purifier looks big enough on paper');
+    expect(spare?.body).toContain('A real room can differ from the chart.');
+    const match = advice({ roomSqft: 180, purifierCadrCfm: 117 }, poorDay).find(
+      (a) => a.id === 'purifier-match',
+    );
+    expect(match?.title).toBe('Your purifier looks about the right size');
+    expect(match?.reason.text).toContain('estimation purposes');
+  });
+});
+
+describe('softened wording', () => {
+  it('says the air outside stays very poor through the midday spell, not all day', () => {
+    const row = advice(
+      {},
+      { aqi: aqiOk(350), airing: { kind: 'keep_shut', leastBadHour: '14:00', pm25: 160 } },
+    ).find((a) => a.id === 'airing-keep-shut');
+    expect(row?.body).toContain('The air outside stays very poor through the midday spell.');
+    expect(row?.body).not.toContain('all day');
+  });
+
+  it('offers airing the home only if needed', () => {
+    const row = advice({}, poorDay).find((a) => a.id === 'airing-window');
+    expect(row?.body).toContain('If you need to air the home, do it between 13:00 and 14:00');
+  });
+
+  it('says only that no three hours are forecast to be Poor or worse when it says to air as usual', () => {
+    const row = advice().find((a) => a.id === 'airing-normal');
+    expect(row?.body).toContain('No three hours between 06:00 and 22:00');
+    expect(row?.reason.source.status).toBe('APP');
+    expect(row?.reason.source.url).toBe('');
+  });
+
+  it('does not call an air conditioner a cleaner, and ties the car claim to the Delhi study', () => {
+    const row = advice({}, poorDay).find((a) => a.id === 'myth-ac');
+    expect(row?.body).toContain('An air conditioner on its own is not an air cleaner.');
+    expect(row?.body).toContain('in one Delhi study');
+    expect(row?.body).not.toContain('does not clean fine particles');
   });
 });

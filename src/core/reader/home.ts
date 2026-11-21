@@ -1,3 +1,4 @@
+import { M3H_PER_CFM } from '@/core/home/purifier';
 import { COOKING, HABITS, HEATING } from '@/core/profile/schema';
 import type { Quoted, ReaderOutput } from '@/core/reader/schema';
 import {
@@ -23,7 +24,25 @@ const ROOM: Measure = {
   max: 5000,
 };
 const CEILING: Measure = { units: ['ft', 'feet', 'foot'], min: 6, max: 30 };
-const PURIFIER: Measure = { units: ['cadr', 'cfm'], min: 1, max: 2000 };
+// A purifier rating counts only with its unit: cfm, or m3/h which is converted. Many purifiers sold
+// in India give CADR in m3/h, so a bare "CADR 400" is not assumed to be cfm.
+const PURIFIER_CFM: Measure = { units: ['cfm'], min: 1, max: 2000 };
+const PURIFIER_M3H: Measure = {
+  units: [
+    'm3/h',
+    'm3/hr',
+    'm3 per hour',
+    'm³/h',
+    'm³/hr',
+    'm³ per hour',
+    'cmh',
+    'cubic metres per hour',
+    'cubic meters per hour',
+  ],
+  min: 2,
+  max: Math.round(2000 * M3H_PER_CFM),
+};
+const PURIFIER_BARE: Measure = { units: ['cadr'], min: 1, max: PURIFIER_M3H.max };
 
 /**
  * A size or rating the family gave. It counts when it is within what a home can have and the text
@@ -49,6 +68,23 @@ function measured(
   return after.test(text) || before.test(text) ? field.value : undefined;
 }
 
+/** The purifier's CADR in cfm, or a note that the family gave a number without its unit. */
+function readPurifier(
+  text: string,
+  field: Quoted<number> | undefined,
+): { cfm?: number; note?: string } {
+  const cfm = measured(text, field, PURIFIER_CFM);
+  if (cfm !== undefined) return { cfm };
+  const m3h = measured(text, field, PURIFIER_M3H);
+  if (m3h !== undefined) return { cfm: Math.max(1, Math.round(m3h / M3H_PER_CFM)) };
+  if (measured(text, field, PURIFIER_BARE) !== undefined) {
+    return {
+      note: 'The purifier rating needs its unit: say whether the CADR is in cfm or m3/h. It was left out for now.',
+    };
+  }
+  return {};
+}
+
 function termed<V extends string>(
   text: string,
   field: Quoted<V> | undefined,
@@ -69,7 +105,8 @@ export function readHome(text: string, output: ReaderOutput): { home: Home; note
   );
   const roomSqft = measured(text, draft.roomSqft, ROOM);
   const ceilingFt = measured(text, draft.ceilingFt, CEILING);
-  const purifierCadrCfm = measured(text, draft.purifierCadrCfm, PURIFIER);
+  const purifier = readPurifier(text, draft.purifierCadrCfm);
+  const purifierCadrCfm = purifier.cfm;
   const home: Home = {
     cooking: cooking ?? COOKING[0],
     habits,
@@ -78,9 +115,11 @@ export function readHome(text: string, output: ReaderOutput): { home: Home; note
     ...(ceilingFt === undefined ? {} : { ceilingFt }),
     ...(purifierCadrCfm === undefined ? {} : { purifierCadrCfm }),
   };
-  const notes =
-    cooking === undefined && heating === undefined
+  const notes = [
+    ...(cooking === undefined && heating === undefined
       ? ['Assumed cooking on LPG or PNG and no heating. Change it in the form.']
-      : [];
+      : []),
+    ...(purifier.note === undefined ? [] : [purifier.note]),
+  ];
   return { home, notes };
 }

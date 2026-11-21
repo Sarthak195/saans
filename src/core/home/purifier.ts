@@ -3,6 +3,9 @@ import type { Home } from '@/core/types';
 
 export type PurifierFit = 'none' | 'unknown' | 'short' | 'spare' | 'match';
 
+/** Cubic metres per hour in one cfm; many purifiers sold in India give their CADR in m3/h. */
+export const M3H_PER_CFM = 1.699;
+
 /**
  * The clean air delivery rate (cfm) a room needs for particles: 0.65 cfm for each sq ft, which is
  * the US EPA chart for rooms with 8 ft ceilings. Taller ceilings get a note, not a scaled number,

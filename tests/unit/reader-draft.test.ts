@@ -4,7 +4,7 @@ import { readDraft, type ReaderOutput } from '@/core/reader';
 
 const text =
   'My son Aarav plays football on Mon to Fri for 45 minutes at 5 pm, a brisk run. We live in a 180 sq ft flat with a 10 ft ceiling, ' +
-  'cook on LPG, light incense every evening and use an angithi in winter. The purifier has a CADR of 200.';
+  'cook on LPG, light incense every evening and use an angithi in winter. The purifier has a CADR of 200 cfm.';
 
 const base: ReaderOutput = {
   members: [{ label: { value: 'son', quote: 'My son' }, conditions: [] }],
@@ -21,7 +21,7 @@ const base: ReaderOutput = {
   home: {
     roomSqft: { value: 180, quote: '180 sq ft' },
     ceilingFt: { value: 10, quote: '10 ft' },
-    purifierCadrCfm: { value: 200, quote: 'CADR of 200' },
+    purifierCadrCfm: { value: 200, quote: 'CADR of 200 cfm' },
     cooking: { value: 'lpg_png', quote: 'cook on LPG' },
     habits: [{ value: 'incense', quote: 'light incense' }],
     heating: { value: 'angithi_coal', quote: 'an angithi' },
@@ -43,6 +43,38 @@ describe('reading the home', () => {
       purifierCadrCfm: 200,
     });
     expect(notes.join(' ')).not.toContain('cooking on LPG or PNG');
+  });
+
+  describe('the purifier rating', () => {
+    const read = (said: string, quote: string, value: number) =>
+      readDraft(said, { ...base, home: { ...base.home, purifierCadrCfm: { value, quote } } });
+
+    it('converts a rating given in m3/h to cfm', () => {
+      for (const unit of ['m3/h', 'm³/h', 'm3/hr', 'm3 per hour', 'cmh']) {
+        const said = `The purifier has a CADR of 340 ${unit}.`;
+        expect(read(said, `340 ${unit}`, 340).home.purifierCadrCfm, unit).toBe(200);
+      }
+    });
+
+    it('does not read a bare CADR as cfm, and asks for the unit', () => {
+      const said = 'The purifier has a CADR of 400.';
+      const { home, notes } = read(said, 'CADR of 400', 400);
+      expect(home.purifierCadrCfm).toBeUndefined();
+      expect(notes.join(' ')).toContain('needs its unit');
+      expect(notes.join(' ')).toContain('cfm or m3/h');
+    });
+
+    it('keeps a rating stated in cfm as it is, and a rating with no purifier words alone', () => {
+      expect(read('Purifier CADR 350 cfm.', '350 cfm', 350).home.purifierCadrCfm).toBe(350);
+      const none = read('We have 400 things.', '400', 400);
+      expect(none.home.purifierCadrCfm).toBeUndefined();
+      expect(none.notes.join(' ')).not.toContain('needs its unit');
+    });
+
+    it('drops a rating that is out of range in either unit', () => {
+      expect(read('A CADR of 9000 cfm.', '9000 cfm', 9000).home.purifierCadrCfm).toBeUndefined();
+      expect(read('A CADR of 9000 m3/h.', '9000 m3/h', 9000).home.purifierCadrCfm).toBeUndefined();
+    });
   });
 
   it('drops a fabricated value and a number with no unit, and assumes the default', () => {

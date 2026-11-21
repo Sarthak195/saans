@@ -6,8 +6,7 @@
         "id": "epa-air-cleaner-sizing",
         "title": "US EPA, Guide to Air Cleaners in the Home",
         "url": "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home",
-        "quote": "Room area (square feet) 100 200 300 400 500 600 Minimum CADR (cfm) 65 130 195 260 325 390 Note this chart is for estimation purposes. The CADRs are calculated based on an 8-foot ceiling.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     "assumedCeilingFt": {
@@ -16,8 +15,7 @@
         "id": "epa-air-cleaner-sizing",
         "title": "US EPA, Guide to Air Cleaners in the Home",
         "url": "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home",
-        "quote": "Room area (square feet) 100 200 300 400 500 600 Minimum CADR (cfm) 65 130 195 260 325 390 Note this chart is for estimation purposes. The CADRs are calculated based on an 8-foot ceiling.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     "festivalMonths": {
@@ -25,7 +23,7 @@
       "source": {
         "id": "festival-months",
         "title": "Saans rule: show the Diwali guidance in October and November, because the festival date changes each year",
-        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "url": "",
         "status": "APP"
       }
     }
@@ -48,7 +46,7 @@
         "id": "mohfw-angithi",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 3",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Avoid burning of wood/ charcoal in 'Anghiti' during winters, in closed and confined condition which may be fatal due to CO and buildup CO2",
+        "quote": "which may be fatal due to CO and buildup CO2",
         "status": "P-READ"
       }
     },
@@ -67,7 +65,7 @@
       "source": {
         "id": "co-gas-heater",
         "title": "Saans rule: treat a gas heater like an angithi, because it also makes carbon monoxide",
-        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -86,7 +84,7 @@
       "source": {
         "id": "airing-unknown",
         "title": "Saans rule: ask for a check of the AQI when there is no air data for the day",
-        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -99,13 +97,13 @@
       "then": {
         "priority": 10,
         "title": "Air your home as usual today",
-        "body": "The air outside is forecast to be Moderately polluted or better during the day, so ventilate as you normally do. Close the windows if you notice smoke or dust nearby.",
-        "reason": "The health ministry advises keeping windows shut on poor to severe days, and the forecast for today is better than that."
+        "body": "No three hours between 06:00 and 22:00 are forecast to be Poor or worse, so ventilate as you normally do. Close the windows if you notice smoke or dust nearby.",
+        "reason": "The health ministry advises keeping windows shut on poor to severe days. Saans advises airing as usual only when no spell in the waking day is forecast to be that bad."
       },
       "source": {
         "id": "airing-normal",
-        "title": "Saans rule: ventilate as usual when the day is not forecast to be poor",
-        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "title": "Saans rule: ventilate as usual only when no three hours of the waking day are forecast to be poor or worse",
+        "url": "",
         "status": "APP"
       }
     },
@@ -117,7 +115,7 @@
       "then": {
         "priority": 10,
         "title": "Open windows only from {start} to {end}",
-        "body": "Keep outside doors and windows shut in the morning and late evening. Air the home between {start} and {end}, when outdoor fine particles are forecast to be lowest, at about {pm25} micrograms per cubic metre. How long to air is a Saans choice.",
+        "body": "Keep outside doors and windows shut in the morning and late evening. If you need to air the home, do it between {start} and {end}, when outdoor fine particles are forecast to be lowest, at about {pm25} micrograms per cubic metre. How long to air is a Saans choice.",
         "reason": "The health ministry advises keeping doors and windows shut in the morning and late evening on poor to severe days and airing only if needed around midday. Saans picks the cleanest spell in the forecast."
       },
       "source": {
@@ -136,7 +134,7 @@
       "then": {
         "priority": 10,
         "title": "Keep windows shut today",
-        "body": "The air outside is poor all day. If you must air a room, do it briefly around {hour}, when outdoor fine particles are forecast to be lowest, at about {pm25} micrograms per cubic metre.",
+        "body": "The air outside stays very poor through the midday spell. If you must air a room, do it briefly around {hour}, when outdoor fine particles are forecast to be lowest, at about {pm25} micrograms per cubic metre.",
         "reason": "The health ministry advises keeping doors and windows shut on poor to severe days and airing only if needed. Saans picks the least bad hour in the forecast."
       },
       "source": {
@@ -153,17 +151,17 @@
         "cooking": ["biomass"]
       },
       "then": {
-        "priority": 15,
-        "title": "Switch from wood, dung or crop waste to LPG, PNG or electric",
-        "body": "Burning biomass for cooking fills the home with smoke. If you cannot switch yet, use a clean cookstove, cook with the exhaust fan on or a window open, and keep young children and older family members out of the kitchen.",
-        "reason": "The health ministry asks people to avoid burning biomass and to use gas or electricity for cooking and heating."
+        "priority": 0,
+        "title": "Never cook on wood, dung or crop waste in a closed room",
+        "body": "Never cook in a closed room. Keep the exhaust fan running and a door or window open while you cook, even on a day when the air outside is poor, because smoke and carbon monoxide build up in a shut room. Burning biomass for cooking fills the home with smoke, so switch to LPG, PNG or electric when you can. Until then use a clean cookstove and keep young children and older family members out of the kitchen.",
+        "reason": "The health ministry asks people to avoid burning biomass and to use gas or electricity for cooking and heating. The closed-room warning is Saans extending the ministry's warning about burning fuel in a closed room: smoke and carbon monoxide build up when a room is shut. It comes before any advice about keeping windows shut.",
+        "safety": true
       },
       "source": {
         "id": "mohfw-clean-fuels",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 2",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Avoid burning biomass such as wood, coal, animal dung, kerosene. Use clean smokeless fuels (gas or electricity) for cooking and heating purposes.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -172,17 +170,17 @@
         "cooking": ["kerosene"]
       },
       "then": {
-        "priority": 15,
-        "title": "Switch from kerosene to LPG, PNG or electric",
-        "body": "Kerosene smoke stays in the kitchen and the rooms around it. Switch to LPG, PNG or an electric stove if you can, and until then cook with the exhaust fan on or a window open.",
-        "reason": "The health ministry asks people to avoid burning kerosene and to use gas or electricity for cooking and heating."
+        "priority": 0,
+        "title": "Never cook on kerosene in a closed room",
+        "body": "Never cook in a closed room. Keep the exhaust fan running and a door or window open while you cook, even on a day when the air outside is poor, because kerosene smoke and carbon monoxide build up in a shut room. Switch to LPG, PNG or an electric stove if you can.",
+        "reason": "The health ministry asks people to avoid burning kerosene and to use gas or electricity for cooking and heating. The closed-room warning is Saans extending the ministry's warning about burning fuel in a closed room: smoke and carbon monoxide build up when a room is shut. It comes before any advice about keeping windows shut.",
+        "safety": true
       },
       "source": {
         "id": "mohfw-clean-fuels",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 2",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Avoid burning biomass such as wood, coal, animal dung, kerosene. Use clean smokeless fuels (gas or electricity) for cooking and heating purposes.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -193,14 +191,14 @@
       "then": {
         "priority": 20,
         "title": "Diwali nights: stay in and skip the firecrackers",
-        "body": "Firecracker smoke can seriously affect people with heart or lung disease. Stay indoors on the nights of Diwali and avoid burning firecrackers, especially if anyone has asthma or another lung disease. If you must be near the smoke, wear a well-fitted N95 or N99 mask. See a doctor at once if anyone has trouble breathing.",
-        "reason": "The health ministry gives this advice for Diwali. Saans shows it in October and November because the festival date changes each year."
+        "body": "Stay indoors on the nights of Diwali and skip the firecrackers. Firecracker smoke is especially hard on people with asthma or lung disease. If an adult or teenager must be near the smoke, a well-fitted N95 or N99 mask may help for a short time, if it fits snugly. Respirators are not made in small children's sizes, so keep children indoors, away from the smoke, instead of relying on a mask. Consult the nearest doctor if anyone has breathlessness or chest discomfort. For severe breathlessness or chest pain, get urgent medical help. This is general guidance, not medical advice: if someone has a lung or heart condition or is pregnant, ask their doctor before relying on a mask.",
+        "reason": "The health ministry advises staying indoors on the nights of Diwali, avoiding firecrackers, and using a fitted N95 or N99 mask for the smoke. The US EPA says respirators are not made in sizes for young children. Saans shows this in October and November because the festival date changes each year."
       },
       "source": {
         "id": "mohfw-diwali",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 30",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Stay indoor during nights of Diwali to reduce exposure to air pollution.",
+        "quote": "Stay indoor during nights of Diwali",
         "status": "P-READ"
       }
     },
@@ -213,11 +211,11 @@
       "then": {
         "priority": 30,
         "title": "Look for a purifier rated about {needed} cfm for your room",
-        "body": "Your room is about {sqft} sq ft. The EPA sizing chart asks for a clean air delivery rate (CADR) of about 0.65 cfm for each sq ft, so check the CADR on the box and choose {needed} cfm or more. Change the filter when the maker says to, and avoid any purifier that makes ozone.{ceilingNote}",
-        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles. Saans reads it as 0.65 cfm for each sq ft.",
+        "body": "Your room is about {sqft} sq ft. The EPA sizing chart asks for a clean air delivery rate (CADR) of about 0.65 cfm for each sq ft, so check the CADR on the box and choose {needed} cfm or more, which is about {neededM3h} m3/h if the box lists m3/h. Change the filter when the maker says to, and avoid any purifier that makes ozone.{ceilingNote}",
+        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles, and says it is for estimation purposes. Saans reads it as 0.65 cfm for each sq ft.",
         "impact": {
           "kind": "purifier",
-          "text": "Your room needs a CADR of about {needed} cfm.",
+          "text": "Your room needs a CADR of about {needed} cfm by this estimate.",
           "numbers": ["needed"]
         }
       },
@@ -225,8 +223,7 @@
         "id": "epa-air-cleaner-sizing",
         "title": "US EPA, Guide to Air Cleaners in the Home",
         "url": "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home",
-        "quote": "Room area (square feet) 100 200 300 400 500 600 Minimum CADR (cfm) 65 130 195 260 325 390 Note this chart is for estimation purposes. The CADRs are calculated based on an 8-foot ceiling.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -239,7 +236,7 @@
         "priority": 30,
         "title": "Your purifier is about {gap} cfm short for this room",
         "body": "Your purifier is rated {have} cfm and your room of about {sqft} sq ft needs about {needed} cfm. It still helps: run it on a high setting with the door shut, and consider adding a box-fan filter. Change the filter when the maker says to.{ceilingNote}",
-        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles. Saans reads it as 0.65 cfm for each sq ft.",
+        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles, and says it is for estimation purposes. Saans reads it as 0.65 cfm for each sq ft.",
         "impact": {
           "kind": "purifier",
           "text": "Your purifier gives {have} cfm against about {needed} cfm needed, so it is about {gap} cfm short.",
@@ -250,8 +247,7 @@
         "id": "epa-air-cleaner-sizing",
         "title": "US EPA, Guide to Air Cleaners in the Home",
         "url": "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home",
-        "quote": "Room area (square feet) 100 200 300 400 500 600 Minimum CADR (cfm) 65 130 195 260 325 390 Note this chart is for estimation purposes. The CADRs are calculated based on an 8-foot ceiling.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -262,9 +258,9 @@
       },
       "then": {
         "priority": 30,
-        "title": "Your purifier is big enough for this room",
-        "body": "Your purifier is rated {have} cfm and your room of about {sqft} sq ft needs about {needed} cfm. Run it with the door shut and change the filter when the maker says to.{ceilingNote}",
-        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles. Saans reads it as 0.65 cfm for each sq ft.",
+        "title": "Your purifier looks big enough on paper",
+        "body": "Your purifier is rated {have} cfm and, by the EPA estimate, your room of about {sqft} sq ft needs about {needed} cfm. A real room can differ from the chart. Run it with the door shut and change the filter when the maker says to.{ceilingNote}",
+        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles, and says it is for estimation purposes. Saans reads it as 0.65 cfm for each sq ft.",
         "impact": {
           "kind": "purifier",
           "text": "Your purifier gives {have} cfm against about {needed} cfm needed, about {gap} cfm to spare.",
@@ -275,8 +271,7 @@
         "id": "epa-air-cleaner-sizing",
         "title": "US EPA, Guide to Air Cleaners in the Home",
         "url": "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home",
-        "quote": "Room area (square feet) 100 200 300 400 500 600 Minimum CADR (cfm) 65 130 195 260 325 390 Note this chart is for estimation purposes. The CADRs are calculated based on an 8-foot ceiling.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -287,9 +282,9 @@
       },
       "then": {
         "priority": 30,
-        "title": "Your purifier is the right size for this room",
-        "body": "Your purifier is rated {have} cfm, which is what your room of about {sqft} sq ft needs. Run it with the door shut and change the filter when the maker says to.{ceilingNote}",
-        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles. Saans reads it as 0.65 cfm for each sq ft.",
+        "title": "Your purifier looks about the right size",
+        "body": "Your purifier is rated {have} cfm, which is about what the EPA estimate gives for your room of about {sqft} sq ft. A real room can differ from the chart. Run it with the door shut and change the filter when the maker says to.{ceilingNote}",
+        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles, and says it is for estimation purposes. Saans reads it as 0.65 cfm for each sq ft.",
         "impact": {
           "kind": "purifier",
           "text": "Your purifier gives {have} cfm, matching the about {needed} cfm needed.",
@@ -300,8 +295,7 @@
         "id": "epa-air-cleaner-sizing",
         "title": "US EPA, Guide to Air Cleaners in the Home",
         "url": "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home",
-        "quote": "Room area (square feet) 100 200 300 400 500 600 Minimum CADR (cfm) 65 130 195 260 325 390 Note this chart is for estimation purposes. The CADRs are calculated based on an 8-foot ceiling.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -314,14 +308,13 @@
         "priority": 30,
         "title": "Tell us your room size to check the purifier",
         "body": "Add the size of the room where you spend the most time. The EPA chart asks for about 0.65 cfm of clean air delivery for each sq ft, and we can then say whether a purifier is big enough.",
-        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles. Saans reads it as 0.65 cfm for each sq ft."
+        "reason": "The US EPA chart pairs each room size with a minimum CADR for removing particles, and says it is for estimation purposes. Saans reads it as 0.65 cfm for each sq ft."
       },
       "source": {
         "id": "epa-air-cleaner-sizing",
         "title": "US EPA, Guide to Air Cleaners in the Home",
         "url": "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home",
-        "quote": "Room area (square feet) 100 200 300 400 500 600 Minimum CADR (cfm) 65 130 195 260 325 390 Note this chart is for estimation purposes. The CADRs are calculated based on an 8-foot ceiling.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -334,7 +327,7 @@
         "priority": 35,
         "title": "A box-fan filter is a low-cost way to clean one room",
         "body": "Tape a MERV 13 furnace filter to a box fan, or build the four-filter Corsi-Rosenthal box. Use a newer fan with a UL or ETL mark. The result below is from a lab chamber, so expect less in a real home, and change the filters often in heavy smoke because filters loaded with smoke work much less well.",
-        "reason": "A university study tested do-it-yourself box-fan filters with simulated smoke. Saans offers one as a low-cost option, with those limits.",
+        "reason": "A university study tested do-it-yourself box-fan filters with simulated smoke in a chamber. Saans offers one as a low-cost option, with those limits.",
         "impact": {
           "kind": "purifier",
           "text": "In a lab chamber the four-filter box cleaned about 260% more air than the one-filter design, which reached 111 cfm.",
@@ -345,8 +338,7 @@
         "id": "holder-2022-box-fan",
         "title": "Holder, Halliday and Virtaranta 2022, Evaluation of do-it-yourself air cleaners for wildfire smoke, Indoor Air",
         "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9828579/",
-        "quote": "The CADR was greatly reduced with filters heavily loaded with smoke, pointing to the need for frequent filter changes during smoke events.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -442,16 +434,15 @@
       "when": {},
       "then": {
         "priority": 50,
-        "title": "Ventilate the kitchen while you cook",
-        "body": "Run the exhaust fan and open a kitchen window while you cook. On days when the air is poor, open the window in the 12:00 to 16:00 spell and keep it shut in the morning and late evening.",
-        "reason": "The health ministry asks for cooking areas to be well ventilated. Saans combines this with its advice on when to open windows on poor days."
+        "title": "Run the exhaust fan while you cook",
+        "body": "Always run the exhaust fan while you cook. On poor days, open the kitchen window in the 12:00 to 16:00 spell if you can. If you cook on wood, dung or kerosene, never cook in a closed room.",
+        "reason": "The health ministry asks for cooking areas to be well ventilated. Saans combines this with its advice on when to open windows on poor days, and keeps the exhaust fan running at all times."
       },
       "source": {
         "id": "mohfw-kitchen-ventilation",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 23",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Ensure cooking areas are well ventilated with cross ventilation by opening windows, doors to reduce exposure to household air pollution.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -469,7 +460,7 @@
         "id": "mohfw-wet-mopping",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I item 10",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "Practice wet mopping instead of sweeping or vacuum cleaning inside homes.",
+        "quote": "Practice wet mopping instead of sweeping or vacuum cleaning",
         "status": "P-READ"
       }
     },
@@ -492,8 +483,7 @@
         "id": "cummings-waring-2020",
         "title": "Cummings and Waring 2020, Potted plants do not improve indoor air quality, Journal of Exposure Science and Environmental Epidemiology 30",
         "url": "https://www.nature.com/articles/s41370-019-0175-9",
-        "quote": "with a median of 0.023 m3/h",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -503,8 +493,8 @@
         "priority": 81,
         "myth": true,
         "title": "Myth: a cloth or paper mask protects you from smog",
-        "body": "Paper masks, handkerchiefs, scarves and cloth do not keep out fine particles. A disposable N95 or N99 helps only if it fits snugly over your nose and mouth, and only for a short time outdoors. Replace it as its instructions say.",
-        "reason": "The health ministry says paper masks, handkerchiefs, scarves and cloth are not effective, and that a well-fitted N95 or N99 may help for short exposures."
+        "body": "Paper masks, handkerchiefs, scarves and cloth do not keep out fine particles. For an adult or teenager, a disposable N95 or N99 may help for a short time outdoors, but only if it fits snugly over the nose and mouth. Replace it as its instructions say. Respirators are not made in small children's sizes, so a child should not rely on a mask. This is general guidance, not medical advice: if someone has a lung or heart condition or is pregnant, ask their doctor before relying on a mask.",
+        "reason": "The health ministry says paper masks, handkerchiefs, scarves and cloth are not effective, and that a well-fitted N95 or N99 may help if the exposure is short. The US EPA says respirators do not come in sizes suitable for young children."
       },
       "source": {
         "id": "mohfw-masks",
@@ -528,8 +518,7 @@
         "id": "epa-ozone",
         "title": "US EPA, Guide to Air Cleaners in the Home",
         "url": "https://www.epa.gov/indoor-air-quality-iaq/guide-air-cleaners-home",
-        "quote": "Avoid portable air cleaners and furnace/HVAC filters that intentionally produce ozone. Ozone is a lung irritant.",
-        "status": "P-READ"
+        "status": "P-FETCH"
       }
     },
     {
@@ -539,14 +528,14 @@
         "priority": 83,
         "myth": true,
         "title": "Myth: the air conditioner cleans the air",
-        "body": "An air conditioner cools the air but does not clean fine particles out of it. On a poor-air day, set it to recirculate so it does not pull in outside air, at home and in the car.",
+        "body": "An air conditioner on its own is not an air cleaner. A closed car measured cleaner than the roadside in one Delhi study, because less outside air gets in. On a poor-air day, set the air conditioning to recirculate so it does not pull in outside air, at home and in the car.",
         "reason": "The health ministry advises recirculate mode to avoid contact with outside air. That limits what comes in but does not clean it."
       },
       "source": {
         "id": "mohfw-air-conditioner",
         "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure I section III item 3",
         "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
-        "quote": "When operating air conditioners in buildings or vehicle, use in \"re-circulate\" mode to avoid contact with outside air.",
+        "quote": "re-circulate",
         "status": "P-READ"
       }
     }

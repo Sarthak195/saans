@@ -3,7 +3,7 @@ import { clockOf, fillTemplate, oneDecimal, roundToFive } from '@/core/format';
 import type { Vars } from '@/core/format';
 import { HOME_RULES, INDOOR } from '@/core/home/data';
 import { homeFacts } from '@/core/home/facts';
-import { checkPurifier } from '@/core/home/purifier';
+import { M3H_PER_CFM, checkPurifier } from '@/core/home/purifier';
 import type { HomeAdvice, Plan } from '@/core/plan/types';
 import { allMatches } from '@/core/rules/evaluate';
 import type { Household } from '@/core/types';
@@ -27,6 +27,7 @@ function variablesFor(household: Household, plan: Plan): Vars {
   if (home.roomSqft !== undefined && check.needed !== undefined) {
     vars.sqft = Math.round(home.roomSqft);
     vars.needed = check.needed;
+    vars.neededM3h = roundToFive(check.needed * M3H_PER_CFM);
     const tall =
       home.ceilingFt !== undefined && home.ceilingFt > INDOOR.assumptions.assumedCeilingFt.value;
     vars.ceilingNote = tall
