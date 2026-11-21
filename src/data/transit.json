@@ -1,0 +1,711 @@
+{
+  "cities": [
+    {
+      "id": "delhi-ncr",
+      "name": "Delhi NCR",
+      "names": [
+        "delhi",
+        "new delhi",
+        "noida",
+        "greater noida",
+        "gurugram",
+        "gurgaon",
+        "ghaziabad",
+        "faridabad",
+        "gautam buddh nagar"
+      ],
+      "admin1": ["Delhi"],
+      "center": {
+        "lat": 28.6,
+        "lon": 77.2
+      },
+      "radiusKm": 55,
+      "options": [
+        {
+          "id": "delhi-metro",
+          "kind": "metro",
+          "name": "Delhi Metro",
+          "operator": "Delhi Metro Rail Corporation",
+          "url": "https://www.delhimetrorail.com/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-delhi-metro",
+            "title": "Delhi Metro Rail Corporation: official website, reachable on 21 Nov 2026",
+            "url": "https://www.delhimetrorail.com/",
+            "status": "P-FETCH"
+          }
+        },
+        {
+          "id": "dtc",
+          "kind": "bus",
+          "name": "DTC buses",
+          "operator": "Delhi Transport Corporation",
+          "url": "https://dtc.delhi.gov.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-dtc",
+            "title": "Delhi Transport Corporation: official website, reachable on 21 Nov 2026",
+            "url": "https://dtc.delhi.gov.in/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "mumbai",
+      "name": "Mumbai",
+      "names": ["mumbai", "bombay", "thane", "navi mumbai", "andheri"],
+      "admin1": [],
+      "center": {
+        "lat": 19.08,
+        "lon": 72.88
+      },
+      "radiusKm": 40,
+      "options": [
+        {
+          "id": "mumbai-western-railway",
+          "kind": "rail",
+          "name": "Mumbai suburban rail (Western line)",
+          "operator": "Western Railway",
+          "url": "https://wr.indianrailways.gov.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-mumbai-western-railway",
+            "title": "Western Railway: official website, reachable on 21 Nov 2026",
+            "url": "https://wr.indianrailways.gov.in/",
+            "status": "P-FETCH"
+          }
+        },
+        {
+          "id": "mumbai-central-railway",
+          "kind": "rail",
+          "name": "Mumbai suburban rail (Central line)",
+          "operator": "Central Railway",
+          "url": "https://cr.indianrailways.gov.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-mumbai-central-railway",
+            "title": "Central Railway: official website, reachable on 21 Nov 2026",
+            "url": "https://cr.indianrailways.gov.in/",
+            "status": "P-FETCH"
+          }
+        },
+        {
+          "id": "mumbai-metro",
+          "kind": "metro",
+          "name": "Mumbai Metro",
+          "operator": "Mumbai Metro Rail Corporation (MMRCL)",
+          "url": "https://mmrcl.com/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-mumbai-metro",
+            "title": "Mumbai Metro Rail Corporation (MMRCL): official website, reachable on 21 Nov 2026",
+            "url": "https://mmrcl.com/",
+            "status": "P-FETCH"
+          }
+        },
+        {
+          "id": "best",
+          "kind": "bus",
+          "name": "BEST buses",
+          "operator": "BEST Undertaking",
+          "url": "https://www.bestundertaking.com/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-best",
+            "title": "BEST Undertaking: official website, reachable on 21 Nov 2026",
+            "url": "https://www.bestundertaking.com/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "kolkata",
+      "name": "Kolkata",
+      "names": ["kolkata", "calcutta", "howrah", "salt lake", "bidhannagar"],
+      "admin1": [],
+      "center": {
+        "lat": 22.57,
+        "lon": 88.36
+      },
+      "radiusKm": 30,
+      "options": [
+        {
+          "id": "kolkata-metro",
+          "kind": "metro",
+          "name": "Kolkata Metro",
+          "operator": "Metro Railway, Kolkata",
+          "url": "https://mtp.indianrailways.gov.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-kolkata-metro",
+            "title": "Metro Railway, Kolkata: official website, reachable on 21 Nov 2026",
+            "url": "https://mtp.indianrailways.gov.in/",
+            "status": "P-FETCH"
+          }
+        },
+        {
+          "id": "kolkata-buses",
+          "kind": "bus",
+          "name": "Kolkata buses",
+          "operator": "West Bengal Transport Department",
+          "url": "https://transport.wb.gov.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-kolkata-buses",
+            "title": "West Bengal Transport Department: official website, reachable on 21 Nov 2026",
+            "url": "https://transport.wb.gov.in/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bengaluru",
+      "name": "Bengaluru",
+      "names": ["bengaluru", "bangalore", "indiranagar"],
+      "admin1": [],
+      "center": {
+        "lat": 12.97,
+        "lon": 77.59
+      },
+      "radiusKm": 30,
+      "options": [
+        {
+          "id": "namma-metro",
+          "kind": "metro",
+          "name": "Namma Metro",
+          "operator": "Bangalore Metro Rail Corporation (BMRCL)",
+          "url": "https://english.bmrc.co.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-namma-metro",
+            "title": "Bangalore Metro Rail Corporation (BMRCL): official website, reachable on 21 Nov 2026",
+            "url": "https://english.bmrc.co.in/",
+            "status": "P-FETCH"
+          }
+        },
+        {
+          "id": "bmtc",
+          "kind": "bus",
+          "name": "BMTC buses",
+          "operator": "Bengaluru Metropolitan Transport Corporation",
+          "url": "https://mybmtc.karnataka.gov.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-bmtc",
+            "title": "Bengaluru Metropolitan Transport Corporation: official website, reachable on 21 Nov 2026",
+            "url": "https://mybmtc.karnataka.gov.in/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "chennai",
+      "name": "Chennai",
+      "names": ["chennai", "madras"],
+      "admin1": [],
+      "center": {
+        "lat": 13.08,
+        "lon": 80.27
+      },
+      "radiusKm": 30,
+      "options": [
+        {
+          "id": "chennai-metro",
+          "kind": "metro",
+          "name": "Chennai Metro",
+          "operator": "Chennai Metro Rail Limited",
+          "url": "https://chennaimetrorail.org/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-chennai-metro",
+            "title": "Chennai Metro Rail Limited: official website, reachable on 21 Nov 2026",
+            "url": "https://chennaimetrorail.org/",
+            "status": "P-FETCH"
+          }
+        },
+        {
+          "id": "mtc",
+          "kind": "bus",
+          "name": "MTC buses",
+          "operator": "Metropolitan Transport Corporation, Chennai",
+          "url": "https://mtcbus.tn.gov.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-mtc",
+            "title": "Metropolitan Transport Corporation, Chennai: official website, reachable on 21 Nov 2026",
+            "url": "https://mtcbus.tn.gov.in/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyderabad",
+      "name": "Hyderabad",
+      "names": ["hyderabad", "secunderabad"],
+      "admin1": [],
+      "center": {
+        "lat": 17.39,
+        "lon": 78.49
+      },
+      "radiusKm": 30,
+      "options": [
+        {
+          "id": "hyderabad-metro",
+          "kind": "metro",
+          "name": "Hyderabad Metro",
+          "operator": "Hyderabad Metro Rail Limited",
+          "url": "https://hmrl.co.in/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-hyderabad-metro",
+            "title": "Hyderabad Metro Rail Limited: official website, reachable on 21 Nov 2026",
+            "url": "https://hmrl.co.in/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pune",
+      "name": "Pune",
+      "names": ["pune", "pimpri chinchwad"],
+      "admin1": [],
+      "center": {
+        "lat": 18.52,
+        "lon": 73.86
+      },
+      "radiusKm": 30,
+      "options": [
+        {
+          "id": "pune-metro",
+          "kind": "metro",
+          "name": "Pune Metro",
+          "operator": "Maha-Metro Pune",
+          "url": "https://www.punemetrorail.org/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-pune-metro",
+            "title": "Maha-Metro Pune: official website, reachable on 21 Nov 2026",
+            "url": "https://www.punemetrorail.org/",
+            "status": "P-FETCH"
+          }
+        },
+        {
+          "id": "pmpml",
+          "kind": "bus",
+          "name": "PMPML buses",
+          "operator": "Pune Mahanagar Parivahan Mahamandal Limited",
+          "url": "https://pmpml.org/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-pmpml",
+            "title": "Pune Mahanagar Parivahan Mahamandal Limited: official website, reachable on 21 Nov 2026",
+            "url": "https://pmpml.org/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ahmedabad",
+      "name": "Ahmedabad",
+      "names": ["ahmedabad"],
+      "admin1": [],
+      "center": {
+        "lat": 23.02,
+        "lon": 72.57
+      },
+      "radiusKm": 25,
+      "options": [
+        {
+          "id": "ahmedabad-metro",
+          "kind": "metro",
+          "name": "Ahmedabad Metro",
+          "operator": "Gujarat Metro Rail Corporation",
+          "url": "https://www.gujaratmetrorail.com/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-ahmedabad-metro",
+            "title": "Gujarat Metro Rail Corporation: official website, reachable on 21 Nov 2026",
+            "url": "https://www.gujaratmetrorail.com/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "nagpur",
+      "name": "Nagpur",
+      "names": ["nagpur"],
+      "admin1": [],
+      "center": {
+        "lat": 21.15,
+        "lon": 79.09
+      },
+      "radiusKm": 20,
+      "options": [
+        {
+          "id": "nagpur-metro",
+          "kind": "metro",
+          "name": "Nagpur Metro",
+          "operator": "Maha Metro (Maharashtra Metro Rail Corporation)",
+          "url": "https://www.mahametro.org/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-nagpur-metro",
+            "title": "Maha Metro (Maharashtra Metro Rail Corporation): official website, reachable on 21 Nov 2026",
+            "url": "https://www.mahametro.org/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bhopal",
+      "name": "Bhopal",
+      "names": ["bhopal"],
+      "admin1": [],
+      "center": {
+        "lat": 23.26,
+        "lon": 77.41
+      },
+      "radiusKm": 20,
+      "options": [
+        {
+          "id": "bhopal-metro",
+          "kind": "metro",
+          "name": "Bhopal Metro",
+          "operator": "Madhya Pradesh Metro Rail Corporation",
+          "url": "https://mpmrcl.com/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-bhopal-metro",
+            "title": "Madhya Pradesh Metro Rail Corporation: official website, reachable on 21 Nov 2026",
+            "url": "https://mpmrcl.com/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    },
+    {
+      "id": "indore",
+      "name": "Indore",
+      "names": ["indore"],
+      "admin1": [],
+      "center": {
+        "lat": 22.72,
+        "lon": 75.86
+      },
+      "radiusKm": 20,
+      "options": [
+        {
+          "id": "indore-metro",
+          "kind": "metro",
+          "name": "Indore Metro",
+          "operator": "Madhya Pradesh Metro Rail Corporation",
+          "url": "https://mpmrcl.com/",
+          "check": {
+            "on": "2026-11-21",
+            "httpStatus": 200
+          },
+          "source": {
+            "id": "site-indore-metro",
+            "title": "Madhya Pradesh Metro Rail Corporation: official website, reachable on 21 Nov 2026",
+            "url": "https://mpmrcl.com/",
+            "status": "P-FETCH"
+          }
+        }
+      ]
+    }
+  ],
+  "fallback": {
+    "id": "other",
+    "name": "your city",
+    "options": [
+      {
+        "id": "city-bus",
+        "kind": "bus",
+        "name": "a city bus",
+        "operator": "your local bus service",
+        "url": "",
+        "source": {
+          "id": "saans-generic-bus",
+          "title": "Saans rule: assume a city bus may serve a trip, and say nothing about other transport here",
+          "url": "",
+          "status": "APP"
+        }
+      }
+    ]
+  },
+  "assumptions": {
+    "weeklyKm": {
+      "source": {
+        "id": "saans-weekly-km",
+        "title": "Saans rule: car-km avoided a week is your trip length one way, times 2 for the way back, times the days you listed",
+        "url": "",
+        "status": "APP"
+      }
+    },
+    "carpoolHalf": {
+      "source": {
+        "id": "saans-carpool-half",
+        "title": "Saans rule: sharing a ride with one other household and taking turns halves your own car-km",
+        "url": "",
+        "status": "APP"
+      }
+    }
+  },
+  "distanceBands": {
+    "shortBelowKm": 2,
+    "longAboveKm": 15,
+    "source": {
+      "id": "saans-distance-bands",
+      "title": "Saans rule: a trip is short under 2 km, mid from 2 to 15 km and long above 15 km",
+      "url": "",
+      "status": "APP"
+    }
+  },
+  "rules": [
+    {
+      "id": "short-walk-cycle",
+      "when": {
+        "band": ["short"],
+        "mode": ["car", "two_wheeler", "auto"],
+        "level": ["good", "satisfactory", "moderate"]
+      },
+      "then": {
+        "title": "Walk or cycle this short trip",
+        "body": "At {km} km each way this trip is short enough to walk or cycle. Today the air is {levelLabel}, so it is a reasonable day for it. Keep to quieter lanes away from heavy traffic where you can.",
+        "reason": "The GRAP citizens charter, written for Delhi NCR, asks people to walk or cycle for small distances. Saans suggests it only when the air is Moderately polluted or better, because in a Delhi study people on foot breathed more fine particles per minute than people inside vehicles.",
+        "impact": {
+          "kind": "distance",
+          "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
+          "numbers": ["weekKm", "km", "days"]
+        }
+      },
+      "source": {
+        "id": "grap-walk-cycle",
+        "title": "CAQM Graded Response Action Plan, citizens charter (revision 21.11.2025)",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Walk or use cycles for small distances.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "mid-transit-rail",
+      "when": {
+        "band": ["mid"],
+        "mode": ["car", "two_wheeler", "auto"],
+        "rail": [true]
+      },
+      "then": {
+        "title": "Try {options} for this trip",
+        "body": "At {km} km each way, {options} could cover this trip. Check the route map for stations near your home and your destination.{links}",
+        "reason": "The health ministry advises using public transport whenever possible on polluted days.",
+        "impact": {
+          "kind": "distance",
+          "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
+          "numbers": ["weekKm", "km", "days"]
+        },
+        "exposure": "transit"
+      },
+      "source": {
+        "id": "mohfw-public-transport",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 20",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Use public transport whenever possible to reduce air pollution.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "mid-transit-bus",
+      "when": {
+        "band": ["mid"],
+        "mode": ["car", "two_wheeler", "auto"],
+        "rail": [false]
+      },
+      "then": {
+        "title": "Try {options} for this trip",
+        "body": "At {km} km each way, {options} may cover this trip. Check the routes near your home and your destination.{links}",
+        "reason": "The health ministry advises using public transport whenever possible on polluted days.",
+        "impact": {
+          "kind": "distance",
+          "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
+          "numbers": ["weekKm", "km", "days"]
+        },
+        "exposure": "transit"
+      },
+      "source": {
+        "id": "mohfw-public-transport",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 20",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Use public transport whenever possible to reduce air pollution.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "long-transit-rail",
+      "when": {
+        "band": ["long"],
+        "mode": ["car", "two_wheeler", "auto"],
+        "rail": [true]
+      },
+      "then": {
+        "title": "Take {options} for the long part of this trip",
+        "body": "At {km} km each way, {options} could carry the long part of this trip, with a short ride or walk at each end. Check the route map.{links}",
+        "reason": "The health ministry advises using public transport whenever possible on polluted days.",
+        "impact": {
+          "kind": "distance",
+          "text": "About {weekKm} fewer km by {vehicle} each week: {km} km one way, there and back, on {days} days a week. This assumes you make the trip on each of those days.{exposureNote}",
+          "numbers": ["weekKm", "km", "days"]
+        },
+        "exposure": "transit"
+      },
+      "source": {
+        "id": "mohfw-public-transport",
+        "title": "Ministry of Health and Family Welfare, Advisory on Air Pollution and Health, Annexure II item 20",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "quote": "Use public transport whenever possible to reduce air pollution.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "carpool",
+      "when": {
+        "mode": ["car"],
+        "band": ["short", "mid", "long"]
+      },
+      "then": {
+        "title": "Share this ride with another household",
+        "body": "If another household is going your way, take turns driving. Each of you then drives on half the days.",
+        "reason": "The GRAP citizens charter, written for Delhi NCR, asks people to share a ride or use public transport. Taking turns with one other household is a Saans assumption.",
+        "impact": {
+          "kind": "distance",
+          "text": "Your car would do about {halfKm} fewer km each week, half of the {weekKm} km it does now ({km} km one way, there and back, on {days} days a week).",
+          "numbers": ["halfKm", "weekKm", "km", "days"]
+        }
+      },
+      "source": {
+        "id": "grap-share-ride",
+        "title": "CAQM Graded Response Action Plan, citizens charter (revision 21.11.2025)",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Choose a cleaner commute. Share a ride to work or use public transport.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "no-idling",
+      "when": {
+        "mode": ["car"]
+      },
+      "then": {
+        "title": "Switch the engine off when you wait",
+        "body": "Turn the engine off at red lights and while you wait for someone. Do it if the wait will be longer than about 15 seconds.",
+        "reason": "The GRAP citizens charter asks drivers not to idle and to turn off the engine at red lights. PCRA, the oil ministry fuel-saving body, advises switching off beyond 15 seconds at a red light.",
+        "impact": {
+          "kind": "none",
+          "text": "Not quantified: Saans has no sourced idling figure for Indian cars.",
+          "numbers": []
+        }
+      },
+      "source": {
+        "id": "grap-no-idling",
+        "title": "CAQM Graded Response Action Plan, citizens charter (revision 21.11.2025)",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Do not idle your vehicle, also turn off the engine at red lights.",
+        "status": "P-READ"
+      },
+      "alsoSource": {
+        "id": "pcra-15-seconds",
+        "title": "Press Information Bureau, Ministry of Petroleum and Natural Gas, 18 January 2008",
+        "url": "https://www.pib.gov.in/newsite/erelcontent.aspx?relid=34747",
+        "quote": "This wastage may be saved simply by switching off vehicle engine beyond 15 seconds at traffic red lights.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "id": "combine-errands",
+      "when": {
+        "kind": ["errand"],
+        "mode": ["car", "two_wheeler", "auto"],
+        "repeats": [true]
+      },
+      "then": {
+        "title": "Combine your errands into one trip",
+        "body": "You make this errand trip on {days} days a week. Doing the errands together in one trip leaves {tripsSaved} fewer trips.",
+        "reason": "The GRAP citizens charter, written for Delhi NCR, asks people to combine errands and reduce trips.",
+        "impact": {
+          "kind": "distance",
+          "text": "About {saved} fewer km by {vehicle} each week: {tripsSaved} fewer trips of {km} km one way, there and back. This assumes everything fits into one trip.",
+          "numbers": ["saved", "tripsSaved", "km"]
+        }
+      },
+      "source": {
+        "id": "grap-combine-errands",
+        "title": "CAQM Graded Response Action Plan, citizens charter (revision 21.11.2025)",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Combine errands and reduce trips.",
+        "status": "P-READ"
+      }
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "intro": "At this AQI, GRAP Stage {stage} measures apply in Delhi NCR. Check caqm.nic.in for the stage in force.",
+  "stages": [
+    {
+      "stage": 1,
+      "from": 201,
+      "to": 300,
+      "line": "Stage I measures include a citizens charter asking drivers not to idle and to turn the engine off at red lights.",
+      "trigger": {
+        "id": "caqm-grap-stage-1-trigger",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage I",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "DELHI AQI ranging between 201-300",
+        "status": "P-READ"
+      },
+      "source": {
+        "id": "caqm-grap-stage-1-charter",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage I citizens charter",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Do not idle your vehicle, also turn off the engine at red lights.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "stage": 2,
+      "from": 301,
+      "to": 400,
+      "line": "Stage II measures include housing societies providing electric heaters to guards and other staff, so that nobody has to burn waste or wood to keep warm.",
+      "trigger": {
+        "id": "caqm-grap-stage-2-trigger",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage II",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "DELHI AQI ranging between 301-400",
+        "status": "P-READ"
+      },
+      "source": {
+        "id": "caqm-grap-stage-2-heaters",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage II actions",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Resident Welfare Associations to necessarily provide electric heaters to staff engaged in security, sanitation, horticulture and other miscellaneous services to avoid open Bio-Mass/ MSW burning during winters.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "stage": 3,
+      "from": 401,
+      "to": 450,
+      "line": "Stage III measures include hybrid classes, in school and online, for children up to Class V in Delhi, Gurugram, Faridabad, Ghaziabad and Gautam Buddh Nagar. Families can choose the online option.",
+      "trigger": {
+        "id": "caqm-grap-stage-3-trigger",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage III",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "DELHI AQI ranging between 401-450",
+        "status": "P-READ"
+      },
+      "source": {
+        "id": "caqm-grap-stage-3-schools",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage III actions",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "mandatorily conduct classes in schools for children up to class V in a \"Hybrid\" mode i.e., both in physical and online mode (wherever online mode is feasible) [...] The option to exercise the online mode of education, wherever available, shall vest with the students and their guardians.",
+        "status": "P-READ"
+      }
+    },
+    {
+      "stage": 4,
+      "from": 451,
+      "to": 500,
+      "line": "Stage IV measures include a citizens charter asking children, older people and people with lung or heart disease to avoid outdoor activities and stay indoors as much as possible.",
+      "trigger": {
+        "id": "caqm-grap-stage-4-trigger",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage IV",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "DELHI AQI > 450",
+        "status": "P-READ"
+      },
+      "source": {
+        "id": "caqm-grap-stage-4-charter",
+        "title": "CAQM Graded Response Action Plan for the NCR (revision 21.11.2025), Stage IV citizens charter",
+        "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+        "quote": "Children, elderly and those with respiratory, cardiovascular, cerebrovascular or other chronic diseases to avoid outdoor activities and stay indoors, as much as possible.",
+        "status": "P-READ"
+      }
+    }
+  ]
+}
