@@ -63,7 +63,14 @@ const SERVER_SYNTAX = [
 ];
 
 export default defineConfig([
-  globalIgnores(['.next/**', 'coverage/**', 'node_modules/**', 'next-env.d.ts', '.planning/**']),
+  globalIgnores([
+    '.next/**',
+    'coverage/**',
+    'node_modules/**',
+    'next-env.d.ts',
+    '.planning/**',
+    '.claude/**',
+  ]),
   ...nextVitals,
   {
     // The App Router has no pages/ directory, and the rule warns on every run when it finds none.

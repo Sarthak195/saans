@@ -11,3 +11,6 @@ node_modules/
 coverage/
 *.tsbuildinfo
 next-env.d.ts
+
+# Local agent worktrees and tool state
+.claude/
