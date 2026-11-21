@@ -6,12 +6,8 @@ import type { HomeAdvice } from '@/core/plan/types';
 import { checkNumbers } from '@/core/text';
 import type { Home } from '@/core/types';
 
-<<<<<<< HEAD
-import { INSUFFICIENT, aqiOk, makeHousehold, makePlan, windowOf } from '../helpers/plan-doubles';
-=======
 import { INSUFFICIENT, aqiOk, makeHousehold, makePlan, windowOf } from '../helpers/plan-doubles';
 import { CLAIMS_SAFE, DASHES, UNFILLED } from '../helpers/text';
->>>>>>> 1c42240 (test(core): helper coverage and lint-clean fact types for home, alternatives and community)
 
 function advice(home: Partial<Home> = {}, plan: Parameters<typeof makePlan>[0] = {}): HomeAdvice[] {
   return buildHomeAdvice({ household: makeHousehold({ home }), plan: makePlan(plan) });

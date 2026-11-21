@@ -18,12 +18,8 @@ import {
   makeHousehold,
   makePlan,
   makeRoutine,
-<<<<<<< HEAD
-} from '../helpers/plan-doubles';
-=======
 } from '../helpers/plan-doubles';
 import { CLAIMS_SAFE, DASHES, UNFILLED } from '../helpers/text';
->>>>>>> 1c42240 (test(core): helper coverage and lint-clean fact types for home, alternatives and community)
 
 interface Trip {
   place?: Place;
