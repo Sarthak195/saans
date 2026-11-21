@@ -1,4 +1,3 @@
-import { templateNotice } from '@/core/briefing';
 import { communityKindOf, keepFromForm, withCommunityKind } from '@/server/edits';
 import { field, handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { writeNotice } from '@/server/genai';
@@ -36,7 +35,7 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
     if (view.unavailable !== undefined) return seeOther(back);
 
     const written = await writeNotice({ plan: view.plan, community, lang });
-    const n = sealWritten(written, templateNotice(view.plan, community), {
+    const n = sealWritten(written, {
       token,
       view,
       lang,

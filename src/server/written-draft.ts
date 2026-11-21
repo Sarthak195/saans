@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createHash } from 'node:crypto';
 
-import { checkWritten } from '@/core/briefing';
+import { checkWritten, templateBriefing, templateNotice } from '@/core/briefing';
 import type { CommunityKind, Language } from '@/core/types';
 import { AppError } from '@/server/errors';
 import type { WrittenText } from '@/server/genai';
@@ -39,20 +39,42 @@ function seconds(now: Date): number {
 
 /**
  * A written summary or notice packed into a short sealed parameter, so a page can show it after a
- * redirect without keeping anything. A cut-off text could lose a caveat, so one that does not fit
- * is swapped for the code-built text instead.
+ * redirect without keeping anything. Code-built text is not carried at all, only its note: the
+ * page builds it again from the plan it shows. A cut-off model text could lose a caveat, so one
+ * that does not fit is swapped for the code-built text too.
  */
-export function sealWritten(written: WrittenText, plain: string, target: WrittenFor): string {
+export function sealWritten(written: WrittenText, target: WrittenFor): string {
   const base = { binding: bindingOf(target), issuedAt: seconds(target.now) };
-  const whole = sealWrittenText({
+  if (written.by === 'gemini') {
+    const whole = sealWrittenText({
+      ...base,
+      text: written.text,
+      by: 'gemini',
+      lang: written.lang,
+    });
+    if (openWrittenText(whole).text === written.text) return whole;
+  }
+  const note = written.by === 'gemini' ? TOO_LONG : written.note;
+  return sealWrittenText({
     ...base,
-    text: written.text,
-    by: written.by,
-    lang: written.lang,
-    ...(written.note === undefined ? {} : { note: written.note }),
+    text: '',
+    by: 'template',
+    lang: 'en',
+    ...(note === undefined ? {} : { note }),
   });
-  if (openWrittenText(whole).text === written.text) return whole;
-  return sealWrittenText({ ...base, text: plain, by: 'template', lang: 'en', note: TOO_LONG });
+}
+
+/** The code-built text for this page, built again from its plan so it is always the current one. */
+function plainFor(target: WrittenFor, note: string | undefined): WrittenText | undefined {
+  const { plan, community } = target.view;
+  const text =
+    target.audience === 'family'
+      ? templateBriefing(plan)
+      : community === undefined
+        ? undefined
+        : templateNotice(plan, community);
+  if (text === undefined) return undefined;
+  return { by: 'template', lang: 'en', text, ...(note === undefined ? {} : { note }) };
 }
 
 /** Names are put in after the checks, so they are blanked here: a label's digits are not facts. */
@@ -88,18 +110,18 @@ export function openWritten(
   if (token === undefined) return undefined;
   try {
     const sealed = openWrittenText(token);
-    if (sealed.text === '' || sealed.binding !== bindingOf(target)) return undefined;
+    if (sealed.binding !== bindingOf(target)) return undefined;
     const age = seconds(target.now) - sealed.issuedAt;
     if (age > MAX_AGE_SECONDS || age < -MAX_FUTURE_SECONDS) return undefined;
+    if (sealed.by === 'template') return plainFor(target, sealed.note);
+    if (sealed.text === '') return undefined;
     const written: WrittenText = {
       by: sealed.by,
       text: sealed.text,
       lang: sealed.lang,
       ...(sealed.note === undefined ? {} : { note: sealed.note }),
     };
-    // Code-built text needs no check; only the model's words are looked at again.
-    if (written.by === 'gemini' && !stillHolds(written, target)) return undefined;
-    return written;
+    return stillHolds(written, target) ? written : undefined;
   } catch (error) {
     if (error instanceof AppError) return undefined;
     throw error;

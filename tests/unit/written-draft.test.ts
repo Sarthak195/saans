@@ -1,12 +1,15 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { templateBriefing, templateNotice } from '@/core/briefing';
 import { sampleById } from '@/core/profile/samples';
 import { openDraft, openHousehold, sealDraft, sealHousehold } from '@/server/seal';
 import type { WrittenText } from '@/server/genai';
+import { briefingWithDeps, noticeWithDeps } from '@/server/genai/writer';
 import { openWritten, sealWritten } from '@/server/written-draft';
 import type { WrittenFor } from '@/server/written-draft';
 
 import { stubKeys } from '../helpers/form';
+import { RECORDED_NOW, depsWith, replay } from '../helpers/genai';
 import { HINDI_SUMMARY, SUMMARY, writtenFor } from '../helpers/written';
 
 const sample = sampleById('s1');
@@ -32,7 +35,7 @@ const gemini = (text: string, lang: 'en' | 'hi' = 'en'): WrittenText => ({
 });
 
 function sealedFor(target: WrittenFor, written: WrittenText = gemini(SUMMARY)): string {
-  return sealWritten(written, 'plain', target);
+  return sealWritten(written, target);
 }
 
 describe('written text is bound to the page it was made for', () => {
@@ -134,10 +137,70 @@ describe('written text is checked again before it is shown', () => {
     expect(openWritten(sealedFor(target, gemini(text)), target)?.text).toBe(text);
   });
 
-  it('does not re-check code-built text, which can be longer than a model reply may be', async () => {
+  it('builds code-made text again from the page and carries only its note', async () => {
     const target = await writtenFor(sample.household, TOKEN);
-    const long = Array.from({ length: 12 }, (_, i) => `Sentence number ${String(i)}.`).join(' ');
-    const template: WrittenText = { by: 'template', lang: 'en', text: long, note: 'Paused.' };
-    expect(openWritten(sealedFor(target, template), target)).toEqual(template);
+    const stale: WrittenText = {
+      by: 'template',
+      lang: 'en',
+      text: 'AQI 999 at 03:00 yesterday.',
+      note: 'Paused.',
+    };
+    const shown = openWritten(sealedFor(target, stale), target);
+    expect(shown).toEqual({
+      by: 'template',
+      lang: 'en',
+      text: templateBriefing(target.view.plan),
+      note: 'Paused.',
+    });
+    expect(shown?.text).not.toContain('999');
+
+    const notice = await writtenFor(school.household, OTHER, { audience: 'school' });
+    expect(openWritten(sealedFor(notice, stale), notice)?.text).toBe(
+      templateNotice(
+        notice.view.plan,
+        notice.view.community as NonNullable<typeof notice.view.community>,
+      ),
+    );
+  });
+});
+
+describe('what the writer really produces still opens on its own page', () => {
+  async function targetFor(
+    id: 's1' | 's6',
+    token: string,
+    audience: WrittenFor['audience'],
+  ): Promise<WrittenFor> {
+    const household = sampleById(id)?.household;
+    if (household === undefined) throw new Error('no sample');
+    return writtenFor(household, token, { audience, now: RECORDED_NOW });
+  }
+
+  it.each(['en', 'hi'] as const)('keeps the recorded %s briefing', async (lang) => {
+    const target = { ...(await targetFor('s1', TOKEN, 'family')), lang };
+    const { view } = target;
+    const written = await briefingWithDeps(
+      {
+        plan: view.plan,
+        home: view.home,
+        alternatives: view.alternatives,
+        household: view.household,
+        lang,
+      },
+      depsWith(replay(`briefing-${lang}`)),
+    );
+    expect(written.by).toBe('gemini');
+    expect(openWritten(sealWritten(written, target), target)).toEqual(written);
+  });
+
+  it('keeps the recorded notice', async () => {
+    const target = await targetFor('s6', OTHER, 'school');
+    const { view } = target;
+    if (view.community === undefined) throw new Error('no community view');
+    const written = await noticeWithDeps(
+      { plan: view.plan, community: view.community, lang: 'en' },
+      depsWith(replay('notice-s6')),
+    );
+    expect(written.by).toBe('gemini');
+    expect(openWritten(sealWritten(written, target), target)).toEqual(written);
   });
 });

@@ -1,4 +1,3 @@
-import { templateBriefing } from '@/core/briefing';
 import { keepFromForm, planPath } from '@/server/edits';
 import { field, handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { writeBriefing } from '@/server/genai';
@@ -38,7 +37,7 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
       household: view.household,
       lang,
     });
-    const b = sealWritten(written, templateBriefing(view.plan), {
+    const b = sealWritten(written, {
       token,
       view,
       lang,

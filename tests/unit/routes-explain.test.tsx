@@ -7,6 +7,7 @@ import { POST as explainPost } from '@/app/plan/[token]/explain/route';
 import PlanTokenPage from '@/app/plan/[token]/page';
 import CommunitySamplePage from '@/app/plan/sample/[id]/community/page';
 import SamplePage from '@/app/plan/sample/[id]/page';
+import { templateBriefing } from '@/core/briefing';
 import { sampleById } from '@/core/profile/samples';
 import { writeBriefing, writeNotice } from '@/server/genai';
 import { sealHousehold } from '@/server/seal';
@@ -92,7 +93,7 @@ describe('no page view calls Gemini', () => {
 describe('a written summary in the address', () => {
   it('is shown with its own label', async () => {
     const target = await writtenFor(sample.household, TOKEN);
-    const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, 'plain', target);
+    const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, target);
     const html = await planHtml({ b });
     expect(html).toContain(SUMMARY);
     expect(html).toContain('Written by Gemini from your plan');
@@ -102,18 +103,19 @@ describe('a written summary in the address', () => {
   it('shows the template label and the note when the model was unavailable', async () => {
     const b = sealWritten(
       { by: 'template', lang: 'en', text: SUMMARY, note: 'Paused.' },
-      'plain',
+
       await writtenFor(sample.household, TOKEN),
     );
     const html = await planHtml({ b });
-    expect(html).toContain(SUMMARY);
+    // Code-made text is built again from the page, so only the note is carried.
+    expect(html).not.toContain(SUMMARY);
     expect(html).toContain('Written by Saans from your plan');
     expect(html).toContain('Paused.');
   });
 
   it('ignores a tampered parameter', async () => {
     const target = await writtenFor(sample.household, TOKEN);
-    const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, 'plain', target);
+    const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, target);
     const html = await planHtml({ b: `${b.slice(0, -4)}AAAA` });
     expect(html).not.toContain(SUMMARY);
     expect(html).toContain('Written by Saans from your plan');
@@ -163,7 +165,7 @@ describe('POST /plan/[token]/explain', () => {
     expect(openWritten(query(location).get('b') ?? '', target)).toEqual({
       by: 'template',
       lang: 'en',
-      text: SUMMARY,
+      text: templateBriefing(target.view.plan),
       note: 'Paused.',
     });
   });
