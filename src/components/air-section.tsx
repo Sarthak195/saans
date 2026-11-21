@@ -93,15 +93,18 @@ function GasTable({
 export function AirSection({
   air,
   smogDay = false,
+  unavailable = false,
 }: {
   readonly air: AirSummary;
   readonly smogDay?: boolean;
+  /** True when the plan was built with no air data at all. */
+  readonly unavailable?: boolean;
 }): ReactElement {
   const { aqi } = air;
   return (
     <section aria-labelledby="air-title" id="air" className="section">
       <h2 id="air-title">Air today</h2>
-      <Provenance air={air} smogDay={smogDay} />
+      {unavailable ? null : <Provenance air={air} smogDay={smogDay} />}
       {aqi.kind === 'ok' ? (
         <>
           <p className="aqi-line">
@@ -116,11 +119,12 @@ export function AirSection({
         </>
       ) : (
         <p>
-          There are not enough hours of air data to work out today&apos;s AQI. The hourly numbers
-          below still guide the plan.
+          {unavailable
+            ? 'The air data for this place could not be loaded, so there is no reading to show.'
+            : "There are not enough hours of air data to work out today's AQI. The hourly numbers below still guide the plan."}
         </p>
       )}
-      <SourceLine air={air} />
+      {unavailable ? null : <SourceLine air={air} />}
       <details>
         <summary>Why this can differ from the Sameer app</summary>
         <p>

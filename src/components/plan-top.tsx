@@ -167,3 +167,47 @@ export function BriefingSection({
     </section>
   );
 }
+
+/** A box for one more question about the plan, read by Gemini and answered from the plan's own numbers. */
+export function AskSection({
+  action,
+  formToken,
+  keep,
+}: {
+  readonly action: string;
+  readonly formToken: string;
+  readonly keep: Readonly<Record<string, string>>;
+}): ReactElement {
+  return (
+    <section id="ask" aria-labelledby="ask-title" className="section">
+      <h2 id="ask-title">Ask about this plan</h2>
+      <form method="post" action={action}>
+        <input type="hidden" name="formToken" value={formToken} />
+        {Object.entries(keep).map(([name, value]) => (
+          <input key={name} type="hidden" name={name} value={value} />
+        ))}
+        <div className="field">
+          <label htmlFor="ask-text">Your question</label>
+          <input
+            id="ask-text"
+            name="text"
+            type="text"
+            maxLength={300}
+            autoComplete="off"
+            aria-describedby="ask-hint"
+            required
+          />
+          <p className="small" id="ask-hint">
+            For example: can my son play at 6 pm, or what if she walks at 7 am. Your question is
+            sent to Google&apos;s Gemini API to read it. Avoid names.
+          </p>
+        </div>
+        <p>
+          <button className="button" type="submit">
+            Ask
+          </button>
+        </p>
+      </form>
+    </section>
+  );
+}

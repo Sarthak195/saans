@@ -234,3 +234,8 @@ a {
     scroll-behavior: auto !important;
   }
 }
+
+.site-name a {
+  color: inherit;
+  text-decoration: none;
+}

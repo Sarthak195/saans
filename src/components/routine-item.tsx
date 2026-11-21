@@ -13,6 +13,8 @@ export interface WhatIfTarget {
   /** Where the what-if form posts, such as '/plan/<token>/whatif'. */
   action: string;
   formToken: string;
+  /** Values the new plan page should keep, such as the day, sent back with the form. */
+  keep?: Readonly<Record<string, string>>;
 }
 
 function SourceNote({ source }: { readonly source: SourceRef }): ReactElement {
@@ -66,6 +68,9 @@ function WhatIfForm({
       <form method="post" action={target.action}>
         <input type="hidden" name="formToken" value={target.formToken} />
         <input type="hidden" name="routineId" value={advice.routineId} />
+        {Object.entries(target.keep ?? {}).map(([name, value]) => (
+          <input key={name} type="hidden" name={name} value={value} />
+        ))}
         <div className="field">
           <label htmlFor={`${id}-start`}>Start time</label>
           <input

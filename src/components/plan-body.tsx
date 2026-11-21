@@ -9,7 +9,14 @@ import { AirSection } from './air-section';
 import { DayRibbon } from './day-ribbon';
 import type { PlanContext } from './links';
 import { GlanceSection, MemberSummaries, SevereBanner, Timeline } from './plan-day';
-import { AnswerCard, BriefingSection, JumpBar, PlanHeader, StatusLine } from './plan-top';
+import {
+  AnswerCard,
+  AskSection,
+  BriefingSection,
+  JumpBar,
+  PlanHeader,
+  StatusLine,
+} from './plan-top';
 import type { Briefing } from './plan-top';
 
 export interface PlanBodyProps {
@@ -38,6 +45,7 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
     plan.answer === undefined
       ? undefined
       : plan.routines.find((r) => r.ref === plan.answer?.routineRef);
+  const keep = { day: plan.day.relative, ...(smogDay ? { air: 'smog-day' } : {}) };
   const markers = plan.routines
     .filter((r) => r.scheduled)
     .map((r) => ({ label: `${r.memberLabel} ${r.start}`, start: r.start }));
@@ -46,7 +54,6 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
     <>
       <PlanHeader plan={plan} ctx={ctx} smogDay={smogDay} />
       <StatusLine text={status} />
-      {intro}
       <JumpBar hasAnswer={plan.answer !== undefined} />
       {plan.answer === undefined ? null : (
         <AnswerCard
@@ -55,8 +62,9 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
           question={view.household.question}
         />
       )}
+      {intro}
       <BriefingSection briefing={briefing} ctx={ctx} lang={lang} />
-      <AirSection air={plan.air} smogDay={smogDay} />
+      <AirSection air={plan.air} smogDay={smogDay} unavailable={view.unavailable !== undefined} />
       <section id="hours" aria-labelledby="hours-title" className="section">
         <h2 id="hours-title">Hour by hour</h2>
         <DayRibbon
@@ -71,9 +79,10 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
       <Timeline
         plan={plan}
         before={before}
-        whatIf={{ action: `${ctx.actionBase}/whatif`, formToken: ctx.formToken }}
+        whatIf={{ action: `${ctx.actionBase}/whatif`, formToken: ctx.formToken, keep }}
       />
       <MemberSummaries members={plan.members} />
+      <AskSection action={`${ctx.actionBase}/ask`} formToken={ctx.formToken} keep={keep} />
       <HomeSection home={view.home} />
       <AlternativesSection alternatives={view.alternatives} transit={view.transit} />
       <GrapSection grap={view.grap} />

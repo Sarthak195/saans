@@ -466,3 +466,82 @@ td {
 .ribbon-markers [data-row='8'] {
   grid-row: 8;
 }
+
+/* Forms. Every control is at least 44 px tall and has a visible label. */
+.field {
+  margin-bottom: var(--space-4);
+}
+label,
+legend {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-weight: 600;
+}
+input[type='text'],
+input[type='number'],
+input[type='time'],
+select,
+textarea {
+  display: block;
+  width: 100%;
+  max-width: 32rem;
+  min-height: var(--target-size);
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: #ffffff;
+  color: var(--color-text);
+  font: inherit;
+}
+textarea {
+  max-width: 100%;
+  min-height: 9rem;
+}
+input[aria-invalid='true'],
+select[aria-invalid='true'] {
+  border-color: var(--band-very-poor-bg);
+}
+.field-error {
+  margin: var(--space-1) 0;
+  color: #8f1d1d;
+  font-weight: 600;
+}
+fieldset {
+  min-width: 0;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  border: 0;
+}
+fieldset.row {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+}
+.checks {
+  margin-bottom: var(--space-3);
+}
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-size);
+  margin-right: var(--space-4);
+  font-weight: 400;
+}
+input[type='checkbox'] {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.error-summary {
+  margin: var(--space-4) 0;
+  padding: var(--space-3) var(--space-4);
+  border: 3px solid var(--band-very-poor-bg);
+}
+.error-summary h2 {
+  margin-bottom: var(--space-2);
+}
+.notice-text {
+  max-width: 70ch;
+  padding: var(--space-2) var(--space-3);
+  border-left: 0.25rem solid var(--color-border);
+  white-space: pre-wrap;
+}
