@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Tests run offline by design: there is no API key in this workflow and there must never be one.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      # Typecheck, lint, format, tests and the repository hygiene check.
+      - name: Verify
+        run: npm run verify
+
+      - name: Coverage thresholds
+        run: npm run coverage
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      # A plain pattern scan of tracked files. It catches the common key shapes; it is a
+      # backstop for the .gitignore rules, not a replacement for them.
+      - name: Scan for committed secrets
+        run: |
+          if git grep -nE 'AIza[0-9A-Za-z_-]{35}|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----' -- . ':!package-lock.json'; then
+            echo 'A key-like string is committed. Remove it and rotate the key.'
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build
