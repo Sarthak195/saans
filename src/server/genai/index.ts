@@ -1,89 +1,54 @@
 import 'server-only';
 
-import type {
-  Alternative,
-  CommunityPlan,
-  HomeAdvice,
-  Plan,
-  QuestionTarget,
-} from '@/core/plan/types';
-import type { Household, Language, Mode } from '@/core/types';
+import type { Alternative, CommunityPlan, HomeAdvice, Plan } from '@/core/plan/types';
+import type { Household, Language } from '@/core/types';
+import { defaultDeps } from '@/server/genai/config';
+import type { GenaiDeps } from '@/server/genai/model';
+import { questionWithDeps } from '@/server/genai/question';
+import { readWithDeps } from '@/server/genai/reader';
+import type { QuestionResult, ReaderResult, WrittenText } from '@/server/genai/types';
 import type { PlaceMatch } from '@/server/geo/geocode';
+import { briefingWithDeps, noticeWithDeps } from '@/server/genai/writer';
 
-/** What reading a family's own words produced: a household to plan for, a place to pick, or the form. */
-export type ReaderResult =
-  | {
-      kind: 'household';
-      household: Household;
-      target?: QuestionTarget;
-      /** Plain notes for the family, such as values assumed because the text did not say. */
-      notes: string[];
-      by: 'gemini' | 'keywords';
-    }
-  | { kind: 'choose_place'; options: PlaceMatch[]; text: string }
-  | { kind: 'form'; reason: string; text: string };
+export type { QuestionResult, ReaderResult, WrittenText };
 
-export interface WrittenText {
-  by: 'gemini' | 'template';
-  text: string;
-  lang: Language;
-  /** Shown beside the text when the template stood in, for example while the free quota is used up. */
-  note?: string;
+// Each function takes the model call, model names and cache as an optional last argument so tests
+// can replay recordings; the app passes nothing and gets the real client from the environment.
+
+/** Reads a family's own words into a household, a place to choose, or the form. */
+export function readHousehold(
+  input: { text: string; place?: PlaceMatch; now: Date },
+  deps: GenaiDeps = defaultDeps(),
+): Promise<ReaderResult> {
+  return readWithDeps(input, deps);
 }
 
-export type QuestionResult =
-  | {
-      kind: 'question';
-      intent: 'can_i' | 'what_if_time' | 'what_if_mode' | 'explain';
-      target: QuestionTarget;
-      newStart?: string;
-      newMode?: Mode;
-    }
-  | { kind: 'unclear'; reason: string };
-
-const NOT_READY = 'Reading text is not available yet, so please use the form.';
-
-export function readHousehold(input: {
-  text: string;
-  place?: PlaceMatch;
-  now: Date;
-}): Promise<ReaderResult> {
-  return Promise.resolve({ kind: 'form', reason: NOT_READY, text: input.text });
+/** Sorts one question about the plan into an intent and what it points at. */
+export function readQuestion(
+  input: { text: string; household: Household },
+  deps: GenaiDeps = defaultDeps(),
+): Promise<QuestionResult> {
+  return questionWithDeps(input, deps);
 }
 
-export function readQuestion(input: {
-  text: string;
-  household: Household;
-}): Promise<QuestionResult> {
-  return Promise.resolve({
-    kind: 'unclear',
-    reason: input.text.trim() === '' ? 'Type a question first.' : NOT_READY,
-  });
+/** A short briefing for the plan, written by the model and checked, or built in code. */
+export function writeBriefing(
+  input: {
+    plan: Plan;
+    home: HomeAdvice[];
+    alternatives: Alternative[];
+    household: Household;
+    lang: Language;
+  },
+  deps: GenaiDeps = defaultDeps(),
+): Promise<WrittenText> {
+  return briefingWithDeps(input, deps);
 }
 
-export function writeBriefing(input: {
-  plan: Plan;
-  home: HomeAdvice[];
-  alternatives: Alternative[];
-  household: Household;
-  lang: Language;
-}): Promise<WrittenText> {
-  const changed = input.plan.routines.filter((r) => r.decision !== 'keep').length;
-  return Promise.resolve({
-    by: 'template',
-    lang: input.lang,
-    text: `${String(changed)} routines change in this plan.`,
-  });
-}
-
-export function writeNotice(input: {
-  plan: Plan;
-  community: CommunityPlan;
-  lang: Language;
-}): Promise<WrittenText> {
-  return Promise.resolve({
-    by: 'template',
-    lang: input.lang,
-    text: `${String(input.community.actions.length)} actions for today.`,
-  });
+/** A short notice for a society, school or office, written and checked the same way. */
+export function writeNotice(
+  input: { plan: Plan; community: CommunityPlan; lang: Language },
+  deps: GenaiDeps = defaultDeps(),
+): Promise<WrittenText> {
+  return noticeWithDeps(input, deps);
 }
