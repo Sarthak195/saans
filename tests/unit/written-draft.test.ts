@@ -155,11 +155,10 @@ describe('written text is checked again before it is shown', () => {
     expect(shown?.text).not.toContain('999');
 
     const notice = await writtenFor(school.household, OTHER, { audience: 'school' });
+    const { community } = notice.view;
+    if (community === undefined) throw new Error('no community view');
     expect(openWritten(sealedFor(notice, stale), notice)?.text).toBe(
-      templateNotice(
-        notice.view.plan,
-        notice.view.community as NonNullable<typeof notice.view.community>,
-      ),
+      templateNotice(notice.view.plan, community),
     );
   });
 });

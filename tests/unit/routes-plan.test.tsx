@@ -272,7 +272,6 @@ describe('plan pages and the community notice', () => {
   const sealedNotice = async (token: string): Promise<string> =>
     sealWritten(
       { by: 'gemini', lang: 'en', text: NOTICE },
-      'plain',
       await writtenFor(school.household, token, {
         audience: school.household.community?.kind ?? 'society',
       }),
