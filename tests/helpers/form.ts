@@ -16,13 +16,14 @@ export function stubKeys(): void {
 /** A same-site form POST as a browser would send it, with a fresh form token unless one is given. */
 export function formPost(
   path: string,
-  fields: Record<string, string>,
+  fields: Record<string, string> | readonly (readonly [string, string])[],
   options: { token?: string; origin?: string | null } = {},
 ): Request {
-  const body = new URLSearchParams({
-    formToken: options.token ?? issueFormToken(new Date()),
-    ...fields,
-  }).toString();
+  const entries = Array.isArray(fields) ? fields : Object.entries(fields);
+  const body = new URLSearchParams([
+    ['formToken', options.token ?? issueFormToken(new Date())],
+    ...(entries as readonly [string, string][]),
+  ]).toString();
   const headers: Record<string, string> = { 'content-type': FORM_TYPE };
   if (options.origin !== null) headers.origin = options.origin ?? ORIGIN;
   return new Request(`${ORIGIN}${path}`, { method: 'POST', headers, body });
