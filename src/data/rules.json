@@ -114,7 +114,11 @@
   "grid": [
     {
       "id": "essential-severe-sensitive",
-      "when": { "level": ["severe"], "sensitivity": ["high", "raised"], "essential": [true] },
+      "when": {
+        "level": ["severe"],
+        "sensitivity": ["high", "raised"],
+        "essential": [true]
+      },
       "then": {
         "decision": "essential",
         "text": "The air is {level}. Children, older adults and people with lung or heart conditions are advised to stay indoors as much as possible. If this trip cannot wait, protect against the air as below."
@@ -123,7 +127,10 @@
     },
     {
       "id": "essential-severe-general",
-      "when": { "level": ["severe"], "essential": [true] },
+      "when": {
+        "level": ["severe"],
+        "essential": [true]
+      },
       "then": {
         "decision": "essential",
         "text": "The air is {level} and can affect even healthy people, even during light activity. This trip stays, so protect against the air as below."
@@ -132,7 +139,10 @@
     },
     {
       "id": "essential-very-poor",
-      "when": { "level": ["very_poor"], "essential": [true] },
+      "when": {
+        "level": ["very_poor"],
+        "essential": [true]
+      },
       "then": {
         "decision": "essential",
         "text": "The air is {level}, and a long time in it can cause respiratory illness, more so for people with lung or heart conditions. This trip stays, so protect against the air as below."
@@ -141,7 +151,11 @@
     },
     {
       "id": "essential-poor-sensitive",
-      "when": { "level": ["poor"], "sensitivity": ["high", "raised"], "essential": [true] },
+      "when": {
+        "level": ["poor"],
+        "sensitivity": ["high", "raised"],
+        "essential": [true]
+      },
       "then": {
         "decision": "essential",
         "text": "The air is {level}. Pregnant women, young children and older adults are advised to limit time outdoors. This trip stays, so protect against the air as below."
@@ -150,7 +164,10 @@
     },
     {
       "id": "essential-poor-general",
-      "when": { "level": ["poor"], "essential": [true] },
+      "when": {
+        "level": ["poor"],
+        "essential": [true]
+      },
       "then": {
         "decision": "essential",
         "text": "The air is {level}, and a long time in it can cause breathing discomfort. This trip stays, so protect against the air as below."
@@ -159,7 +176,11 @@
     },
     {
       "id": "essential-moderate-high",
-      "when": { "level": ["moderate"], "sensitivity": ["high"], "essential": [true] },
+      "when": {
+        "level": ["moderate"],
+        "sensitivity": ["high"],
+        "essential": [true]
+      },
       "then": {
         "decision": "essential",
         "text": "The air is {level} and can cause breathing discomfort to people with lung or heart conditions, children and older adults. This trip stays, so protect against the air as below."
@@ -168,7 +189,12 @@
     },
     {
       "id": "essential-moderate-vigorous",
-      "when": { "level": ["moderate"], "intensity": ["vigorous"], "essential": [true] },
+      "when": {
+        "level": ["moderate"],
+        "sensitivity": ["raised"],
+        "intensity": ["vigorous"],
+        "essential": [true]
+      },
       "then": {
         "decision": "essential",
         "text": "The air is {level} and this trip is hard effort. It stays, so protect against the air as below."
@@ -191,7 +217,10 @@
     },
     {
       "id": "severe-sensitive",
-      "when": { "level": ["severe"], "sensitivity": ["high", "raised"] },
+      "when": {
+        "level": ["severe"],
+        "sensitivity": ["high", "raised"]
+      },
       "then": {
         "decision": "indoors",
         "text": "The air is {level}. Children, older adults and people with lung or heart conditions are advised to stay indoors as much as possible."
@@ -200,7 +229,9 @@
     },
     {
       "id": "severe-general",
-      "when": { "level": ["severe"] },
+      "when": {
+        "level": ["severe"]
+      },
       "then": {
         "decision": "indoors",
         "text": "The air is {level} and can affect even healthy people, even during light activity. Stay indoors for this."
@@ -209,7 +240,10 @@
     },
     {
       "id": "very-poor-high",
-      "when": { "level": ["very_poor"], "sensitivity": ["high"] },
+      "when": {
+        "level": ["very_poor"],
+        "sensitivity": ["high"]
+      },
       "then": {
         "decision": "indoors",
         "text": "The air is {level}. On days this polluted, health advice is to reschedule outdoor activity and stay indoors."
@@ -231,7 +265,10 @@
     },
     {
       "id": "very-poor-raised-light",
-      "when": { "level": ["very_poor"], "sensitivity": ["raised"] },
+      "when": {
+        "level": ["very_poor"],
+        "sensitivity": ["raised"]
+      },
       "then": {
         "decision": "move",
         "fallback": "lighten",
@@ -255,7 +292,9 @@
     },
     {
       "id": "very-poor-general-light",
-      "when": { "level": ["very_poor"] },
+      "when": {
+        "level": ["very_poor"]
+      },
       "then": {
         "decision": "lighten",
         "text": "The air is {level}. Keep this short and gentle, because a long time in it can cause respiratory illness."
@@ -264,7 +303,10 @@
     },
     {
       "id": "poor-high",
-      "when": { "level": ["poor"], "sensitivity": ["high"] },
+      "when": {
+        "level": ["poor"],
+        "sensitivity": ["high"]
+      },
       "then": {
         "decision": "move",
         "fallback": "indoors",
@@ -288,7 +330,10 @@
     },
     {
       "id": "poor-raised-light",
-      "when": { "level": ["poor"], "sensitivity": ["raised"] },
+      "when": {
+        "level": ["poor"],
+        "sensitivity": ["raised"]
+      },
       "then": {
         "decision": "lighten",
         "text": "The air is {level}. Keep this short and gentle, because a long time in it can cause breathing discomfort."
@@ -297,7 +342,11 @@
     },
     {
       "id": "poor-general-vigorous",
-      "when": { "level": ["poor"], "sensitivity": ["general"], "intensity": ["vigorous"] },
+      "when": {
+        "level": ["poor"],
+        "sensitivity": ["general"],
+        "intensity": ["vigorous"]
+      },
       "then": {
         "decision": "move",
         "fallback": "lighten",
@@ -307,7 +356,9 @@
     },
     {
       "id": "poor-general-easier",
-      "when": { "level": ["poor"] },
+      "when": {
+        "level": ["poor"]
+      },
       "then": {
         "decision": "lighten",
         "text": "The air is {level}. Keep this shorter and gentler, because a long time in it can cause breathing discomfort."
@@ -316,7 +367,11 @@
     },
     {
       "id": "moderate-high-vigorous",
-      "when": { "level": ["moderate"], "sensitivity": ["high"], "intensity": ["vigorous"] },
+      "when": {
+        "level": ["moderate"],
+        "sensitivity": ["high"],
+        "intensity": ["vigorous"]
+      },
       "then": {
         "decision": "move",
         "fallback": "indoors",
@@ -326,7 +381,10 @@
     },
     {
       "id": "moderate-high",
-      "when": { "level": ["moderate"], "sensitivity": ["high"] },
+      "when": {
+        "level": ["moderate"],
+        "sensitivity": ["high"]
+      },
       "then": {
         "decision": "lighten",
         "text": "The air is {level} and can cause breathing discomfort to people with lung or heart conditions, children and older adults. Keep this lighter and shorter."
@@ -335,7 +393,11 @@
     },
     {
       "id": "moderate-raised-vigorous",
-      "when": { "level": ["moderate"], "sensitivity": ["raised"], "intensity": ["vigorous"] },
+      "when": {
+        "level": ["moderate"],
+        "sensitivity": ["raised"],
+        "intensity": ["vigorous"]
+      },
       "then": {
         "decision": "lighten",
         "text": "The air is {level} and can cause breathing discomfort to children. Swap hard effort for an easier pace."
@@ -344,7 +406,11 @@
     },
     {
       "id": "satisfactory-high-vigorous",
-      "when": { "level": ["satisfactory"], "sensitivity": ["high"], "intensity": ["vigorous"] },
+      "when": {
+        "level": ["satisfactory"],
+        "sensitivity": ["high"],
+        "intensity": ["vigorous"]
+      },
       "then": {
         "decision": "lighten",
         "text": "The air is {level}, which can cause minor breathing discomfort to sensitive people. An easier pace is better than hard effort."
@@ -353,19 +419,31 @@
     },
     {
       "id": "keep-good",
-      "when": { "level": ["good"] },
-      "then": { "decision": "keep", "text": "The air is {level}. No change is needed." },
+      "when": {
+        "level": ["good"]
+      },
+      "then": {
+        "decision": "keep",
+        "text": "The air is {level}. No change is needed."
+      },
       "source": "cpcb:good"
     },
     {
       "id": "keep-satisfactory",
-      "when": { "level": ["satisfactory"] },
-      "then": { "decision": "keep", "text": "The air is {level}. No change is needed for this." },
+      "when": {
+        "level": ["satisfactory"]
+      },
+      "then": {
+        "decision": "keep",
+        "text": "The air is {level}. No change is needed for this."
+      },
       "source": "cpcb:satisfactory"
     },
     {
       "id": "keep-moderate",
-      "when": { "level": ["moderate"] },
+      "when": {
+        "level": ["moderate"]
+      },
       "then": {
         "decision": "keep",
         "text": "The air is {level}. It mainly affects people with lung or heart conditions, so no change is needed here. Ease off if breathing feels uncomfortable."
@@ -390,9 +468,19 @@
     }
   },
   "guards": {
-    "essentialKinds": { "kinds": ["commute", "school_run"], "source": "app-essential-kinds" },
-    "windowGain": { "minCutPercent": 20, "source": "app-window-gain" },
-    "poorDay": { "earliestHour": 10, "latestHour": 19, "source": "app-poor-day-hours" },
+    "essentialKinds": {
+      "kinds": ["commute", "school_run"],
+      "source": "app-essential-kinds"
+    },
+    "windowGain": {
+      "minCutPercent": 20,
+      "source": "app-window-gain"
+    },
+    "poorDay": {
+      "earliestHour": 10,
+      "latestHour": 19,
+      "source": "app-poor-day-hours"
+    },
     "childHours": {
       "bands": ["child", "teen"],
       "fromHour": 7,
@@ -458,49 +546,67 @@
   "topActions": [
     {
       "id": "top-severe",
-      "when": { "severe": [true] },
+      "when": {
+        "severe": [true]
+      },
       "then": "Keep hard exercise and outdoor play indoors {when}, and wear a well-fitted N95 mask on any adult trip you cannot skip.",
       "source": "app-top-action"
     },
     {
       "id": "top-indoors",
-      "when": { "outcome": ["indoors"] },
+      "when": {
+        "outcome": ["indoors"]
+      },
       "then": "Bring the routines marked indoors inside {when}.",
       "source": "app-top-action"
     },
     {
       "id": "top-move",
-      "when": { "outcome": ["move"] },
+      "when": {
+        "outcome": ["move"]
+      },
       "then": "Move the routines marked for a cleaner time {when}.",
       "source": "app-top-action"
     },
     {
       "id": "top-essential",
-      "when": { "outcome": ["essential"] },
+      "when": {
+        "outcome": ["essential"]
+      },
       "then": "Protect the trips that cannot change {when}, as listed below.",
       "source": "app-top-action"
     },
     {
       "id": "top-lighten",
-      "when": { "outcome": ["lighten"] },
+      "when": {
+        "outcome": ["lighten"]
+      },
       "then": "Keep outdoor time shorter and gentler {when}.",
       "source": "app-top-action"
     },
     {
       "id": "top-poor-day",
-      "when": { "outcome": ["keep"], "poorDay": [true] },
+      "when": {
+        "outcome": ["keep"],
+        "poorDay": [true]
+      },
       "then": "The air is {level} {when}, so check the cleaner hours before heading out.",
       "source": "app-top-action"
     },
     {
       "id": "top-no-routines",
-      "when": { "outcome": ["none"], "hasBest": [true] },
+      "when": {
+        "outcome": ["none"],
+        "hasBest": [true]
+      },
       "then": "The cleanest 3 hours {when} are {best}. Add your routines to get a plan for each person.",
       "source": "app-top-action"
     },
     {
       "id": "top-no-data",
-      "when": { "outcome": ["none"] },
+      "when": {
+        "outcome": ["none"]
+      },
       "then": "There is no air forecast for {when} yet. Check back later.",
       "source": "app-top-action"
     },
