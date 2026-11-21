@@ -35,6 +35,8 @@ const communitySchema = z.strictObject({
       id: z.string().min(1),
       title: z.string().min(1),
       body: z.string().min(1),
+      // Wording for a window that is itself poor or worse, so it never reads as a good time for sport.
+      poor: z.strictObject({ title: z.string().min(1), body: z.string().min(1) }),
       reason: z.string().min(1),
       source: sourceRefSchema,
     }),
@@ -46,6 +48,7 @@ const communitySchema = z.strictObject({
         kind: z.exactOptional(z.array(z.enum(COMMUNITY_KINDS))),
         level: z.exactOptional(z.array(z.enum(LEVELS))),
         ncr: z.exactOptional(z.array(z.boolean())),
+        delhi: z.exactOptional(z.array(z.boolean())),
       }),
       then: z.strictObject({
         priority: z.number().int().min(0),

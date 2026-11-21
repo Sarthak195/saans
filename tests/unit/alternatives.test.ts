@@ -172,14 +172,15 @@ describe('impact numbers', () => {
 });
 
 describe('combining errands', () => {
-  it('saves (n - 1) trips of 2 x km, counting the way back, on errands made 3 days a week', () => {
+  it('saves (n - 1) x km, one way only, on errands made 3 days a week', () => {
     const list = alternatives({
       routine: { kind: 'errand', km: 4, days: ['mon', 'wed', 'fri'] },
       advice: { kind: 'errand' },
     });
     const combine = list.find((a) => a.id.endsWith('combine-errands'));
-    expect(combine?.impact.numbers).toEqual([16, 2, 4]);
-    expect(combine?.impact.text).toContain('About 16 fewer km by car each week');
+    expect(combine?.impact.numbers).toEqual([8, 2, 4]);
+    expect(combine?.impact.text).toContain('About 8 fewer km by car each week');
+    expect(combine?.impact.text).toContain('one way only');
     expect(combine?.impact.text).toContain('assumes everything fits into one trip');
   });
 

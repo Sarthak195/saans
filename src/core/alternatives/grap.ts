@@ -15,6 +15,8 @@ const grapSchema = z.strictObject({
     .array(
       z.strictObject({
         stage: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+        // The schedule writes stages in Roman numerals, so the note does too.
+        roman: z.enum(['I', 'II', 'III', 'IV']),
         from: z.number().int(),
         to: z.number().int(),
         line: z.string().min(1),
@@ -40,6 +42,6 @@ export function grapNote(
   if (cityOf(place)?.id !== DELHI_NCR_ID) return null;
   const row = GRAP.stages.find((s) => aqi.aqi >= s.from && aqi.aqi <= s.to);
   if (!row) return null;
-  const intro = fillTemplate(GRAP.intro, { stage: row.stage });
+  const intro = fillTemplate(GRAP.intro, { stage: row.roman });
   return { stage: row.stage, text: `${intro} ${row.line}`, source: row.source };
 }

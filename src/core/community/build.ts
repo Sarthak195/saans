@@ -1,11 +1,12 @@
 import { fillTemplate } from '@/core/advice/format';
-import { planLevel } from '@/core/advice/level';
+import { isPoorOrWorse, planLevel } from '@/core/advice/level';
 import { DELHI_NCR_ID, cityOf } from '@/core/alternatives/cities';
 import { COMMUNITY, COMMUNITY_RULES } from '@/core/community/data';
 import type { CommunityFacts } from '@/core/community/facts';
 import { bestOutdoorWindow } from '@/core/community/window';
 import type { CommunityAction, CommunityPlan, Impact, Plan, Window } from '@/core/plan/types';
 import { allMatches } from '@/core/rules/evaluate';
+import { normalizeText } from '@/core/text/normalize';
 import type { Community, Household } from '@/core/types';
 
 // A household with no community set is read as a housing society with no outdoor slots.
@@ -14,10 +15,12 @@ const DEFAULT_COMMUNITY: Community = { kind: 'society', outdoorSlots: [] };
 function windowAction(window: Window): CommunityAction {
   const { action } = COMMUNITY.window;
   const vars = { start: window.start, end: window.end, pm25: window.pm25 };
+  // A window that is itself poor is only the least bad time, never a good time for sport.
+  const words = isPoorOrWorse(window.level) ? action.poor : action;
   return {
     id: action.id,
-    title: fillTemplate(action.title, vars),
-    body: fillTemplate(action.body, vars),
+    title: fillTemplate(words.title, vars),
+    body: fillTemplate(words.body, vars),
     reason: { ruleId: action.id, text: action.reason, source: action.source },
   };
 }
@@ -52,6 +55,7 @@ export function buildCommunity(input: { household: Household; plan: Plan }): Com
     kind: community.kind,
     level: planLevel(plan),
     ncr: cityOf(plan.place)?.id === DELHI_NCR_ID,
+    delhi: normalizeText(plan.place.admin1) === 'delhi',
   };
 
   const bestWindow = bestOutdoorWindow(plan, community.outdoorSlots);

@@ -66,7 +66,8 @@ function tripVars(
     vars.weekKm = weekKm;
     vars.halfKm = oneDecimal(weekKm / 2);
     vars.tripsSaved = days - 1;
-    vars.saved = oneDecimal((days - 1) * km * 2);
+    // Errands are counted one way only: (n - 1) trips of km each, so the figure is a floor.
+    vars.saved = oneDecimal((days - 1) * km);
   }
   // Rail and metro lead where they exist; buses are named only when they are all there is.
   const listed = transit.options.filter((o) => (facts.rail ? o.kind !== 'bus' : o.kind === 'bus'));

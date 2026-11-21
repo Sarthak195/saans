@@ -21,7 +21,7 @@ describe('grapNote stages', () => {
 
   it('says what applies at this AQI and never claims the stage in force', () => {
     const note = grapNote(DELHI, aqiOk(320));
-    expect(note?.text.startsWith('At this AQI, GRAP Stage 2 measures apply in Delhi NCR.')).toBe(
+    expect(note?.text.startsWith('At this AQI, GRAP Stage II measures apply in Delhi NCR.')).toBe(
       true,
     );
     expect(note?.text).toContain('Check caqm.nic.in for the stage in force.');

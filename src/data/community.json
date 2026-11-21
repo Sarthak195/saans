@@ -25,6 +25,10 @@
       "id": "best-window",
       "title": "Hold outdoor time from {start} to {end}",
       "body": "Of your outdoor slots, the cleaner time is {start} to {end}, at about {pm25} micrograms per cubic metre of fine particles. Hold assembly, sport or play then if you can.",
+      "poor": {
+        "title": "Least bad outdoor time: {start} to {end}",
+        "body": "The air is poor all day. If an activity cannot move indoors or to another day, {start} to {end} is the least bad time among your slots, at about {pm25} micrograms per cubic metre of fine particles. Keep it short and light."
+      },
       "reason": "Saans compares the forecast for each of your outdoor slots and the hours around it, and picks the lowest. It follows the same limits as the family plan: on poor days nothing before 10:00 or after 19:00.",
       "source": {
         "id": "community-best-window",
@@ -278,13 +282,13 @@
     {
       "id": "report-polluters",
       "when": {
-        "ncr": [true]
+        "delhi": [true]
       },
       "then": {
         "priority": 30,
         "title": "Report open burning and polluting vehicles through the city apps",
         "body": "If you see waste or leaves burning, or a vehicle with visible smoke, report it through the 311 App, the Green Delhi App or the SAMEER App.",
-        "reason": "The GRAP citizens charter asks people in Delhi NCR to report air-polluting activities through these apps."
+        "reason": "The GRAP citizens charter asks people in Delhi to report air-polluting activities through these apps."
       },
       "source": {
         "id": "caqm-grap-report-apps",

@@ -415,66 +415,6 @@
           }
         }
       ]
-    },
-    {
-      "id": "bhopal",
-      "name": "Bhopal",
-      "names": ["bhopal"],
-      "admin1": [],
-      "center": {
-        "lat": 23.26,
-        "lon": 77.41
-      },
-      "radiusKm": 20,
-      "options": [
-        {
-          "id": "bhopal-metro",
-          "kind": "metro",
-          "name": "Bhopal Metro",
-          "operator": "Madhya Pradesh Metro Rail Corporation",
-          "url": "https://mpmrcl.com/",
-          "check": {
-            "on": "2026-11-21",
-            "httpStatus": 200
-          },
-          "source": {
-            "id": "site-bhopal-metro",
-            "title": "Madhya Pradesh Metro Rail Corporation: official website, reachable on 21 Nov 2026",
-            "url": "https://mpmrcl.com/",
-            "status": "P-FETCH"
-          }
-        }
-      ]
-    },
-    {
-      "id": "indore",
-      "name": "Indore",
-      "names": ["indore"],
-      "admin1": [],
-      "center": {
-        "lat": 22.72,
-        "lon": 75.86
-      },
-      "radiusKm": 20,
-      "options": [
-        {
-          "id": "indore-metro",
-          "kind": "metro",
-          "name": "Indore Metro",
-          "operator": "Madhya Pradesh Metro Rail Corporation",
-          "url": "https://mpmrcl.com/",
-          "check": {
-            "on": "2026-11-21",
-            "httpStatus": 200
-          },
-          "source": {
-            "id": "site-indore-metro",
-            "title": "Madhya Pradesh Metro Rail Corporation: official website, reachable on 21 Nov 2026",
-            "url": "https://mpmrcl.com/",
-            "status": "P-FETCH"
-          }
-        }
-      ]
     }
   ],
   "fallback": {
@@ -725,7 +665,7 @@
         "reason": "The GRAP citizens charter, written for Delhi NCR, asks people to combine errands and reduce trips.",
         "impact": {
           "kind": "distance",
-          "text": "About {saved} fewer km by {vehicle} each week: {tripsSaved} fewer trips of {km} km one way, there and back. This assumes everything fits into one trip.",
+          "text": "About {saved} fewer km by {vehicle} each week: {tripsSaved} fewer trips of {km} km. This counts each trip one way only, so the real saving is likely larger, and it assumes everything fits into one trip.",
           "numbers": ["saved", "tripsSaved", "km"],
           "source": {
             "id": "saans-weekly-km",

@@ -11,4 +11,6 @@ export interface CommunityFacts extends Record<string, FactValue> {
   kind: CommunityKind;
   level: PlanLevel;
   ncr: boolean;
+  /** The place is in the state of Delhi, where the city reporting apps work. */
+  delhi: boolean;
 }

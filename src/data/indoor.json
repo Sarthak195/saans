@@ -72,15 +72,35 @@
       }
     },
     {
+      "id": "airing-unknown",
+      "when": {
+        "airing": ["normal"],
+        "level": ["unknown"]
+      },
+      "then": {
+        "priority": 10,
+        "title": "Check the air before you open windows",
+        "body": "We could not read enough air data for today. Look at the AQI first: if it is poor or worse, keep windows shut except around midday, and if it is better, ventilate as you normally do.",
+        "reason": "The health ministry advises keeping windows shut on poor to severe days. Without data for today Saans cannot say which kind of day this is."
+      },
+      "source": {
+        "id": "airing-unknown",
+        "title": "Saans rule: ask for a check of the AQI when there is no air data for the day",
+        "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+        "status": "APP"
+      }
+    },
+    {
       "id": "airing-normal",
       "when": {
-        "airing": ["normal"]
+        "airing": ["normal"],
+        "level": ["good", "satisfactory", "moderate"]
       },
       "then": {
         "priority": 10,
         "title": "Air your home as usual today",
-        "body": "The air outside is not forecast to be poor during the day, so ventilate as you normally do. Close the windows if you notice smoke or dust nearby.",
-        "reason": "The health ministry advises keeping windows shut on poor to severe days, and today is not forecast to be one."
+        "body": "The air outside is forecast to be Moderately polluted or better during the day, so ventilate as you normally do. Close the windows if you notice smoke or dust nearby.",
+        "reason": "The health ministry advises keeping windows shut on poor to severe days, and the forecast for today is better than that."
       },
       "source": {
         "id": "airing-normal",

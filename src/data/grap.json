@@ -3,6 +3,7 @@
   "stages": [
     {
       "stage": 1,
+      "roman": "I",
       "from": 201,
       "to": 300,
       "line": "Stage I measures include a citizens charter asking drivers not to idle and to turn the engine off at red lights.",
@@ -23,6 +24,7 @@
     },
     {
       "stage": 2,
+      "roman": "II",
       "from": 301,
       "to": 400,
       "line": "Stage II measures include housing societies providing electric heaters to guards and other staff, so that nobody has to burn waste or wood to keep warm.",
@@ -43,6 +45,7 @@
     },
     {
       "stage": 3,
+      "roman": "III",
       "from": 401,
       "to": 450,
       "line": "Stage III measures include hybrid classes, in school and online, for children up to Class V in Delhi, Gurugram, Faridabad, Ghaziabad and Gautam Buddh Nagar. Families can choose the online option.",
@@ -63,6 +66,7 @@
     },
     {
       "stage": 4,
+      "roman": "IV",
       "from": 451,
       "to": 500,
       "line": "Stage IV measures include a citizens charter asking children, older people and people with lung or heart disease to avoid outdoor activities and stay indoors as much as possible.",
