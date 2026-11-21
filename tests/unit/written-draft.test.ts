@@ -1,6 +1,7 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { templateBriefing, templateNotice } from '@/core/briefing';
+import { writtenAllowance } from '@/core/plan/facts';
 import { sampleById } from '@/core/profile/samples';
 import { openDraft, openHousehold, sealDraft, sealHousehold } from '@/server/seal';
 import type { WrittenText } from '@/server/genai';
@@ -102,6 +103,17 @@ describe('written text is checked again before it is shown', () => {
     const target = await writtenFor(sample.household, TOKEN);
     const bad = sealedFor(target, gemini('The air quality index is 7777 today. Take water along.'));
     expect(openWritten(bad, target)).toBeUndefined();
+  });
+
+  it('refuses a bare number that the plan has only as an hour of the day', async () => {
+    const target = await writtenFor(sample.household, TOKEN);
+    const { plan, home, alternatives, grap } = target.view;
+    const [hour] = writtenAllowance(plan, { home, alternatives, grap }).clockOnly;
+    if (hour === undefined) throw new Error('no clock-only number in the sample plan');
+    const bare = `Expect ${String(hour)} bad days this week. Take water along.`;
+    expect(openWritten(sealedFor(target, gemini(bare)), target)).toBeUndefined();
+    const timed = `Go out at ${String(hour)}:00 today. Take water along.`;
+    expect(openWritten(sealedFor(target, gemini(timed)), target)).toBeDefined();
   });
 
   it('drops markup, the wrong language and a text with one sentence', async () => {

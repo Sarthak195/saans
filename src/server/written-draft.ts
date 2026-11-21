@@ -3,6 +3,7 @@ import 'server-only';
 import { createHash } from 'node:crypto';
 
 import { checkWritten, templateBriefing, templateNotice } from '@/core/briefing';
+import { writtenAllowance } from '@/core/plan/facts';
 import type { CommunityKind, Language } from '@/core/types';
 import { AppError } from '@/server/errors';
 import type { WrittenText } from '@/server/genai';
@@ -77,24 +78,24 @@ function plainFor(target: WrittenFor, note: string | undefined): WrittenText | u
   return { by: 'template', lang: 'en', text, ...(note === undefined ? {} : { note }) };
 }
 
-/** Names are put in after the checks, so they are blanked here: a label's digits are not facts. */
-function withoutNames(text: string, view: PlanView): string {
-  const names = [view.plan.place.name, ...view.plan.members.map((m) => m.label)]
-    .filter((n) => n !== '')
-    .sort((a, b) => b.length - a.length);
-  return names.reduce((rest, name) => rest.split(name).join('x'), text);
-}
-
 /** The same checks a text passed when it was written, run again against the plan on this page. */
 function stillHolds(written: WrittenText, target: WrittenFor): boolean {
-  const { plan, facts } = target.view;
+  const { plan, home, alternatives, grap, community } = target.view;
+  const family = target.audience === 'family';
+  // The extras are the ones the writer allowed for this audience, so clock-hour and label rules match.
+  const allowance = writtenAllowance(
+    plan,
+    family ? { home, alternatives, grap } : { community, grap },
+  );
   const changes = plan.severe || plan.routines.some((r) => r.decision !== 'keep');
-  return checkWritten(withoutNames(written.text, target.view), {
+  return checkWritten(written.text, {
     lang: written.lang,
-    allowedNumbers: facts,
+    allowedNumbers: allowance.numbers,
+    clockOnly: allowance.clockOnly,
+    names: allowance.names,
     // Routine names were swapped in after the first check, so only the number and tone checks apply.
     refs: [],
-    noReassurance: target.audience !== 'family' || changes,
+    noReassurance: !family || changes,
   }).ok;
 }
 
