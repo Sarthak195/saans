@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import samplesData from '@/data/samples.json';
-import { householdSchema } from '@/core/profile/schema';
+import { WEEKDAYS, householdSchema } from '@/core/profile/schema';
 import { SAMPLES, sampleById } from '@/core/profile/samples';
+import { buildPlan } from '@/core/plan/build-plan';
 import { quoteInText } from '@/core/text';
+import { at, flatSeries } from '../helpers/plan';
 import { SNAPSHOT_TARGETS } from '@/server/air/recorded-targets';
 
 function sample(id: string) {
@@ -61,6 +63,19 @@ describe('SAMPLES', () => {
     }
   });
 
+  it.each(SAMPLES.map((s) => [s.id, s] as const))(
+    '%s has something on every day of the week, so no weekday gives an empty plan',
+    (_id, s) => {
+      const routines = [...s.household.routines, ...(s.household.community?.outdoorSlots ?? [])];
+      for (const day of WEEKDAYS) {
+        expect(
+          routines.some((r) => r.days.includes(day)),
+          `${s.id} on ${day}`,
+        ).toBe(true);
+      }
+    },
+  );
+
   it('uses no dashes in user-facing words', () => {
     for (const s of SAMPLES) {
       const words = `${s.title} ${s.summary} ${s.text ?? ''}`;
@@ -98,11 +113,23 @@ describe('S1, the Delhi family', () => {
     expect(walk?.days).toHaveLength(7);
     const play = routines.find((r) => r.memberId === 'son');
     expect(play).toMatchObject({ minutes: 60, intensity: 'vigorous', flexHours: 3 });
-    expect(play?.days).toEqual(['mon', 'tue', 'wed', 'thu', 'fri', 'sat']);
+    expect(play?.days).toHaveLength(7);
     const drive = routines.find((r) => r.kind === 'commute');
     expect(drive).toMatchObject({ mode: 'car', km: 18, start: '08:30', minutes: 45 });
     expect(home).toMatchObject({ habits: ['incense'], cooking: 'lpg_png', roomSqft: 180 });
     expect(home.purifierCadrCfm).toBeUndefined();
+  });
+
+  it('answers the cricket question on a Sunday too', () => {
+    const plan = buildPlan({
+      household: s1.household,
+      series: flatSeries(100),
+      now: at('2026-11-22', '09:00'),
+      ...(s1.question === undefined ? {} : { question: s1.question }),
+    });
+    expect(plan.day.weekday).toBe('sun');
+    expect(plan.answer?.text).not.toContain('not on Sundays');
+    expect(plan.answer?.routineRef).toBe('routine_2');
   });
 
   it('has typed text that contains every fact the profile quotes', () => {

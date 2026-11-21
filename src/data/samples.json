@@ -55,7 +55,7 @@
           "start": "17:00",
           "minutes": 60,
           "intensity": "vigorous",
-          "days": ["mon", "tue", "wed", "thu", "fri", "sat"],
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
           "flexHours": 3
         },
         {
@@ -452,7 +452,7 @@
             "start": "15:00",
             "minutes": 60,
             "intensity": "vigorous",
-            "days": ["mon", "tue", "wed", "thu", "fri"],
+            "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
             "flexHours": 2
           }
         ]

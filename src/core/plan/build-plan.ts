@@ -5,6 +5,7 @@ import { displayPm25 } from '@/core/format';
 import { adviseRoutine } from '@/core/plan/advice';
 import type { Evaluated } from '@/core/plan/advice';
 import { buildAnswer } from '@/core/plan/answer';
+import type { NextRun } from '@/core/plan/answer';
 import { hourOfDay } from '@/core/plan/clock';
 import { buildGlance, hasSevereBlock, planDayBand } from '@/core/plan/glance';
 import { summariseMembers } from '@/core/plan/members';
@@ -13,11 +14,13 @@ import type { Outcome } from '@/core/plan/rules-data';
 import type { AirSummary, Plan, QuestionTarget } from '@/core/plan/types';
 import { defaultPlanDay, istParts, planDays } from '@/core/time';
 import type { PlanDay } from '@/core/time';
+import { WEEKDAYS } from '@/core/profile/schema';
 import type { Household } from '@/core/types';
 
 export type { QuestionTarget } from '@/core/plan/types';
 
-const SEVERE_AQI = 301;
+// AQI 301 is where Very Poor starts; the plan's `severe` flag means Very Poor or worse.
+const VERY_POOR_AQI = 301;
 // The hourly strip in the plan covers the waking day: 06:00 up to, not including, 22:00.
 const STRIP_FROM = 6;
 const STRIP_HOURS = 16;
@@ -55,13 +58,14 @@ export function buildPlan(input: PlanInput): Plan {
   const pm = pmIndex(series);
   const aqi = aqiToday(series, parts.hourStamp);
   const dayBand = planDayBand(series, pm, day);
-  const ctx = {
-    day,
+  const contextFor = (forDay: PlanDay) => ({
+    day: forDay,
     pm,
-    poorDay: atLeast(dayBand, 'poor'),
+    poorDay: atLeast(forDay === day ? dayBand : planDayBand(series, pm, forDay), 'poor'),
     // Today's earlier hours are gone, so no window is offered before now.
-    notBefore: day.relative === 'today' ? parts.hour * 60 + parts.minute : 0,
-  };
+    notBefore: forDay.relative === 'today' ? parts.hour * 60 + parts.minute : 0,
+  });
+  const ctx = contextFor(day);
 
   const evaluated = household.routines.map((routine, index) => {
     const at = household.members.findIndex((m) => m.id === routine.memberId);
@@ -71,7 +75,7 @@ export function buildPlan(input: PlanInput): Plan {
     return adviseRoutine(routine, member, { routine: index + 1, member: at + 1 }, ctx);
   });
 
-  const severe = (aqi.kind === 'ok' && aqi.aqi >= SEVERE_AQI) || hasSevereBlock(pm, day);
+  const severe = (aqi.kind === 'ok' && aqi.aqi >= VERY_POOR_AQI) || hasSevereBlock(pm, day);
   const glance = buildGlance({ day, pm, severe, outcome: strongest(evaluated), dayBand });
 
   const air: AirSummary = {
@@ -98,8 +102,32 @@ export function buildPlan(input: PlanInput): Plan {
     input.question?.aboutToday === true &&
     day.relative === 'tomorrow' &&
     parts.hour >= EVENING_OVER_HOUR;
+  // A routine asked about that is not on the plan day is answered for the next day it runs.
+  const nextRun = (found: Evaluated): NextRun | undefined => {
+    const routine = household.routines.find((r) => r.id === found.advice.routineId);
+    if (!routine) return undefined;
+    const later = days
+      .slice(days.findIndex((d) => d.date === day.date) + 1)
+      .find((d) => routine.days.includes(d.weekday));
+    if (!later) {
+      const from = WEEKDAYS.indexOf(day.weekday);
+      const weekday = [...WEEKDAYS.slice(from + 1), ...WEEKDAYS.slice(0, from + 1)].find((w) =>
+        routine.days.includes(w),
+      );
+      return weekday === undefined ? undefined : { weekday };
+    }
+    const at = household.members.findIndex((m) => m.id === routine.memberId);
+    const member = household.members[at];
+    if (!member) return undefined;
+    const numbers = { routine: evaluated.indexOf(found) + 1, member: at + 1 };
+    const laterCtx = contextFor(later);
+    return {
+      weekday: later.weekday,
+      later: { found: adviseRoutine(routine, member, numbers, laterCtx), day: later },
+    };
+  };
   const answer = input.question
-    ? buildAnswer({ target: input.question, evaluated, day, shifted })
+    ? buildAnswer({ target: input.question, evaluated, day, shifted, nextRun })
     : undefined;
 
   return {

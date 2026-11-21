@@ -5,6 +5,7 @@ import { WEEKDAY_FULL } from '@/core/plan/clock';
 import type { DaySlot, QuestionAnswer, QuestionTarget, RoutineAdvice } from '@/core/plan/types';
 import { numbersIn } from '@/core/plan/words';
 import type { PlanDay } from '@/core/time';
+import type { Weekday } from '@/core/types';
 
 function startHour(advice: RoutineAdvice): number {
   return toMinutes(advice.start) / 60;
@@ -47,10 +48,24 @@ function whenPhrase(day: PlanDay, slot: DaySlot): string {
   return `${WEEKDAY_FULL[day.weekday]} ${slot}`;
 }
 
-function sentenceFor(found: Evaluated, day: PlanDay): string {
+/** The next time an unscheduled routine runs: a later plan day with its own advice, or just the weekday. */
+export interface NextRun {
+  weekday: Weekday;
+  later?: { found: Evaluated; day: PlanDay };
+}
+
+function sentenceFor(found: Evaluated, day: PlanDay, next?: NextRun): string {
   const { advice } = found;
   if (!advice.scheduled) {
-    return `That routine is not on ${WEEKDAY_FULL[day.weekday]}s, so nothing changes.`;
+    const notOn = `That routine is not on ${WEEKDAY_FULL[day.weekday]}s`;
+    if (next?.later) {
+      const { later } = next;
+      return `${notOn}, so here is the next day it runs, ${WEEKDAY_FULL[later.day.weekday]}. ${sentenceFor(later.found, later.day)}`;
+    }
+    if (next) {
+      return `${notOn}. It next runs on ${WEEKDAY_FULL[next.weekday]}, which this plan does not cover, so nothing changes yet.`;
+    }
+    return `${notOn}, so nothing changes.`;
   }
   if (advice.level === null || advice.pm25 === null) {
     return 'There is no air data for that time, so nothing is changed.';
@@ -87,10 +102,13 @@ export function buildAnswer(args: {
   evaluated: Evaluated[];
   day: PlanDay;
   shifted: boolean;
+  /** For a routine that is not on the plan day: when it runs next, with the advice for that day. */
+  nextRun?: (found: Evaluated) => NextRun | undefined;
 }): QuestionAnswer | undefined {
   const found = matchRoutine(args.evaluated, args.target);
   if (!found) return undefined;
-  const sentence = sentenceFor(found, args.day);
+  const next = found.advice.scheduled ? undefined : args.nextRun?.(found);
+  const sentence = sentenceFor(found, args.day, next);
   const text = args.shifted
     ? `This ${found.advice.slot} is already over, so here is tomorrow. ${sentence}`
     : sentence;

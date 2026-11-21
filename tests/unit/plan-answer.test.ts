@@ -41,13 +41,13 @@ const cricket = routine({
 
 describe('answering a question', () => {
   it('builds the answer from computed values only', () => {
-    const { answer } = answerFor(byHour({ 14: 140 }, 245), { routineId: 'r1' }, [cricket]);
+    const { answer } = answerFor(byHour({ 14: 100 }, 245), { routineId: 'r1' }, [cricket]);
     expect(answer?.text).toBe(
-      'Not this evening outdoors: PM2.5 around 17:00 is forecast at about 245 (Very Poor). 14:00 to 15:00 is cleaner at about 140, about 45% less.',
+      'Not this evening outdoors: PM2.5 around 17:00 is forecast at about 245 (Very Poor). 14:00 to 15:00 is cleaner at about 100, about 60% less.',
     );
     expect(answer?.routineRef).toBe('routine_1');
     expect(answer?.shiftedToNextDay).toBe(false);
-    expect(answer?.numbers).toEqual([17, 0, 245, 14, 15, 140, 45]);
+    expect(answer?.numbers).toEqual([17, 0, 245, 14, 15, 100, 60]);
   });
 
   it('says the evening is over and answers for tomorrow when the question was about today', () => {
@@ -156,11 +156,51 @@ describe('answering a question', () => {
     );
   });
 
-  it('says so when the routine is not on the plan day or has no data', () => {
-    const sundayOnly = routine({ id: 'r1', memberId: 'm1', days: ['sun'] });
-    expect(answerFor(byHour({}, 100), { routineId: 'r1' }, [sundayOnly]).answer?.text).toBe(
-      'That routine is not on Saturdays, so nothing changes.',
+  it('answers for the next day a routine runs when it is not on the plan day', () => {
+    const sundayOnly = routine({ id: 'r1', memberId: 'm1', days: ['sun'], flexHours: 0 });
+    const { answer, plan } = answerFor(byHour({}, 100), { routineId: 'r1' }, [sundayOnly]);
+    expect(plan.day.weekday).toBe('sat');
+    expect(answer?.text).toBe(
+      'That routine is not on Saturdays, so here is the next day it runs, Sunday. Go lighter tomorrow evening: PM2.5 around 17:00 is forecast at about 100 (Poor). Keep it shorter and gentler.',
     );
+    expect(answer?.routineRef).toBe('routine_1');
+    expect(answer?.numbers).toEqual([17, 0, 100]);
+  });
+
+  it('uses the later day own air, not the plan day air', () => {
+    const sundayOnly = routine({ id: 'r1', memberId: 'm1', days: ['sun'], flexHours: 0 });
+    const series = seriesOf((date, hour) => (date === '2026-11-22' && hour === 17 ? 20 : 245));
+    const { answer, plan } = answerFor(series, { routineId: 'r1' }, [sundayOnly]);
+    expect(answer?.text).toContain('Yes, go ahead tomorrow evening');
+    expect(answer?.text).toContain('about 20 (Good)');
+    const facts = planFacts(plan);
+    for (const n of answer?.numbers ?? []) expect(facts).toContain(n);
+  });
+
+  it('says when the routine next runs beyond the days the plan covers', () => {
+    const wednesdayOnly = routine({ id: 'r1', memberId: 'm1', days: ['wed'] });
+    expect(answerFor(byHour({}, 100), { routineId: 'r1' }, [wednesdayOnly]).answer?.text).toBe(
+      'That routine is not on Saturdays. It next runs on Wednesday, which this plan does not cover, so nothing changes yet.',
+    );
+  });
+
+  it('keeps the evening-over notice together with the next day the routine runs', () => {
+    const mondayOnly = routine({ id: 'r1', memberId: 'm1', days: ['mon'], flexHours: 0 });
+    const { answer, plan } = answerFor(
+      byHour({}, 100),
+      { routineId: 'r1', aboutToday: true },
+      [mondayOnly],
+      NIGHT,
+    );
+    expect(plan.day.weekday).toBe('sun');
+    expect(answer?.shiftedToNextDay).toBe(true);
+    expect(answer?.text).toContain('This evening is already over, so here is tomorrow.');
+    expect(answer?.text).toContain(
+      'That routine is not on Sundays, so here is the next day it runs, Monday.',
+    );
+  });
+
+  it('says so when the routine has no data', () => {
     const noData = seriesOf(() => null);
     expect(answerFor(noData, { routineId: 'r1' }, [cricket]).answer?.text).toBe(
       'There is no air data for that time, so nothing is changed.',
