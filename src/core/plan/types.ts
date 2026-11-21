@@ -81,6 +81,14 @@ export interface Glance {
   topAction: string;
 }
 
+/** What a family's question points at, once read: a routine, a member, an hour, or today rather than the plan day. */
+export interface QuestionTarget {
+  routineId?: string;
+  memberId?: string;
+  hour?: number;
+  aboutToday?: boolean;
+}
+
 export interface QuestionAnswer {
   text: string;
   routineRef?: string;
