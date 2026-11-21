@@ -68,8 +68,9 @@ export function SevereBanner(): ReactElement {
       <ol>
         <li>Keep hard exercise and play indoors.</li>
         <li>
-          Adults who must go out should wear a well-fitted N95 respirator. Respirators are not made
-          for small children, so keep children away from traffic and shorten their trips.
+          If an adult has to go out, consider a well-fitted N95 or N99 mask; it may help on a short
+          trip. Respirators are not made in small children&apos;s sizes, so keep children away from
+          traffic and shorten their trips.
         </li>
         <li>
           Run a purifier, or a box fan with a filter, in the room where the family spends most time.
