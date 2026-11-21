@@ -1,0 +1,100 @@
+import type { Decision } from '@/core/decision';
+import type { Plan } from '@/core/plan/types';
+import type { Language } from '@/core/types';
+import { checkNumbers, checkPolarity } from '@/core/text';
+
+const MAX_CHARS = 1200;
+const MIN_SENTENCES = 2;
+const MAX_SENTENCES = 8;
+const DEVANAGARI = /\p{Script=Devanagari}/gu;
+const LETTERS = /\p{L}/gu;
+const SENTENCE_BREAK = /(?<!\d)\.|\.(?!\d)|[!?।॥\n\r]+/;
+const MARKUP = /[{}<>`]/;
+const EN_DASH = '–';
+const EM_DASH = '—';
+
+export interface CheckResult {
+  ok: boolean;
+  /** Short reasons for a rejected text, for the tests and the maintainers. Never shown to a family. */
+  reasons: string[];
+}
+
+/** Dashes read badly out loud and in a narrow column; a range becomes "to", a pause a comma. */
+export function tidyText(text: string): string {
+  return text
+    .replace(new RegExp(`(\\d)\\s*[${EN_DASH}${EM_DASH}]\\s*(\\d)`, 'g'), '$1 to $2')
+    .replace(new RegExp(`\\s*[${EN_DASH}${EM_DASH}]\\s*`, 'g'), ', ')
+    .replace(/[*#]+/g, '')
+    .replace(/[ \t]+/g, ' ')
+    .trim();
+}
+
+function devanagariShare(text: string): number {
+  const letters = text.match(LETTERS)?.length ?? 0;
+  return letters === 0 ? 0 : (text.match(DEVANAGARI)?.length ?? 0) / letters;
+}
+
+function sentenceCount(text: string): number {
+  return text.split(SENTENCE_BREAK).filter((s) => s.trim() !== '').length;
+}
+
+/** True when any one sentence tells the reader things are fine (a nudge toward "safe"). */
+export function reassuresAnywhere(text: string): boolean {
+  // checkPolarity looks for reassurance in sentences that name a plan item, so each sentence is
+  // given a stand-in item to name.
+  return text
+    .split(SENTENCE_BREAK)
+    .some(
+      (sentence) =>
+        checkPolarity(`routine_0 ${sentence}`, [{ ref: 'routine_0', decision: 'move' }])
+          .reassuringAboutNonKeep.length > 0,
+    );
+}
+
+export interface PolarityRef {
+  ref: string;
+  decision: Decision;
+}
+
+/** The refs a briefing may mention: every routine with its decision, and every member as a keep. */
+export function polarityRefs(plan: Plan): PolarityRef[] {
+  return [
+    ...plan.routines.map((r) => ({ ref: r.ref, decision: r.decision })),
+    ...plan.members.map((m) => ({ ref: m.memberRef, decision: 'keep' as const })),
+  ];
+}
+
+/**
+ * Decides whether written text may be shown. Every number must be one the plan computed, every
+ * routine the plan changes must be named and not reassured about, no placeholder may be made up,
+ * and the text must be in the language asked for and free of markup.
+ */
+export function checkWritten(
+  text: string,
+  options: {
+    lang: Language;
+    allowedNumbers: readonly number[];
+    refs: readonly PolarityRef[];
+    noReassurance?: boolean;
+  },
+): CheckResult {
+  const reasons: string[] = [];
+  if (text.trim() === '') return { ok: false, reasons: ['empty'] };
+  if (text.length > MAX_CHARS) reasons.push('too long');
+  if (MARKUP.test(text)) reasons.push('markup');
+  const sentences = sentenceCount(text);
+  if (sentences < MIN_SENTENCES || sentences > MAX_SENTENCES) reasons.push('sentence count');
+
+  const share = devanagariShare(text);
+  if (options.lang === 'hi' ? share < 0.4 : share > 0.05) reasons.push('wrong language');
+
+  const numbers = checkNumbers(text, options.allowedNumbers);
+  if (!numbers.ok) reasons.push(`unknown numbers ${numbers.unknown.join(' ')}`);
+
+  const polarity = checkPolarity(text, options.refs);
+  if (polarity.missing.length > 0) reasons.push(`missing ${polarity.missing.join(' ')}`);
+  if (polarity.reassuringAboutNonKeep.length > 0) reasons.push('reassurance about a change');
+  if (polarity.invented.length > 0) reasons.push(`invented ${polarity.invented.join(' ')}`);
+  if (options.noReassurance === true && reassuresAnywhere(text)) reasons.push('reassurance');
+  return { ok: reasons.length === 0, reasons };
+}
