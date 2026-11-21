@@ -75,7 +75,8 @@ export function POST(request: Request): Promise<Response> {
             ? result.household
             : { ...result.household, questionTarget: result.target };
         // The notes quote the family's own labels, so only a fixed key goes into the address.
-        const query = result.notes.length === 0 ? {} : { note: 'filled' };
+        const note = result.by === 'keywords' ? 'keywords' : 'filled';
+        const query = result.notes.length === 0 ? {} : { note };
         const anchor = household.questionTarget === undefined ? 'plan-title' : 'answer';
         return seeOther(planPath(sealHousehold(household), { ...query, status: 'made' }, anchor));
       }

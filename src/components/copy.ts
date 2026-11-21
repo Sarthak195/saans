@@ -42,6 +42,8 @@ export function statusLine(key: string | undefined): string | undefined {
 export const NOTE_LINES = {
   filled:
     "Some details were not in your text, so Saans filled them in, for example an adult where no age was given. Check them under 'Change the family's details'.",
+  keywords:
+    "The AI reader was not available, so Saans read your text by matching words. Please check each detail under 'Change the family's details'.",
   noQuestion: 'Type a question first.',
   noAi: 'Questions need the AI reader, which is not available right now. Pick a routine from the plan instead.',
   notUnderstood: 'We could not tell which routine you mean. Pick one from the plan instead.',

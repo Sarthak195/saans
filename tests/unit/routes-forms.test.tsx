@@ -173,6 +173,18 @@ describe('POST /ask', () => {
     expect(location).not.toContain('Assumed');
   });
 
+  it('uses its own note when the text was read by matching words', async () => {
+    vi.mocked(readHousehold).mockResolvedValue({
+      kind: 'household',
+      household,
+      notes: ['We read this by matching words, without the AI reader. Please check each detail.'],
+      by: 'keywords',
+    });
+    const location = locationOf(await askPost(formPost('/ask', { text: 'We live in Delhi.' })));
+    expect(new URL(location, ORIGIN).searchParams.get('note')).toBe('keywords');
+    expect(location).not.toContain('matching');
+  });
+
   it('lists the places when the text names a place that exists in several states', async () => {
     vi.mocked(readHousehold).mockResolvedValue({
       kind: 'choose_place',
