@@ -14,7 +14,7 @@ One adapter, `src/server/air/open-meteo.ts`, fetches the series, and `src/server
 2. **Recorded, for the sample places only.** If the live call fails and the point is one of the five sample places (compared at 0.1 degree), a dated recording from `src/data/recorded` is used and the page says "Recorded <date>, not live".
 3. **No data.** For any other place the plan is still built from an empty series. The home advice and the alternatives, which need no readings, still render, with a message and a retry link.
 
-A point outside India is refused, not papered over. Place search tries a list of 41 places first, then the Open-Meteo geocoder (3 second timeout, India only, populated places only, results not cached), and asks the family to choose when a name exists in several states. The attribution is printed on every page: "Air quality data: Open-Meteo.com (CC BY 4.0), CAMS; place names: GeoNames."
+A point outside India is refused, not papered over. Place search tries a built-in list of places first, then the Open-Meteo geocoder (3 second timeout, India only, populated places only, results not cached), and asks the family to choose when a name exists in several states. The attribution is printed on every page: "Air quality data: Open-Meteo.com (CC BY 4.0), CAMS; place names: GeoNames."
 
 ## Consequences
 
