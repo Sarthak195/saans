@@ -1,0 +1,468 @@
+[
+  {
+    "id": "s1",
+    "title": "Delhi family: cricket at 5 pm?",
+    "summary": "A Lajpat Nagar family asks whether their son can play cricket downstairs this evening.",
+    "text": "We live in Lajpat Nagar, Delhi. My son is 7 and plays cricket downstairs around 5 pm. My mother has asthma and walks at 6:30 am. I drive to Gurugram at 8:30. Can my son play outside this evening?",
+    "recordedId": "delhi-lajpat-nagar",
+    "question": {
+      "routineId": "play",
+      "aboutToday": true
+    },
+    "household": {
+      "v": 1,
+      "place": {
+        "name": "Lajpat Nagar",
+        "admin1": "Delhi",
+        "lat": 28.6,
+        "lon": 77.2
+      },
+      "members": [
+        {
+          "id": "grandmother",
+          "label": "Grandmother",
+          "ageBand": "older",
+          "conditions": ["asthma_copd"]
+        },
+        {
+          "id": "son",
+          "label": "Son",
+          "ageBand": "child",
+          "conditions": []
+        },
+        {
+          "id": "parent",
+          "label": "Parent",
+          "ageBand": "adult",
+          "conditions": []
+        }
+      ],
+      "routines": [
+        {
+          "id": "walk",
+          "memberId": "grandmother",
+          "kind": "walk",
+          "start": "06:30",
+          "minutes": 30,
+          "intensity": "light",
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+          "flexHours": 2
+        },
+        {
+          "id": "play",
+          "memberId": "son",
+          "kind": "outdoor_play",
+          "start": "17:00",
+          "minutes": 60,
+          "intensity": "vigorous",
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat"],
+          "flexHours": 3
+        },
+        {
+          "id": "drive",
+          "memberId": "parent",
+          "kind": "commute",
+          "start": "08:30",
+          "minutes": 45,
+          "intensity": "light",
+          "mode": "car",
+          "km": 18,
+          "days": ["mon", "tue", "wed", "thu", "fri"],
+          "flexHours": 0
+        }
+      ],
+      "home": {
+        "cooking": "lpg_png",
+        "habits": ["incense"],
+        "heating": "none",
+        "roomSqft": 180
+      },
+      "question": "Can my son play outside this evening?",
+      "lang": "en"
+    },
+    "source": {
+      "id": "saans-sample-s1",
+      "title": "Saans rule: this household is an illustration, not a real family",
+      "url": "",
+      "status": "APP"
+    }
+  },
+  {
+    "id": "s2",
+    "title": "Delhi runner: morning run and a scooter ride",
+    "summary": "A 26-year-old in Lajpat Nagar runs at 6 am and rides a scooter to work, described in Hinglish.",
+    "text": "Main Lajpat Nagar mein rehta hoon, 26 saal ka hoon. Subah 6 baje run karta hoon aur 9 baje scooty se 9 km office jaata hoon.",
+    "recordedId": "delhi-lajpat-nagar",
+    "household": {
+      "v": 1,
+      "place": {
+        "name": "Lajpat Nagar",
+        "admin1": "Delhi",
+        "lat": 28.6,
+        "lon": 77.2
+      },
+      "members": [
+        {
+          "id": "me",
+          "label": "Me",
+          "ageBand": "adult",
+          "conditions": []
+        }
+      ],
+      "routines": [
+        {
+          "id": "run",
+          "memberId": "me",
+          "kind": "sport",
+          "start": "06:00",
+          "minutes": 45,
+          "intensity": "vigorous",
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+          "flexHours": 2
+        },
+        {
+          "id": "ride",
+          "memberId": "me",
+          "kind": "commute",
+          "start": "09:00",
+          "minutes": 30,
+          "intensity": "light",
+          "mode": "two_wheeler",
+          "km": 9,
+          "days": ["mon", "tue", "wed", "thu", "fri"],
+          "flexHours": 0
+        }
+      ],
+      "home": {
+        "cooking": "lpg_png",
+        "habits": [],
+        "heating": "none"
+      },
+      "lang": "en"
+    },
+    "source": {
+      "id": "saans-sample-s2",
+      "title": "Saans rule: this household is an illustration, not a real family",
+      "url": "",
+      "status": "APP"
+    }
+  },
+  {
+    "id": "s3",
+    "title": "Mumbai family: a baby's evening pram walk",
+    "summary": "A couple in Andheri with a one-year-old, who commute by train and walk the baby at 5:30 pm.",
+    "recordedId": "mumbai-andheri",
+    "household": {
+      "v": 1,
+      "place": {
+        "name": "Andheri",
+        "admin1": "Maharashtra",
+        "lat": 19.1,
+        "lon": 72.9
+      },
+      "members": [
+        {
+          "id": "parent1",
+          "label": "Parent 1",
+          "ageBand": "adult",
+          "conditions": []
+        },
+        {
+          "id": "parent2",
+          "label": "Parent 2",
+          "ageBand": "adult",
+          "conditions": []
+        },
+        {
+          "id": "baby",
+          "label": "Baby",
+          "ageBand": "infant",
+          "conditions": []
+        }
+      ],
+      "routines": [
+        {
+          "id": "train1",
+          "memberId": "parent1",
+          "kind": "commute",
+          "start": "08:00",
+          "minutes": 50,
+          "intensity": "light",
+          "mode": "metro_rail",
+          "km": 20,
+          "days": ["mon", "tue", "wed", "thu", "fri"],
+          "flexHours": 0
+        },
+        {
+          "id": "train2",
+          "memberId": "parent2",
+          "kind": "commute",
+          "start": "08:30",
+          "minutes": 50,
+          "intensity": "light",
+          "mode": "metro_rail",
+          "km": 20,
+          "days": ["mon", "tue", "wed", "thu", "fri"],
+          "flexHours": 0
+        },
+        {
+          "id": "pram",
+          "memberId": "baby",
+          "kind": "walk",
+          "start": "17:30",
+          "minutes": 30,
+          "intensity": "light",
+          "mode": "walk",
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+          "flexHours": 2
+        }
+      ],
+      "home": {
+        "cooking": "lpg_png",
+        "habits": [],
+        "heating": "none"
+      },
+      "lang": "en"
+    },
+    "source": {
+      "id": "saans-sample-s3",
+      "title": "Saans rule: this household is an illustration, not a real family",
+      "url": "",
+      "status": "APP"
+    }
+  },
+  {
+    "id": "s4",
+    "title": "Kolkata couple: morning walk and a coal heater",
+    "summary": "A retired couple in Salt Lake, one with a heart condition, who walk at 6 am and warm the room with coal.",
+    "recordedId": "kolkata-salt-lake",
+    "household": {
+      "v": 1,
+      "place": {
+        "name": "Salt Lake (Bidhannagar)",
+        "admin1": "West Bengal",
+        "lat": 22.6,
+        "lon": 88.4
+      },
+      "members": [
+        {
+          "id": "grandfather",
+          "label": "Grandfather",
+          "ageBand": "older",
+          "conditions": ["heart"]
+        },
+        {
+          "id": "grandmother",
+          "label": "Grandmother",
+          "ageBand": "older",
+          "conditions": []
+        }
+      ],
+      "routines": [
+        {
+          "id": "walk1",
+          "memberId": "grandfather",
+          "kind": "walk",
+          "start": "06:00",
+          "minutes": 40,
+          "intensity": "light",
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+          "flexHours": 2
+        },
+        {
+          "id": "walk2",
+          "memberId": "grandmother",
+          "kind": "walk",
+          "start": "06:00",
+          "minutes": 40,
+          "intensity": "light",
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+          "flexHours": 2
+        }
+      ],
+      "home": {
+        "cooking": "lpg_png",
+        "habits": [],
+        "heating": "angithi_coal"
+      },
+      "lang": "en"
+    },
+    "source": {
+      "id": "saans-sample-s4",
+      "title": "Saans rule: this household is an illustration, not a real family",
+      "url": "",
+      "status": "APP"
+    }
+  },
+  {
+    "id": "s5",
+    "title": "Bengaluru family: school run and evening play",
+    "summary": "A family of four in Indiranagar who walk to school and play outside at 5:30 pm.",
+    "recordedId": "bengaluru-indiranagar",
+    "household": {
+      "v": 1,
+      "place": {
+        "name": "Indiranagar",
+        "admin1": "Karnataka",
+        "lat": 13,
+        "lon": 77.6
+      },
+      "members": [
+        {
+          "id": "mother",
+          "label": "Mother",
+          "ageBand": "adult",
+          "conditions": []
+        },
+        {
+          "id": "father",
+          "label": "Father",
+          "ageBand": "adult",
+          "conditions": []
+        },
+        {
+          "id": "older",
+          "label": "Older child",
+          "ageBand": "child",
+          "conditions": []
+        },
+        {
+          "id": "younger",
+          "label": "Younger child",
+          "ageBand": "child",
+          "conditions": []
+        }
+      ],
+      "routines": [
+        {
+          "id": "school1",
+          "memberId": "older",
+          "kind": "school_run",
+          "start": "07:30",
+          "minutes": 20,
+          "intensity": "light",
+          "mode": "walk",
+          "km": 1.5,
+          "days": ["mon", "tue", "wed", "thu", "fri"],
+          "flexHours": 0
+        },
+        {
+          "id": "school2",
+          "memberId": "younger",
+          "kind": "school_run",
+          "start": "07:30",
+          "minutes": 20,
+          "intensity": "light",
+          "mode": "walk",
+          "km": 1.5,
+          "days": ["mon", "tue", "wed", "thu", "fri"],
+          "flexHours": 0
+        },
+        {
+          "id": "play1",
+          "memberId": "older",
+          "kind": "outdoor_play",
+          "start": "17:30",
+          "minutes": 45,
+          "intensity": "moderate",
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+          "flexHours": 2
+        },
+        {
+          "id": "play2",
+          "memberId": "younger",
+          "kind": "outdoor_play",
+          "start": "17:30",
+          "minutes": 45,
+          "intensity": "moderate",
+          "days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
+          "flexHours": 2
+        }
+      ],
+      "home": {
+        "cooking": "lpg_png",
+        "habits": [],
+        "heating": "none"
+      },
+      "lang": "en"
+    },
+    "source": {
+      "id": "saans-sample-s5",
+      "title": "Saans rule: this household is an illustration, not a real family",
+      "url": "",
+      "status": "APP"
+    }
+  },
+  {
+    "id": "s6",
+    "title": "Noida school: assembly, PE and sports practice",
+    "summary": "A primary school in Sector 62 with about 300 families, planning its three outdoor slots.",
+    "recordedId": "noida",
+    "household": {
+      "v": 1,
+      "place": {
+        "name": "Sector 62, Noida",
+        "admin1": "Uttar Pradesh",
+        "lat": 28.6,
+        "lon": 77.3
+      },
+      "members": [
+        {
+          "id": "coordinator",
+          "label": "Coordinator",
+          "ageBand": "adult",
+          "conditions": []
+        }
+      ],
+      "routines": [],
+      "home": {
+        "cooking": "lpg_png",
+        "habits": [],
+        "heating": "none"
+      },
+      "lang": "en",
+      "community": {
+        "kind": "school",
+        "households": 300,
+        "outdoorSlots": [
+          {
+            "id": "assembly",
+            "memberId": "coordinator",
+            "kind": "outdoor_play",
+            "start": "08:00",
+            "minutes": 20,
+            "intensity": "light",
+            "days": ["mon", "tue", "wed", "thu", "fri"],
+            "flexHours": 1
+          },
+          {
+            "id": "pe",
+            "memberId": "coordinator",
+            "kind": "sport",
+            "start": "11:00",
+            "minutes": 40,
+            "intensity": "vigorous",
+            "days": ["mon", "tue", "wed", "thu", "fri"],
+            "flexHours": 2
+          },
+          {
+            "id": "practice",
+            "memberId": "coordinator",
+            "kind": "sport",
+            "start": "15:00",
+            "minutes": 60,
+            "intensity": "vigorous",
+            "days": ["mon", "tue", "wed", "thu", "fri"],
+            "flexHours": 2
+          }
+        ]
+      }
+    },
+    "source": {
+      "id": "saans-sample-s6",
+      "title": "Saans rule: this household is an illustration, not a real family",
+      "url": "",
+      "status": "APP"
+    }
+  }
+]
