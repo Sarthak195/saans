@@ -10,6 +10,7 @@ export type AppErrorKind =
   | 'token_too_large'
   | 'form_expired'
   | 'body_too_large'
+  | 'cross_origin'
   | 'genai_quota'
   | 'genai_blocked'
   | 'genai_schema'
@@ -89,6 +90,11 @@ const MESSAGES: Record<AppErrorKind, UserMessage> = {
     title: 'That was too much to send at once',
     body: 'What you entered is larger than we can take in one go.',
     nextAction: 'Shorten your notes and send again.',
+  },
+  cross_origin: {
+    title: 'That request did not come from this page',
+    body: 'We only accept forms sent from Saans itself, to keep your family details from being sent in by another site.',
+    nextAction: 'Open Saans directly and send the form from there.',
   },
   genai_quota: {
     title: 'The AI wording is paused for now',

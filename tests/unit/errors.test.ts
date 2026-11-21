@@ -14,6 +14,7 @@ const KINDS: AppErrorKind[] = [
   'token_too_large',
   'form_expired',
   'body_too_large',
+  'cross_origin',
   'genai_quota',
   'genai_blocked',
   'genai_schema',
