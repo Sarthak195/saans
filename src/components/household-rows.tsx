@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 
 import { CheckGroup, SelectField, TextField } from './form-fields';
-import type { FormState } from './form-fields';
+import type { FormState } from '@/server/household-form';
 import { AGE, CONDITIONS, DAYS, INTENSITY } from './form-options';
 import { KIND_LABEL, MODE_LABEL } from './format';
 

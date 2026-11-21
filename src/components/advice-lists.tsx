@@ -2,29 +2,11 @@ import type { ReactElement } from 'react';
 
 import type { TransitOption } from '@/core/alternatives';
 import type { Alternative, GrapNote, HomeAdvice } from '@/core/plan/types';
-import type { Reason } from '@/core/plan/types';
 
+import { ReasonLine, SourceLink } from './source-link';
 import { withQuery } from './links';
 import type { PlanContext } from './links';
 import { SHARE_WARNING } from './copy';
-
-function ReasonLine({ reason }: { readonly reason: Reason }): ReactElement {
-  const { source } = reason;
-  const title = source.status === 'APP' ? 'Saans rule' : source.title;
-  return (
-    <p className="small">
-      Why: {reason.text} Source:{' '}
-      {source.url === '' ? (
-        title
-      ) : (
-        <a href={source.url} rel="noopener noreferrer">
-          {title}
-        </a>
-      )}
-      .
-    </p>
-  );
-}
 
 function AdviceItem({ item }: { readonly item: HomeAdvice }): ReactElement {
   return (
@@ -132,11 +114,7 @@ export function GrapSection({ grap }: { readonly grap: GrapNote | null }): React
       <h2 id="grap-title">GRAP in Delhi NCR</h2>
       <p>{grap.text}</p>
       <p className="small">
-        Source:{' '}
-        <a href={grap.source.url} rel="noopener noreferrer">
-          {grap.source.title}
-        </a>
-        .
+        Source: <SourceLink source={grap.source} />.
       </p>
     </section>
   );
@@ -166,7 +144,7 @@ export function MoreSection({
         </li>
         <li>
           {smogDay ? (
-            <a href={withQuery(ctx.base, { lang: ctx.keep.lang })}>Back to the plan for today</a>
+            <a href={withQuery(ctx.base, { lang: ctx.keep.lang })}>Back to the live plan</a>
           ) : (
             <a href={withQuery(ctx.base, { ...ctx.keep, air: 'smog-day' })}>
               See this plan on a recorded smog day

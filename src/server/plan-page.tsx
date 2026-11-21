@@ -96,13 +96,15 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
   }
 
   const [briefing, before] = await Promise.all([
-    writeBriefing({
-      plan: view.plan,
-      home: view.home,
-      alternatives: view.alternatives,
-      household: view.household,
-      lang,
-    }),
+    view.unavailable === undefined
+      ? writeBriefing({
+          plan: view.plan,
+          home: view.home,
+          alternatives: view.alternatives,
+          household: view.household,
+          lang,
+        })
+      : Promise.resolve(undefined),
     routineBefore(q.from, q.r, now, day, air),
   ]);
 

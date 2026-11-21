@@ -21,8 +21,9 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
       newStart: wantsMode ? undefined : field(form, 'newStart', 5),
       newMode: wantsMode ? modeOf(field(form, 'newMode', 16)) : undefined,
     });
-    // An unknown routine or an unusable value leaves the plan as it was.
-    if (edited === undefined) return seeOther(planPath(token, keep, 'timeline'));
+    // An unknown routine, an unusable value or the value it already had leaves the plan as it was.
+    if (edited === undefined || JSON.stringify(edited) === JSON.stringify(household))
+      return seeOther(planPath(token, keep, 'timeline'));
 
     return seeOther(
       planPath(

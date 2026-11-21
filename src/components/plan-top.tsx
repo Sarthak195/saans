@@ -3,17 +3,11 @@ import type { ReactElement } from 'react';
 import type { Band } from '@/core/aqi';
 import type { Plan, QuestionAnswer } from '@/core/plan/types';
 import type { Language } from '@/core/types';
+import type { WrittenText } from '@/server/genai';
 
 import { bandClass } from './format';
 import { withQuery } from './links';
 import type { PlanContext } from './links';
-
-export interface Briefing {
-  by: 'gemini' | 'template';
-  text: string;
-  lang: Language;
-  note?: string | undefined;
-}
 
 export function PlanHeader({
   plan,
@@ -79,10 +73,16 @@ export function PlanHeader({
   );
 }
 
-export function JumpBar({ hasAnswer }: { readonly hasAnswer: boolean }): ReactElement {
+export function JumpBar({
+  hasAnswer,
+  hasBriefing,
+}: {
+  readonly hasAnswer: boolean;
+  readonly hasBriefing: boolean;
+}): ReactElement {
   const links: [string, string][] = [
     ...(hasAnswer ? ([['#answer', 'Answer']] as [string, string][]) : []),
-    ['#briefing', 'In short'],
+    ...(hasBriefing ? ([['#briefing', 'In short']] as [string, string][]) : []),
     ['#air', 'Air today'],
     ['#timeline', 'Timeline'],
     ['#home', 'Home'],
@@ -141,7 +141,7 @@ export function BriefingSection({
   ctx,
   lang,
 }: {
-  readonly briefing: Briefing;
+  readonly briefing: WrittenText;
   readonly ctx: PlanContext;
   readonly lang: Language;
 }): ReactElement {
@@ -179,7 +179,7 @@ export function AskSection({
   readonly keep: Readonly<Record<string, string>>;
 }): ReactElement {
   return (
-    <section id="ask" aria-labelledby="ask-title" className="section">
+    <section id="ask" tabIndex={-1} aria-labelledby="ask-title" className="section">
       <h2 id="ask-title">Ask about this plan</h2>
       <form method="post" action={action}>
         <input type="hidden" name="formToken" value={formToken} />

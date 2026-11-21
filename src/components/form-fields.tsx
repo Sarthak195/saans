@@ -1,15 +1,6 @@
 import type { ReactElement } from 'react';
 
-export interface FieldError {
-  field: string;
-  message: string;
-}
-
-/** What was typed, and what was wrong with it, by field name. */
-export interface FormState {
-  values: Readonly<Record<string, string>>;
-  errors: readonly FieldError[];
-}
+import type { FormError, FormState } from '@/server/household-form';
 
 export function fieldId(name: string): string {
   return `f-${name}`;
@@ -148,7 +139,7 @@ export function CheckGroup(props: {
 export function ErrorSummary({
   errors,
 }: {
-  readonly errors: readonly FieldError[];
+  readonly errors: readonly FormError[];
 }): ReactElement | null {
   if (errors.length === 0) return null;
   return (

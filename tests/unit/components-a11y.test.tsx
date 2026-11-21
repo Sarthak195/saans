@@ -12,6 +12,7 @@ import { sampleById } from '@/core/profile/samples';
 import { loadPlanView } from '@/server/plan-view';
 import type { PlanView } from '@/server/plan-view';
 
+import { airBody, jsonResponse } from '../helpers/air-body';
 import { violationsIn } from '../helpers/axe';
 import { DASHES } from '../helpers/plan';
 
@@ -19,8 +20,8 @@ import { DASHES } from '../helpers/plan';
 vi.setConfig({ testTimeout: 30_000 });
 
 async function sampleView(): Promise<PlanView> {
-  // No live data in tests: the sample place falls back to its recording.
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 503 })));
+  // A fixed reply, so the plan never depends on a recording's date.
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(airBody())));
   const sample = sampleById('s1');
   if (sample === undefined) throw new Error('no sample');
   const view = await loadPlanView({

@@ -21,6 +21,12 @@ export const ROUTINE_ROWS = MAX_ROUTINES;
 /** The household form as text by field name. Several choices in one field are joined with commas. */
 export type FormValues = Record<string, string>;
 
+/** What was typed, and what was wrong with it, by field name. */
+export interface FormState {
+  values: Readonly<FormValues>;
+  errors: readonly FormError[];
+}
+
 export interface FormError {
   field: string;
   message: string;

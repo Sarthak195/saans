@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import type { RoutineAdvice } from '@/core/plan/types';
 import type { Language } from '@/core/types';
+import type { WrittenText } from '@/server/genai';
 import type { PlanView } from '@/server/plan-view';
 
 import { AlternativesSection, GrapSection, HomeSection, MoreSection } from './advice-lists';
@@ -17,11 +18,11 @@ import {
   PlanHeader,
   StatusLine,
 } from './plan-top';
-import type { Briefing } from './plan-top';
 
 export interface PlanBodyProps {
   view: PlanView;
-  briefing: Briefing;
+  /** Left out when there is no air data to write about. */
+  briefing?: WrittenText | undefined;
   lang: Language;
   ctx: PlanContext;
   /** A fixed line announced after an action. */
@@ -41,6 +42,7 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
   const { view, briefing, lang, ctx, status, before, intro } = props;
   const { plan } = view;
   const smogDay = view.mode === 'smog-day';
+  const noAir = view.unavailable !== undefined;
   const answered =
     plan.answer === undefined
       ? undefined
@@ -54,7 +56,10 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
     <>
       <PlanHeader plan={plan} ctx={ctx} smogDay={smogDay} />
       <StatusLine text={status} />
-      <JumpBar hasAnswer={plan.answer !== undefined} />
+      <JumpBar
+        hasAnswer={plan.answer !== undefined}
+        hasBriefing={!noAir && briefing !== undefined}
+      />
       {plan.answer === undefined ? null : (
         <AnswerCard
           answer={plan.answer}
@@ -63,26 +68,35 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
         />
       )}
       {intro}
-      <BriefingSection briefing={briefing} ctx={ctx} lang={lang} />
+      {noAir || briefing === undefined ? null : (
+        <BriefingSection briefing={briefing} ctx={ctx} lang={lang} />
+      )}
       <AirSection air={plan.air} smogDay={smogDay} unavailable={view.unavailable !== undefined} />
-      <section id="hours" aria-labelledby="hours-title" className="section">
-        <h2 id="hours-title">Hour by hour</h2>
-        <DayRibbon
-          hourly={plan.air.hourly}
-          dayLabel={plan.day.label}
-          markers={markers}
-          window={plan.glance.best}
-        />
-      </section>
-      <GlanceSection glance={plan.glance} />
-      {plan.severe ? <SevereBanner /> : null}
+      {noAir ? null : (
+        <>
+          <section id="hours" aria-labelledby="hours-title" className="section">
+            <h2 id="hours-title">Hour by hour</h2>
+            <DayRibbon
+              hourly={plan.air.hourly}
+              dayLabel={plan.day.label}
+              markers={markers}
+              window={plan.glance.best}
+            />
+          </section>
+          <GlanceSection glance={plan.glance} />
+          {plan.severe ? <SevereBanner /> : null}
+        </>
+      )}
       <Timeline
         plan={plan}
         before={before}
+        noAir={noAir}
         whatIf={{ action: `${ctx.actionBase}/whatif`, formToken: ctx.formToken, keep }}
       />
-      <MemberSummaries members={plan.members} />
-      <AskSection action={`${ctx.actionBase}/ask`} formToken={ctx.formToken} keep={keep} />
+      {noAir ? null : <MemberSummaries members={plan.members} />}
+      {noAir ? null : (
+        <AskSection action={`${ctx.actionBase}/ask`} formToken={ctx.formToken} keep={keep} />
+      )}
       <HomeSection home={view.home} />
       <AlternativesSection alternatives={view.alternatives} transit={view.transit} />
       <GrapSection grap={view.grap} />

@@ -1,10 +1,6 @@
 import type { ReactElement } from 'react';
 
-export interface NoticeText {
-  title: string;
-  body: string;
-  nextAction: string;
-}
+import type { UserMessage } from '@/server/errors';
 
 export interface NoticeLink {
   href: string;
@@ -29,7 +25,7 @@ export function ErrorNotice({
   text,
   links,
 }: {
-  readonly text: NoticeText;
+  readonly text: UserMessage;
   readonly links: readonly NoticeLink[];
 }): ReactElement {
   return (
@@ -49,7 +45,7 @@ export function AlertNotice({
   text,
   links,
 }: {
-  readonly text: NoticeText;
+  readonly text: UserMessage;
   readonly links: readonly NoticeLink[];
 }): ReactElement {
   return (

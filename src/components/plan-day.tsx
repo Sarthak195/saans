@@ -38,7 +38,7 @@ function airingLine(airing: Airing): string {
 export function GlanceSection({ glance }: { readonly glance: Glance }): ReactElement {
   return (
     <section id="glance" aria-labelledby="glance-title" className="section">
-      <h2 id="glance-title">Today at a glance</h2>
+      <h2 id="glance-title">The day at a glance</h2>
       <dl className="glance">
         <div>
           <dt>Cleanest three hours</dt>
@@ -64,7 +64,7 @@ export function GlanceSection({ glance }: { readonly glance: Glance }): ReactEle
 export function SevereBanner(): ReactElement {
   return (
     <section aria-labelledby="severe-title" className="severe">
-      <h2 id="severe-title">The air is very bad today</h2>
+      <h2 id="severe-title">Very bad air: three things to do</h2>
       <ol>
         <li>Keep hard exercise and play indoors.</li>
         <li>
@@ -92,14 +92,17 @@ export function Timeline({
   plan,
   whatIf,
   before,
+  noAir = false,
 }: {
   readonly plan: Plan;
   readonly whatIf?: WhatIfTarget | undefined;
   /** The routine as it was before a what-if, so its line can show before and after. */
   readonly before?: RoutineAdvice | undefined;
+  /** True when there is no air data: routines are listed, with no advice yet. */
+  readonly noAir?: boolean;
 }): ReactElement {
   return (
-    <section id="timeline" aria-labelledby="timeline-title" className="section">
+    <section id="timeline" tabIndex={-1} aria-labelledby="timeline-title" className="section">
       <h2 id="timeline-title">Timeline</h2>
       {plan.routines.length === 0 ? (
         <p>
@@ -121,6 +124,7 @@ export function Timeline({
                   weekday={plan.day.weekday}
                   whatIf={whatIf}
                   before={before?.routineId === advice.routineId ? before : undefined}
+                  noAir={noAir}
                 />
               ))}
             </ol>
@@ -147,7 +151,9 @@ export function MemberSummaries({
             {m.exposureUsual === 0
               ? 'no outdoor routines on this day.'
               : m.percentLess > 0
-                ? `about ${String(m.percentLess)}% less PM2.5 over the day's outdoor routines with this plan.`
+                ? m.percentLess >= 100
+                  ? 'all outdoor routines move indoors with this plan. Indoor air is usually cleaner than outdoor air but not clean.'
+                  : `about ${String(m.percentLess)}% less PM2.5 over the day's outdoor routines with this plan.`
                 : 'the plan leaves their outdoor time as it is.'}
           </li>
         ))}

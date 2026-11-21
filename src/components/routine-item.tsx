@@ -2,11 +2,11 @@ import type { ReactElement } from 'react';
 
 import { BAND_LABEL } from '@/core/aqi';
 import type { RoutineAdvice } from '@/core/plan/types';
-import type { SourceRef } from '@/core/source';
 import { MODES } from '@/core/profile/schema';
 import type { Weekday } from '@/core/types';
 
 import { BandBadge, DecisionTag } from './band';
+import { SourceLink } from './source-link';
 import { DECISION_WORD, KIND_LABEL, MODE_LABEL, WEEKDAY_LONG } from './format';
 
 export interface WhatIfTarget {
@@ -15,18 +15,6 @@ export interface WhatIfTarget {
   formToken: string;
   /** Values the new plan page should keep, such as the day, sent back with the form. */
   keep?: Readonly<Record<string, string>>;
-}
-
-function SourceNote({ source }: { readonly source: SourceRef }): ReactElement {
-  // Saans's own rules are named as such; every other rule links to where it comes from.
-  const title = source.status === 'APP' ? 'Saans rule' : source.title;
-  return source.url === '' ? (
-    <span>{title}</span>
-  ) : (
-    <a href={source.url} rel="noopener noreferrer">
-      {title}
-    </a>
-  );
 }
 
 function reading(advice: RoutineAdvice): string {
@@ -111,11 +99,14 @@ export function RoutineItem({
   weekday,
   whatIf,
   before,
+  noAir = false,
 }: {
   readonly advice: RoutineAdvice;
   readonly weekday: Weekday;
   readonly whatIf?: WhatIfTarget | undefined;
   readonly before?: RoutineAdvice | undefined;
+  /** True when there is no air data, so no decision can be given yet. */
+  readonly noAir?: boolean;
 }): ReactElement {
   const title = `${advice.memberLabel}: ${KIND_LABEL[advice.kind].toLowerCase()}`;
   if (!advice.scheduled) {
@@ -126,9 +117,20 @@ export function RoutineItem({
       </li>
     );
   }
+  if (noAir) {
+    return (
+      <li className="routine" id={`routine-${advice.routineId}`} tabIndex={-1}>
+        <h4>{title}</h4>
+        <p className="routine-when">
+          {advice.start}, {String(advice.minutes)} minutes
+        </p>
+        <p>No air data, so there is no advice for this routine yet. Try again in a few minutes.</p>
+      </li>
+    );
+  }
   const { window } = advice;
   return (
-    <li className="routine" id={`routine-${advice.routineId}`}>
+    <li className="routine" id={`routine-${advice.routineId}`} tabIndex={-1}>
       <h4>{title}</h4>
       <p className="routine-when">
         {advice.start}, {String(advice.minutes)} minutes
@@ -142,7 +144,7 @@ export function RoutineItem({
       </p>
       {before === undefined ? null : <ChangeNote before={before} now={advice} />}
       <p>
-        {advice.reason.text} Source: <SourceNote source={advice.reason.source} />.
+        {advice.reason.text} Source: <SourceLink source={advice.reason.source} />.
       </p>
       {window === undefined ? null : (
         <p>

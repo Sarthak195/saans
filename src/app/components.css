@@ -546,3 +546,11 @@ input[type='checkbox'] {
   border-left: 0.25rem solid var(--color-border);
   white-space: pre-wrap;
 }
+
+/* Links that stand alone in a list are touch targets too. */
+.samples h3 a,
+.plain-list a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-size);
+}

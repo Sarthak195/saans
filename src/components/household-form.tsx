@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 
 import { CheckGroup, ErrorSummary, SelectField, TextField } from './form-fields';
-import type { FormState } from './form-fields';
+import type { FormState } from '@/server/household-form';
 import { COOKING, HABITS, HEATING } from './form-options';
 import { MemberRow, RoutineRow, rows } from './household-rows';
 

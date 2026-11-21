@@ -2,24 +2,19 @@ import type { ReactElement } from 'react';
 
 import { BAND_LABEL } from '@/core/aqi';
 import type { CommunityPlan, Plan } from '@/core/plan/types';
-import type { CommunityKind, Language } from '@/core/types';
+import type { CommunityKind } from '@/core/types';
+import type { WrittenText } from '@/server/genai';
 
 import { CopyButton } from './copy-button';
 import { SMOG_DAY_LABEL } from './copy';
 import { withQuery } from './links';
+import { ReasonLine } from './source-link';
 
 const KIND_NAME: Record<CommunityKind, string> = {
   society: 'Housing society',
   school: 'School',
   office: 'Office',
 };
-
-export interface NoticeText {
-  text: string;
-  lang: Language;
-  by: 'gemini' | 'template';
-  note?: string | undefined;
-}
 
 /** The link that shares a notice. It carries the notice text and nothing else: never a plan link. */
 export function whatsappLink(notice: string): string {
@@ -66,7 +61,7 @@ export function CommunityView({
   /** This page's own path, for the audience links and the notice link. */
   readonly base: string;
   readonly planHref: string;
-  readonly notice?: NoticeText | undefined;
+  readonly notice?: WrittenText | undefined;
   readonly smogDay: boolean;
 }): ReactElement {
   const { bestOutdoorWindow: window, aggregate } = community;
@@ -88,19 +83,7 @@ export function CommunityView({
             <li key={action.id}>
               <h3>{action.title}</h3>
               <p>{action.body}</p>
-              <p className="small">
-                Why: {action.reason.text} Source:{' '}
-                {action.reason.source.url === '' ? (
-                  action.reason.source.title
-                ) : (
-                  <a href={action.reason.source.url} rel="noopener noreferrer">
-                    {action.reason.source.status === 'APP'
-                      ? 'Saans rule'
-                      : action.reason.source.title}
-                  </a>
-                )}
-                .
-              </p>
+              <ReasonLine reason={action.reason} />
             </li>
           ))}
         </ul>
