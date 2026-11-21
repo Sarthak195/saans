@@ -102,7 +102,7 @@ export async function briefingWithDeps(
       audience: 'family',
       version: BRIEFING_PROMPT_VERSION,
       system: BRIEFING_SYSTEM,
-      facts: briefingFacts(input),
+      facts: briefingFacts(input, lang === 'en'),
       lang,
       check: (text) => checkWritten(text, { lang, allowedNumbers, refs }).reasons,
     },

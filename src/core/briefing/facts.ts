@@ -36,9 +36,9 @@ export interface RoutineFacts {
   pm25?: number;
   level?: string;
   cleanerWindow?: WindowFacts;
-  why: string;
-  protection: string[];
-  effect: string;
+  why?: string;
+  protection?: string[];
+  effect?: string;
   percentLess?: number;
 }
 
@@ -48,12 +48,12 @@ export interface BriefingFacts {
   aqi: { value: number; level: string } | null;
   cleanestWindow: WindowFacts | null;
   worstWindow: WindowFacts | null;
-  topAction: string;
+  topAction?: string;
   members: { ref: string; sensitivity: Sensitivity }[];
   routines: RoutineFacts[];
-  question?: { answer: string; routine?: string };
-  home: string[];
-  alternatives: string[];
+  question?: { answer?: string; routine?: string };
+  home?: string[];
+  alternatives?: string[];
 }
 
 export interface NoticeFacts {
@@ -80,7 +80,7 @@ function aqiOf(plan: Plan): { value: number; level: string } | null {
     : null;
 }
 
-function routineFacts(r: RoutineAdvice): RoutineFacts {
+function routineFacts(r: RoutineAdvice, prose: boolean): RoutineFacts {
   const window = windowOf(r.window ?? null);
   const level = levelOf(r.level);
   return {
@@ -94,18 +94,20 @@ function routineFacts(r: RoutineAdvice): RoutineFacts {
     ...(r.pm25 === null ? {} : { pm25: r.pm25 }),
     ...(level === undefined ? {} : { level }),
     ...(window === null ? {} : { cleanerWindow: window }),
-    why: r.reason.text,
-    protection: r.protection,
-    effect: r.impact.text,
+    ...(prose ? { why: r.reason.text, protection: r.protection, effect: r.impact.text } : {}),
     ...(r.impact.percentLess === undefined ? {} : { percentLess: r.impact.percentLess }),
   };
 }
 
-export function briefingFacts(input: {
-  plan: Plan;
-  home: HomeAdvice[];
-  alternatives: Alternative[];
-}): BriefingFacts {
+/**
+ * The facts for a briefing. With `prose` the plan's own English sentences go along, for the model
+ * to put in its own words; without it only the structure goes (decisions, times, numbers), which
+ * is what a Hindi briefing needs, because a model asked to translate prose tends to copy it.
+ */
+export function briefingFacts(
+  input: { plan: Plan; home: HomeAdvice[]; alternatives: Alternative[] },
+  prose = true,
+): BriefingFacts {
   const { plan } = input;
   const answer = plan.answer;
   return {
@@ -114,23 +116,27 @@ export function briefingFacts(input: {
     aqi: aqiOf(plan),
     cleanestWindow: windowOf(plan.glance.best),
     worstWindow: windowOf(plan.glance.worst),
-    topAction: plan.glance.topAction,
+    ...(prose ? { topAction: plan.glance.topAction } : {}),
     members: plan.members.map((m) => ({ ref: m.memberRef, sensitivity: m.sensitivity })),
-    routines: plan.routines.map(routineFacts),
+    routines: plan.routines.map((r) => routineFacts(r, prose)),
     ...(answer === undefined
       ? {}
       : {
           question: {
-            answer: answer.text,
+            ...(prose ? { answer: answer.text } : {}),
             ...(answer.routineRef === undefined ? {} : { routine: answer.routineRef }),
           },
         }),
-    // The most urgent few, so the briefing stays short; every one is a sentence the plan shows.
-    home: [...input.home]
-      .sort((a, b) => a.priority - b.priority)
-      .slice(0, MAX_HOME)
-      .map((h) => h.title),
-    alternatives: input.alternatives.slice(0, MAX_ALTERNATIVES).map((a) => a.title),
+    ...(prose
+      ? {
+          // The most urgent few, so the briefing stays short; each is a line the plan shows.
+          home: [...input.home]
+            .sort((a, b) => a.priority - b.priority)
+            .slice(0, MAX_HOME)
+            .map((h) => h.title),
+          alternatives: input.alternatives.slice(0, MAX_ALTERNATIVES).map((a) => a.title),
+        }
+      : {}),
   };
 }
 

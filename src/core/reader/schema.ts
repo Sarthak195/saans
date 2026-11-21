@@ -81,8 +81,30 @@ export interface Quoted<T> {
   quote: string;
 }
 
-/** The schema in the form the Gemini API takes: plain JSON Schema, without the draft marker. */
+// Keywords the API's constrained decoding cannot serve ("too many states for serving"). The zod
+// schema still enforces every limit when the reply is parsed.
+const UNSUPPORTED = [
+  '$schema',
+  'minLength',
+  'maxLength',
+  'minItems',
+  'maxItems',
+  'minimum',
+  'maximum',
+  'additionalProperties',
+];
+
+function stripLimits(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stripLimits);
+  if (typeof value !== 'object' || value === null) return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([key]) => !UNSUPPORTED.includes(key))
+      .map(([key, inner]) => [key, stripLimits(inner)]),
+  );
+}
+
+/** The schema in the form the Gemini API takes: plain JSON Schema without size limits or the draft marker. */
 export function jsonSchemaOf(schema: z.ZodType): Record<string, unknown> {
-  const full = z.toJSONSchema(schema, { target: 'draft-7' }) as Record<string, unknown>;
-  return Object.fromEntries(Object.entries(full).filter(([key]) => key !== '$schema'));
+  return stripLimits(z.toJSONSchema(schema, { target: 'draft-7' })) as Record<string, unknown>;
 }

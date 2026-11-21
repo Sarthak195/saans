@@ -1,6 +1,7 @@
 import { AppError } from '@/server/errors';
 
-const TIMEOUT_NAMES = ['TimeoutError', 'AbortError', 'RequestTimeoutError', 'RequestAbortedError'];
+// The SDK names its own timeout "APIConnectionTimeoutError"; the platform's is "TimeoutError".
+const TIMEOUT = /timeout|abort|timed out/i;
 const QUOTA = /RESOURCE_EXHAUSTED|\b429\b|quota|rate.?limit/i;
 const BLOCKED = /SAFETY|PROHIBITED|blocked|BLOCKLIST|RECITATION/i;
 
@@ -21,7 +22,7 @@ export function classifyError(error: unknown): AppError {
   const name = error instanceof Error ? error.name : '';
   const message = error instanceof Error ? error.message : '';
   const status = statusOf(error);
-  if (TIMEOUT_NAMES.includes(name) || status === 408 || status === 504) {
+  if (TIMEOUT.test(`${name} ${message}`) || status === 408 || status === 504) {
     return new AppError('genai_timeout', 'The model did not answer in time');
   }
   if (status === 429 || QUOTA.test(message)) {

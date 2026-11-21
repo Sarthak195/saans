@@ -6,6 +6,8 @@ import { checkNumbers, checkPolarity } from '@/core/text';
 const MAX_CHARS = 1200;
 const MIN_SENTENCES = 2;
 const MAX_SENTENCES = 8;
+// A Hindi sentence may carry a placeholder or a level name in Latin letters, but not be mostly English.
+const MIN_SENTENCE_SHARE = 0.25;
 const DEVANAGARI = /\p{Script=Devanagari}/gu;
 const LETTERS = /\p{L}/gu;
 const SENTENCE_BREAK = /(?<!\d)\.|\.(?!\d)|[!?।॥\n\r]+/;
@@ -32,6 +34,15 @@ export function tidyText(text: string): string {
 function devanagariShare(text: string): number {
   const letters = text.match(LETTERS)?.length ?? 0;
   return letters === 0 ? 0 : (text.match(DEVANAGARI)?.length ?? 0) / letters;
+}
+
+function hasEnglishSentence(text: string): boolean {
+  return text
+    .split(SENTENCE_BREAK)
+    .some(
+      (sentence) =>
+        sentence.match(LETTERS) !== null && devanagariShare(sentence) < MIN_SENTENCE_SHARE,
+    );
 }
 
 function sentenceCount(text: string): number {
@@ -87,6 +98,8 @@ export function checkWritten(
 
   const share = devanagariShare(text);
   if (options.lang === 'hi' ? share < 0.4 : share > 0.05) reasons.push('wrong language');
+  // A Hindi text that drops an English sentence in the middle is not Hindi throughout.
+  if (options.lang === 'hi' && hasEnglishSentence(text)) reasons.push('English sentence');
 
   const numbers = checkNumbers(text, options.allowedNumbers);
   if (!numbers.ok) reasons.push(`unknown numbers ${numbers.unknown.join(' ')}`);
