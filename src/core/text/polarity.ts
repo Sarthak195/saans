@@ -1,7 +1,8 @@
 import { reassurancePhrases } from '@/core/text/lexicon';
 import { normalizeText } from '@/core/text/normalize';
+import type { Decision } from '@/core/decision';
 
-export type Decision = 'keep' | 'lighten' | 'move' | 'indoors' | 'essential';
+export type { Decision };
 
 export interface PolarityItem {
   ref: string;
