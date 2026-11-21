@@ -125,37 +125,56 @@ describe('assertSameOrigin', () => {
 
   it('refuses a cross-origin Origin', () => {
     expect(originKind(req({ origin: 'https://evil.example' }))).toBe('cross_origin');
-    expect(originKind(req({ origin: 'null' }))).toBe('cross_origin');
     expect(originKind(req({ origin: 'http://saans.example' }))).toBe('cross_origin');
     expect(originKind(req({ origin: 'https://saans.example.evil.example' }))).toBe('cross_origin');
   });
 
-  it('uses the forwarded host and protocol behind a proxy', () => {
+  it('takes the host from the Host header and the scheme from the forwarded protocol', () => {
     const behind = (headers: Record<string, string>) =>
       new Request('http://10.0.0.2:8080/ask', { method: 'POST', headers });
     const proxied = {
       origin: 'https://saans.example',
-      host: '10.0.0.2:8080',
-      'x-forwarded-host': 'saans.example',
+      host: 'saans.example',
       'x-forwarded-proto': 'https',
     };
     expect(originKind(behind(proxied))).toBe('no error');
-    expect(originKind(behind({ ...proxied, origin: 'http://10.0.0.2:8080' }))).toBe('cross_origin');
+    expect(originKind(behind({ ...proxied, origin: 'http://saans.example' }))).toBe('cross_origin');
   });
 
-  it('takes the first value when a proxy chain joins forwarded headers', () => {
+  it('ignores a forwarded host that a client could have sent', () => {
+    const request = new Request('https://saans.example/ask', {
+      method: 'POST',
+      headers: {
+        origin: 'https://evil.example',
+        host: 'saans.example',
+        'x-forwarded-host': 'evil.example',
+      },
+    });
+    expect(originKind(request)).toBe('cross_origin');
+    const honest = new Request('https://saans.example/ask', {
+      method: 'POST',
+      headers: {
+        origin: 'https://saans.example',
+        host: 'saans.example',
+        'x-forwarded-host': 'evil.example',
+      },
+    });
+    expect(originKind(honest)).toBe('no error');
+  });
+
+  it('takes the first scheme when a proxy chain joins the forwarded protocol', () => {
     const request = new Request('http://internal/ask', {
       method: 'POST',
       headers: {
         origin: 'https://saans.example',
-        'x-forwarded-host': 'saans.example, internal',
+        host: 'saans.example',
         'x-forwarded-proto': 'https, http',
       },
     });
     expect(originKind(request)).toBe('no error');
   });
 
-  it('falls back to the Host header, then the request URL', () => {
+  it('falls back to the request URL when there is no Host header', () => {
     const byHost = new Request('http://internal/ask', {
       method: 'POST',
       headers: { origin: 'http://saans.example', host: 'saans.example' },
@@ -165,9 +184,18 @@ describe('assertSameOrigin', () => {
     expect(originKind(byUrl)).toBe('no error');
   });
 
-  it('refuses when the forwarded host is not a valid host', () => {
-    const request = req({ origin: 'https://saans.example', 'x-forwarded-host': 'bad host/' });
+  it('refuses when the Host header is not a valid host', () => {
+    const request = req({ origin: 'https://saans.example', host: 'bad host/' });
     expect(originKind(request)).toBe('cross_origin');
+  });
+
+  it("treats Origin 'null' like a missing Origin", () => {
+    expect(originKind(req({ origin: 'null' }))).toBe('cross_origin');
+    expect(originKind(req({ origin: 'null', 'sec-fetch-site': 'cross-site' }))).toBe(
+      'cross_origin',
+    );
+    expect(originKind(req({ origin: 'null', 'sec-fetch-site': 'none' }))).toBe('cross_origin');
+    expect(originKind(req({ origin: 'null', 'sec-fetch-site': 'same-origin' }))).toBe('no error');
   });
 
   it('without Origin, allows only same-origin and direct navigation', () => {

@@ -54,9 +54,13 @@ function firstHeader(request: Request, name: string): string | null {
   return value === undefined || value === '' ? null : value;
 }
 
+/**
+ * This site's own origin. The host comes from the Host header only, because a client can send any
+ * X-Forwarded-Host; the platform's proxy is trusted for the scheme alone.
+ */
 function ownOrigin(request: Request): string | null {
   const url = new URL(request.url);
-  const host = firstHeader(request, 'x-forwarded-host') ?? firstHeader(request, 'host') ?? url.host;
+  const host = firstHeader(request, 'host') ?? url.host;
   const proto = firstHeader(request, 'x-forwarded-proto') ?? url.protocol.replace(/:$/, '');
   try {
     return new URL(`${proto}://${host}`).origin;
@@ -67,14 +71,16 @@ function ownOrigin(request: Request): string | null {
 
 /**
  * Refuses a request that another site could have sent from a visitor's browser. The Origin
- * header must be this site's own; browsers that omit it must say the request is same-origin.
+ * header must be this site's own. A missing Origin, or the literal 'null' that browsers send from
+ * opaque contexts such as sandboxed frames, counts only when the browser says the request is
+ * same-origin.
  */
 export function assertSameOrigin(request: Request): void {
   const origin = request.headers.get('origin');
-  if (origin === null) {
+  if (origin === null || origin === 'null') {
     const site = request.headers.get('sec-fetch-site');
-    if (site === 'same-origin' || site === 'none') return;
-    throw new AppError('cross_origin', 'no Origin and not a same-origin fetch');
+    if (site === 'same-origin' || (origin === null && site === 'none')) return;
+    throw new AppError('cross_origin', 'no usable Origin and not a same-origin fetch');
   }
   if (origin !== ownOrigin(request)) throw new AppError('cross_origin', 'Origin is not this site');
 }

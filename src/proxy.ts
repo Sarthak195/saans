@@ -2,6 +2,8 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { buildSecurityHeaders, createNonce } from '@/server/security-headers';
 
+const STATIC_FILE = /\.[A-Za-z0-9]+$/;
+
 export function proxy(request: NextRequest): NextResponse {
   const nonce = createNonce();
   const security = buildSecurityHeaders({
@@ -16,6 +18,11 @@ export function proxy(request: NextRequest): NextResponse {
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   for (const [name, value] of Object.entries(security)) response.headers.set(name, value);
+  // Pages and the forms behind them can hold a family's details, so no cache keeps a copy. Files
+  // such as a robots.txt have an extension and stay cacheable.
+  if (!STATIC_FILE.test(request.nextUrl.pathname)) {
+    response.headers.set('Cache-Control', 'private, no-store');
+  }
   return response;
 }
 

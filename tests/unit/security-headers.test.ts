@@ -70,7 +70,7 @@ describe('buildSecurityHeaders', () => {
     expect(headers).toMatchObject({
       'Strict-Transport-Security': 'max-age=63072000; includeSubDomains',
       'X-Content-Type-Options': 'nosniff',
-      'Referrer-Policy': 'no-referrer',
+      'Referrer-Policy': 'same-origin',
       'Permissions-Policy': 'geolocation=(self), camera=(), microphone=()',
       'Cross-Origin-Opener-Policy': 'same-origin',
     });
@@ -86,6 +86,15 @@ describe('proxy', () => {
     expect(policy).toMatch(/script-src 'self' 'nonce-[A-Za-z0-9+/=]+' 'strict-dynamic'/);
     expect(response.headers.get('x-middleware-request-content-security-policy')).toBe(policy);
     expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff');
+  });
+
+  it('keeps every page and form response out of caches, but not static files', () => {
+    for (const path of ['/', '/plan/abc', '/household', '/choose/abc', '/ask', '/api/health']) {
+      const response = proxy(new NextRequest(`https://saans.example${path}`));
+      expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+    }
+    const file = proxy(new NextRequest('https://saans.example/robots.txt'));
+    expect(file.headers.get('Cache-Control')).toBeNull();
   });
 
   it('uses a different nonce for each request', () => {

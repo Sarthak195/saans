@@ -45,7 +45,8 @@ export function buildSecurityHeaders(
     'Content-Security-Policy': buildContentSecurityPolicy(options),
     'Strict-Transport-Security': 'max-age=63072000; includeSubDomains',
     'X-Content-Type-Options': 'nosniff',
-    'Referrer-Policy': 'no-referrer',
+    // Forms post with a real Origin under this policy, while sealed links never reach another site.
+    'Referrer-Policy': 'same-origin',
     // Location is requested only by the "use my location" button, from this origin.
     'Permissions-Policy': 'geolocation=(self), camera=(), microphone=()',
     'Cross-Origin-Opener-Policy': 'same-origin',
