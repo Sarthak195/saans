@@ -7,7 +7,14 @@ import { buildCommunity } from '@/core/community';
 import { buildHomeAdvice } from '@/core/home';
 import { buildPlan } from '@/core/plan/build-plan';
 import { planFacts } from '@/core/plan/facts';
-import type { Alternative, CommunityPlan, GrapNote, HomeAdvice, Plan } from '@/core/plan/types';
+import type {
+  Alternative,
+  CommunityPlan,
+  GrapNote,
+  HomeAdvice,
+  Plan,
+  QuestionTarget,
+} from '@/core/plan/types';
 import { istParts } from '@/core/time';
 import type { PlanDay } from '@/core/time';
 import type { Household } from '@/core/types';
@@ -61,6 +68,17 @@ function seriesFor(household: Household, air: AirMode): Promise<AirSeries> {
   return getAirSeries(household.place.lat, household.place.lon);
 }
 
+/** The schema allows an explicit undefined that the plan's own type does not, so the keys are copied when set. */
+function targetOf(target: Household['questionTarget']): QuestionTarget | undefined {
+  if (target === undefined) return undefined;
+  return {
+    ...(target.routineId === undefined ? {} : { routineId: target.routineId }),
+    ...(target.memberId === undefined ? {} : { memberId: target.memberId }),
+    ...(target.hour === undefined ? {} : { hour: target.hour }),
+    ...(target.aboutToday === undefined ? {} : { aboutToday: target.aboutToday }),
+  };
+}
+
 /** Everything a plan page shows, built from the air data and the household in one place. */
 export async function loadPlanView(input: PlanViewInput): Promise<PlanView> {
   const mode = input.air ?? 'live';
@@ -80,7 +98,7 @@ export async function loadPlanView(input: PlanViewInput): Promise<PlanView> {
     series,
     now,
     day,
-    question: household.questionTarget,
+    question: targetOf(household.questionTarget),
   });
   const home = buildHomeAdvice({ household, plan });
   const alternatives = buildAlternatives({ household, plan });

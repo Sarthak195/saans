@@ -1,0 +1,148 @@
+import type { ReactElement } from 'react';
+
+import { healthStatement } from '@/core/aqi';
+import type { AirSummary } from '@/core/plan/types';
+
+import { BandBadge } from './band';
+import { CPCB_URL, SAMEER_URL, SMOG_DAY_LABEL } from './copy';
+import { clockOf, coordinate, dateLabel } from './format';
+
+const GAS_NAME: Record<string, string> = {
+  no2: 'Nitrogen dioxide',
+  o3: 'Ozone',
+  co: 'Carbon monoxide',
+  so2: 'Sulphur dioxide',
+};
+const GAS_ORDER = ['no2', 'o3', 'co', 'so2'] as const;
+
+function SourceLine({ air }: { readonly air: AirSummary }): ReactElement {
+  const grid = `${coordinate(air.gridLat)} N ${coordinate(air.gridLon)} E`;
+  return (
+    <p className="small">
+      Open-Meteo, CAMS global model, grid point {grid}; data hour {clockOf(air.dataHour)} IST;
+      fetched {clockOf(air.fetchedAt)} IST
+    </p>
+  );
+}
+
+function Provenance({
+  air,
+  smogDay,
+}: {
+  readonly air: AirSummary;
+  readonly smogDay: boolean;
+}): ReactElement | null {
+  if (smogDay) return <p className="notice notice--recorded">{SMOG_DAY_LABEL}</p>;
+  if (air.source === 'recorded' && air.recordedOn !== undefined) {
+    return (
+      <p className="notice notice--recorded">
+        Recorded {dateLabel(air.recordedOn)}, not live. The live air data could not be reached, so
+        this plan uses a saved copy.
+      </p>
+    );
+  }
+  if (air.staleSince !== undefined) {
+    return (
+      <p className="notice notice--recorded">
+        Last updated {clockOf(air.staleSince)} IST. The live air data is not reachable right now.
+      </p>
+    );
+  }
+  return null;
+}
+
+function GasTable({
+  gases,
+}: {
+  readonly gases: Partial<Record<string, number>>;
+}): ReactElement | null {
+  const rows = GAS_ORDER.filter((g) => gases[g] !== undefined);
+  if (rows.length === 0) return null;
+  return (
+    <details>
+      <summary>Gases in the air</summary>
+      <table className="stack">
+        <caption>Gas averages, in micrograms per cubic metre</caption>
+        <thead>
+          <tr>
+            <th scope="col">Gas</th>
+            <th scope="col">Average</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((g) => (
+            <tr key={g}>
+              <th scope="row">{GAS_NAME[g]}</th>
+              <td data-label="Average" className="num">
+                {String(gases[g])}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="small">
+        Nitrogen dioxide and sulphur dioxide are averaged over the same 24 hours as the number
+        above. Ozone and carbon monoxide are averaged over the last 8 hours. They are shown for
+        information and do not change the headline number.
+      </p>
+    </details>
+  );
+}
+
+/** The air today: the 24-hour CPCB number with its band, source and the reasons it can differ from an app. */
+export function AirSection({
+  air,
+  smogDay = false,
+}: {
+  readonly air: AirSummary;
+  readonly smogDay?: boolean;
+}): ReactElement {
+  const { aqi } = air;
+  return (
+    <section aria-labelledby="air-title" id="air" className="section">
+      <h2 id="air-title">Air today</h2>
+      <Provenance air={air} smogDay={smogDay} />
+      {aqi.kind === 'ok' ? (
+        <>
+          <p className="aqi-line">
+            <span className="aqi-number">{String(aqi.aqi)}</span>
+            <BandBadge band={aqi.band} />
+          </p>
+          <p>{healthStatement(aqi.band).text}</p>
+          <p className="small">
+            AQI by the CPCB 24-hour method, a model estimate. It is based on{' '}
+            {String(aqi.validHours)} hours of data.
+          </p>
+        </>
+      ) : (
+        <p>
+          There are not enough hours of air data to work out today&apos;s AQI. The hourly numbers
+          below still guide the plan.
+        </p>
+      )}
+      <SourceLine air={air} />
+      <details>
+        <summary>Why this can differ from the Sameer app</summary>
+        <p>
+          This number comes from a model with a grid about 45 km wide, so it describes a large area
+          and not one street. The Sameer app shows readings from a street monitor, which can be much
+          higher or lower right where it stands. The model also gives a 24-hour average, while an
+          app often shows the reading for this hour.
+        </p>
+        <p>
+          Model estimates often read lower than street monitors in north Indian winters. If your
+          local monitor reads worse, trust the worse reading. Check{' '}
+          <a href={CPCB_URL} rel="noopener noreferrer">
+            the CPCB air quality site
+          </a>{' '}
+          or{' '}
+          <a href={SAMEER_URL} rel="noopener noreferrer">
+            the Sameer app page
+          </a>
+          .
+        </p>
+      </details>
+      {aqi.kind === 'ok' ? <GasTable gases={aqi.gases} /> : null}
+    </section>
+  );
+}
