@@ -10,6 +10,7 @@ import SamplePage from '@/app/plan/sample/[id]/page';
 import { templateBriefing } from '@/core/briefing';
 import { sampleById } from '@/core/profile/samples';
 import { writeBriefing, writeNotice } from '@/server/genai';
+import { noCache } from '@/server/genai/cache';
 import { sealHousehold } from '@/server/seal';
 import { openWritten, sealWritten } from '@/server/written-draft';
 
@@ -53,16 +54,76 @@ function planHtml(searchParams: Record<string, string>): Promise<string> {
   }).then(renderToStaticMarkup);
 }
 
-describe('no page view calls Gemini', () => {
-  it('renders plan and community pages, shared and sample, with the model untouched', async () => {
-    const pages = [
-      await planHtml({}),
-      renderToStaticMarkup(
-        await SamplePage({
-          params: Promise.resolve({ id: 's1' }),
-          searchParams: Promise.resolve({}),
-        }),
-      ),
+function sampleHtml(searchParams: Record<string, string> = {}): Promise<string> {
+  return SamplePage({
+    params: Promise.resolve({ id: 's1' }),
+    searchParams: Promise.resolve(searchParams),
+  }).then(renderToStaticMarkup);
+}
+
+describe('a plan page asks Gemini for its English summary', () => {
+  it('asks once per page view, in English, and shows a checked reply with its label', async () => {
+    vi.mocked(writeBriefing).mockResolvedValue({ by: 'gemini', lang: 'en', text: SUMMARY });
+    for (const html of [await planHtml({}), await sampleHtml()]) {
+      expect(html).toContain(SUMMARY);
+      expect(html).toContain('Written by Gemini from your plan; every number checked by Saans');
+      expect(html).not.toMatch(DASHES);
+    }
+    expect(writeBriefing).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(writeBriefing).mock.calls.map((c) => c[0].lang)).toEqual(['en', 'en']);
+  });
+
+  it('shows the code-built summary when the model fails or hands back code-built text', async () => {
+    const plain = (text: string): void => {
+      expect(text).toContain('Written by Saans from your plan');
+    };
+    vi.mocked(writeBriefing).mockRejectedValue(new Error('boom'));
+    plain(await planHtml({}));
+    vi.mocked(writeBriefing).mockResolvedValue({
+      by: 'template',
+      lang: 'en',
+      text: 'Not shown.',
+      note: 'Paused.',
+    });
+    const html = await planHtml({});
+    plain(html);
+    expect(html).not.toContain('Not shown.');
+  });
+
+  it('stops waiting after 4 seconds and shows the code-built summary', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      vi.mocked(writeBriefing).mockReturnValue(new Promise(() => undefined));
+      const pending = planHtml({});
+      // The timer starts after the plan is loaded, so time moves in steps until the page is done.
+      let html: string | undefined;
+      void pending.then((value) => (html = value));
+      for (let step = 0; step < 12 && html === undefined; step += 1) {
+        await vi.advanceTimersByTimeAsync(500);
+      }
+      expect(html).toContain('Written by Saans from your plan');
+      expect(writeBriefing).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('never asks in smog-day mode, with no air data, or for a community page', async () => {
+    await planHtml({ air: 'smog-day' });
+    await sampleHtml({ air: 'smog-day' });
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new DOMException('slow', 'TimeoutError')));
+    const jaipur = {
+      ...sample.household,
+      place: { name: 'Jaipur', admin1: 'Rajasthan', lat: 26.9, lon: 75.8 },
+    };
+    const html = renderToStaticMarkup(
+      await PlanTokenPage({
+        params: Promise.resolve({ token: sealHousehold(jaipur) }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(html).toContain('No air data, so there is no advice');
+    for (const page of [
       renderToStaticMarkup(
         await CommunityTokenPage({
           params: Promise.resolve({ token: SCHOOL }),
@@ -75,16 +136,17 @@ describe('no page view calls Gemini', () => {
           searchParams: Promise.resolve({}),
         }),
       ),
-    ];
-    for (const html of pages) expect(html).not.toMatch(DASHES);
+    ]) {
+      expect(page).not.toMatch(DASHES);
+    }
     expect(writeBriefing).not.toHaveBeenCalled();
     expect(writeNotice).not.toHaveBeenCalled();
   });
 
-  it('shows the labelled code-built summary and two Gemini buttons on a plan page', async () => {
+  it('shows the labelled code-built summary and the two Gemini buttons', async () => {
     const html = await planHtml({});
     expect(html).toContain('Written by Saans from your plan');
-    expect(html).toContain('Explain my plan with Gemini');
+    expect(html).toContain('Write it again with Gemini');
     expect(html).toContain('Explain in Hindi with Gemini');
     expect(html).toContain(`action="/plan/${TOKEN}/explain"`);
   });
@@ -96,7 +158,8 @@ describe('a written summary in the address', () => {
     const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, target);
     const html = await planHtml({ b });
     expect(html).toContain(SUMMARY);
-    expect(html).toContain('Written by Gemini from your plan');
+    expect(html).toContain('Written by Gemini from your plan; every number checked by Saans');
+    // A sealed summary is shown as it is, with no second model call.
     expect(writeBriefing).not.toHaveBeenCalled();
   });
 
@@ -149,6 +212,13 @@ describe('POST /plan/[token]/explain', () => {
     });
     expect(writeBriefing).toHaveBeenCalledTimes(1);
     expect(vi.mocked(writeBriefing).mock.calls[0]?.[0].lang).toBe('hi');
+  });
+
+  it('writes the English summary again without the remembered text', async () => {
+    vi.mocked(writeBriefing).mockResolvedValue({ by: 'gemini', lang: 'en', text: SUMMARY });
+    await explainPost(formPost('/plan/x/explain', { lang: 'en' }), context(TOKEN));
+    const deps = vi.mocked(writeBriefing).mock.calls[0]?.[1];
+    expect(deps?.cache).toBe(noCache);
   });
 
   it('carries the note when the template stood in', async () => {

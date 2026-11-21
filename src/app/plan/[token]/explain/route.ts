@@ -1,6 +1,8 @@
 import { keepFromForm, planPath } from '@/server/edits';
 import { field, handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { writeBriefing } from '@/server/genai';
+import { noCache } from '@/server/genai/cache';
+import { defaultDeps } from '@/server/genai/config';
 import { loadPlanView } from '@/server/plan-view';
 import { airOf, dayOf } from '@/server/query';
 import { openHousehold } from '@/server/seal';
@@ -30,13 +32,17 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
       return seeOther(planPath(token, { ...keep, note: 'noAir' }, 'plan-title'));
     }
 
-    const written = await writeBriefing({
-      plan: view.plan,
-      home: view.home,
-      alternatives: view.alternatives,
-      household: view.household,
-      lang,
-    });
+    const written = await writeBriefing(
+      {
+        plan: view.plan,
+        home: view.home,
+        alternatives: view.alternatives,
+        household: view.household,
+        lang,
+      },
+      // "Write it again" must not hand back the text the page already remembers for these facts.
+      lang === 'en' ? { ...defaultDeps(), cache: noCache } : undefined,
+    );
     const b = sealWritten(written, {
       token,
       view,

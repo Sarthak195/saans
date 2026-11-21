@@ -15,6 +15,7 @@ import { airOf, dayOf, readPlanQuery } from '@/server/query';
 import type { SearchParams } from '@/server/query';
 import { loadPlanView } from '@/server/plan-view';
 import type { AirMode, PlanView } from '@/server/plan-view';
+import { autoBriefing } from '@/server/auto-briefing';
 import { openHousehold } from '@/server/seal';
 import { openWritten } from '@/server/written-draft';
 
@@ -78,22 +79,27 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
     );
   }
 
-  // A page view never calls the model (the free allowance is tiny): the summary is built in code
-  // unless a sealed one from the explain step rides along in the address.
-  const briefing =
+  // A sealed summary from the explain step wins. Otherwise the page asks Gemini for the English
+  // summary and waits only a moment, so the code-built one is always ready as the fallback.
+  const sealed =
     view.unavailable === undefined
-      ? (openWritten(q.b, {
+      ? openWritten(q.b, {
           token: props.token,
           view,
           lang: q.lang === 'hi' ? 'hi' : 'en',
           audience: 'family',
           now,
-        }) ?? {
+        })
+      : undefined;
+  const briefing =
+    view.unavailable !== undefined
+      ? undefined
+      : (sealed ??
+        (await autoBriefing(view)) ?? {
           by: 'template' as const,
           text: templateBriefing(view.plan),
           lang: 'en' as const,
-        })
-      : undefined;
+        });
   const before = await routineBefore(q.from, q.r, now, day, air);
 
   return (

@@ -153,7 +153,7 @@ export function BriefingSection({
 }): ReactElement {
   const source =
     briefing.by === 'gemini'
-      ? 'Written by Gemini from your plan'
+      ? 'Written by Gemini from your plan; every number checked by Saans'
       : 'Written by Saans from your plan';
   return (
     <section id="summary" tabIndex={-1} aria-labelledby="briefing-title" className="section">
@@ -173,7 +173,7 @@ export function BriefingSection({
         </p>
         <p className="actions">
           <button className="button" type="submit" name="lang" value="en">
-            Explain my plan with Gemini
+            Write it again with Gemini
           </button>
           <button className="button" type="submit" name="lang" value="hi">
             Explain in Hindi with Gemini
