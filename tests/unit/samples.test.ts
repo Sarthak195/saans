@@ -63,7 +63,10 @@ describe('SAMPLES', () => {
 
   it('uses no dashes in user-facing words', () => {
     for (const s of SAMPLES) {
-      expect(`${s.title} ${s.summary} ${s.text ?? ''}`).not.toMatch(/[–—]/);
+      const words = `${s.title} ${s.summary} ${s.text ?? ''}`;
+      for (const code of [0x2013, 0x2014]) {
+        expect(words.includes(String.fromCharCode(code))).toBe(false);
+      }
     }
   });
 });
