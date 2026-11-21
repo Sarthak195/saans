@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { clockOf, fillImpact, fillTemplate, oneDecimal, roundToFive } from '@/core/advice/format';
+import { fillImpact } from '@/core/advice/format';
+import { clockOf, fillTemplate, oneDecimal, roundToFive } from '@/core/format';
 import { isPoorOrWorse, planLevel } from '@/core/advice/level';
 import { sourceRefSchema } from '@/core/source';
 

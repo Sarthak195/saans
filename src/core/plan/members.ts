@@ -1,3 +1,4 @@
+import { roundToFive } from '@/core/format';
 import type { Evaluated } from '@/core/plan/advice';
 import { percentLess } from '@/core/plan/pm25';
 import { sensitivityOf } from '@/core/plan/sensitivity';
@@ -21,8 +22,8 @@ export function summariseMembers(members: Member[], evaluated: Evaluated[]): Mem
       memberRef: `member_${String(index + 1)}`,
       label: member.label,
       sensitivity: sensitivityOf(member),
-      exposureUsual: Math.round(usual / 5) * 5,
-      exposurePlan: Math.round(planned / 5) * 5,
+      exposureUsual: roundToFive(usual),
+      exposurePlan: roundToFive(planned),
       percentLess: percentLess(usual, planned),
     };
   });

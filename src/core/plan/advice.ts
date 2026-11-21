@@ -1,8 +1,9 @@
 import { BAND_LABEL, pm25Level } from '@/core/aqi';
 import type { Decision } from '@/core/decision';
 import { indoorsImpact, intensityImpact, noChangeImpact, timingImpact } from '@/core/impact';
-import { WEEKDAY_FULL, toMinutes } from '@/core/plan/clock';
-import { atLeast, displayPm25, meanOver } from '@/core/plan/pm25';
+import { displayPm25, fillTemplate, toMinutes } from '@/core/format';
+import { WEEKDAY_FULL } from '@/core/plan/clock';
+import { atLeast, meanOver } from '@/core/plan/pm25';
 import type { PmIndex } from '@/core/plan/pm25';
 import { protectionFor } from '@/core/plan/protection';
 import { ESSENTIAL_KINDS, GRID, NOT_SCHEDULED, NO_DATA, NO_WINDOW } from '@/core/plan/rules-data';
@@ -10,7 +11,6 @@ import type { DefaultRow } from '@/core/plan/rules-data';
 import { sensitivityOf } from '@/core/plan/sensitivity';
 import type { DaySlot, Impact, RoutineAdvice, Window } from '@/core/plan/types';
 import { findCleanerWindow } from '@/core/plan/windows';
-import { fill } from '@/core/plan/words';
 import { firstMatch } from '@/core/rules/evaluate';
 import type { PlanDay } from '@/core/time';
 import { hoursOf } from '@/core/time';
@@ -104,7 +104,7 @@ export function adviseRoutine(
 
   if (!base.scheduled) {
     const weekdays = `${WEEKDAY_FULL[ctx.day.weekday]}s`;
-    return plain(base, NOT_SCHEDULED, fill(NOT_SCHEDULED.text, { weekdays }));
+    return plain(base, NOT_SCHEDULED, fillTemplate(NOT_SCHEDULED.text, { weekdays }));
   }
   const usual = meanOver(ctx.pm, hoursOf(ctx.day, routine.start, routine.minutes), false);
   if (usual === null) return plain(base, NO_DATA, NO_DATA.text);
@@ -143,7 +143,7 @@ export function adviseRoutine(
 
   const note =
     moveFailed && (decision === 'indoors' || decision === 'lighten') ? NO_WINDOW[decision] : '';
-  const text = fill(rule.then.text, { level: BAND_LABEL[level] });
+  const text = fillTemplate(rule.then.text, { level: BAND_LABEL[level] });
   const advice: RoutineAdvice = {
     ...base,
     pm25: displayPm25(usual),

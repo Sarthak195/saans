@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { BAND_LABEL, pm25Level } from '@/core/aqi';
+import { displayPm25, fillTemplate } from '@/core/format';
 import {
   INDOORS_TEXT,
   breathingRate,
@@ -10,10 +11,10 @@ import {
   percentLess,
   timingImpact,
 } from '@/core/impact';
-import { displayPm25, meanOver, pmIndex } from '@/core/plan/pm25';
+import { meanOver, pmIndex } from '@/core/plan/pm25';
 import { protectionFor } from '@/core/plan/protection';
 import { sensitivityOf } from '@/core/plan/sensitivity';
-import { fill, numbersIn } from '@/core/plan/words';
+import { numbersIn } from '@/core/plan/words';
 import { AGE_BANDS, CONDITIONS } from '@/core/profile/schema';
 import type { Member } from '@/core/types';
 import { flatSeries, member } from '../helpers/plan';
@@ -211,8 +212,8 @@ describe('protection for trips that stay', () => {
 
 describe('wording helpers', () => {
   it('fills placeholders and refuses an unknown one', () => {
-    expect(fill('The air is {level}.', { level: 'Poor' })).toBe('The air is Poor.');
-    expect(() => fill('Hello {who}', {})).toThrow('{who}');
+    expect(fillTemplate('The air is {level}.', { level: 'Poor' })).toBe('The air is Poor.');
+    expect(() => fillTemplate('Hello {who}', {})).toThrow('{who}');
   });
 
   it('reads the numbers in a sentence but not the 2.5 in PM2.5', () => {

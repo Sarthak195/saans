@@ -1,6 +1,7 @@
 import { BAND_LABEL } from '@/core/aqi';
 import type { Evaluated } from '@/core/plan/advice';
-import { WEEKDAY_FULL, toMinutes } from '@/core/plan/clock';
+import { toMinutes } from '@/core/format';
+import { WEEKDAY_FULL } from '@/core/plan/clock';
 import type { DaySlot, QuestionAnswer, QuestionTarget, RoutineAdvice } from '@/core/plan/types';
 import { numbersIn } from '@/core/plan/words';
 import type { PlanDay } from '@/core/time';

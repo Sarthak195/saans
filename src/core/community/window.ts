@@ -1,21 +1,10 @@
 import { isPoorOrWorse, planLevel } from '@/core/advice/level';
-import { roundToFive } from '@/core/advice/format';
 import { pm25Level } from '@/core/aqi';
 import { COMMUNITY } from '@/core/community/data';
+import { fromMinutes, roundToFive, toMinutes } from '@/core/format';
 import type { Plan, Window } from '@/core/plan/types';
 import type { Routine } from '@/core/types';
 import { hoursOf } from '@/core/time';
-
-function minutesOf(hhmm: string): number {
-  const [h, m] = hhmm.split(':').map(Number);
-  return (h ?? 0) * 60 + (m ?? 0);
-}
-
-function clock(minutes: number): string {
-  const h = String(Math.floor(minutes / 60)).padStart(2, '0');
-  const m = String(minutes % 60).padStart(2, '0');
-  return `${h}:${m}`;
-}
 
 interface Candidate {
   start: number;
@@ -31,20 +20,20 @@ function candidatesFor(
   pm25ByHour: ReadonlyMap<string, number>,
 ): Candidate[] {
   const restricted = isPoorOrWorse(planLevel(plan));
-  const earliest = minutesOf(COMMUNITY.window.earliest);
-  const latest = minutesOf(COMMUNITY.window.latest);
+  const earliest = toMinutes(COMMUNITY.window.earliest);
+  const latest = toMinutes(COMMUNITY.window.latest);
   const out: Candidate[] = [];
 
   for (let shift = -slot.flexHours; shift <= slot.flexHours; shift += 1) {
-    const start = minutesOf(slot.start) + shift * 60;
+    const start = toMinutes(slot.start) + shift * 60;
     const end = start + slot.minutes;
     if (start < 0 || end > 24 * 60) continue;
-    if (slot.freeFrom !== undefined && start < minutesOf(slot.freeFrom)) continue;
-    if (slot.freeTo !== undefined && end > minutesOf(slot.freeTo)) continue;
+    if (slot.freeFrom !== undefined && start < toMinutes(slot.freeFrom)) continue;
+    if (slot.freeTo !== undefined && end > toMinutes(slot.freeTo)) continue;
     // On poor days nothing is offered in the early morning or late evening, when the air is worst.
     if (restricted && (start < earliest || end > latest)) continue;
 
-    const values = hoursOf(plan.day, clock(start), slot.minutes).map((hour) =>
+    const values = hoursOf(plan.day, fromMinutes(start), slot.minutes).map((hour) =>
       pm25ByHour.get(hour),
     );
     // A candidate with any hour missing from the forecast cannot be compared fairly.
@@ -72,8 +61,8 @@ export function bestOutdoorWindow(plan: Plan, slots: readonly Routine[]): Window
   )[0];
   if (!best) return null;
   return {
-    start: clock(best.start),
-    end: clock(best.end),
+    start: fromMinutes(best.start),
+    end: fromMinutes(best.end),
     pm25: roundToFive(best.mean),
     level: pm25Level(best.mean),
   };

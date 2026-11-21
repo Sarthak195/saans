@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { addHours, defaultPlanDay, hoursOf, istParts, planDays } from '@/core/time';
+import { addHours, defaultPlanDay, hoursOf, istIso, istParts, planDays } from '@/core/time';
 import type { PlanDay } from '@/core/time';
 
 // Every instant is written in UTC so the expected IST reading is plain arithmetic (+05:30).
@@ -13,6 +13,13 @@ const AT = {
   lateNight: new Date('2026-11-24T18:25:00Z'), // 23:55 IST
   pastMidnight: new Date('2026-11-24T18:35:00Z'), // 00:05 IST Wed 25 Nov
 };
+
+describe('istIso', () => {
+  it('writes an instant on the Indian clock with the offset, and rolls over midnight', () => {
+    expect(istIso(AT.morning)).toBe('2026-11-24T06:00:00+05:30');
+    expect(istIso(new Date('2026-11-24T18:35:45Z'))).toBe('2026-11-25T00:05:45+05:30');
+  });
+});
 
 describe('istParts', () => {
   it('reads 06:00 IST on a Tuesday', () => {

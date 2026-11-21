@@ -1,13 +1,13 @@
 import type { AirSeries } from '@/core/air/types';
 import { BAND_LABEL, aqiToday, pm25Level } from '@/core/aqi';
 import type { Band } from '@/core/aqi';
-import { dayWord, fromMinutes, hourOfDay } from '@/core/plan/clock';
-import { atLeast, displayPm25, meanOver } from '@/core/plan/pm25';
+import { displayPm25, fillTemplate, fromMinutes } from '@/core/format';
+import { dayWord, hourOfDay } from '@/core/plan/clock';
+import { atLeast, meanOver } from '@/core/plan/pm25';
 import type { PmIndex } from '@/core/plan/pm25';
 import { AIRING, TOP_ACTIONS } from '@/core/plan/rules-data';
 import type { Outcome } from '@/core/plan/rules-data';
 import type { Airing, Glance, Window } from '@/core/plan/types';
-import { fill } from '@/core/plan/words';
 import { firstMatch } from '@/core/rules/evaluate';
 import type { PlanDay } from '@/core/time';
 
@@ -110,7 +110,7 @@ export function topActionFor(args: {
     hasBest: best !== null,
   });
   if (!rule) throw new Error('No top-action rule matched');
-  return fill(rule.then, {
+  return fillTemplate(rule.then, {
     when: dayWord(day),
     level: dayBand === null ? '' : BAND_LABEL[dayBand],
     best: best === null ? '' : `${best.start} to ${best.end}`,

@@ -1,10 +1,11 @@
-import { fillImpact, fillTemplate, oneDecimal } from '@/core/advice/format';
+import { fillImpact } from '@/core/advice/format';
 import { TRANSIT, transitOptionsFor } from '@/core/alternatives/cities';
 import type { TransitOption } from '@/core/alternatives/cities';
 import { EXPOSURE, exposureLessPercent } from '@/core/alternatives/exposure';
 import { TRIP_RULES } from '@/core/alternatives/rules';
 import type { AlternativeThen, TripFacts } from '@/core/alternatives/rules';
 import { BAND_LABEL } from '@/core/aqi';
+import { fillTemplate, oneDecimal } from '@/core/format';
 import type { Alternative, Impact, Plan, RoutineAdvice } from '@/core/plan/types';
 import { allMatches } from '@/core/rules/evaluate';
 import type { Rule } from '@/core/rules/evaluate';

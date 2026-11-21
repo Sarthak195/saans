@@ -1,13 +1,14 @@
 import type { AirSeries } from '@/core/air/types';
 import { aqiToday, pm25Level } from '@/core/aqi';
 import type { Decision } from '@/core/decision';
+import { displayPm25 } from '@/core/format';
 import { adviseRoutine } from '@/core/plan/advice';
 import type { Evaluated } from '@/core/plan/advice';
 import { buildAnswer } from '@/core/plan/answer';
 import { hourOfDay } from '@/core/plan/clock';
 import { buildGlance, hasSevereBlock, planDayBand } from '@/core/plan/glance';
 import { summariseMembers } from '@/core/plan/members';
-import { atLeast, displayPm25, pmIndex } from '@/core/plan/pm25';
+import { atLeast, pmIndex } from '@/core/plan/pm25';
 import type { Outcome } from '@/core/plan/rules-data';
 import type { AirSummary, Plan, QuestionTarget } from '@/core/plan/types';
 import { defaultPlanDay, istParts, planDays } from '@/core/time';

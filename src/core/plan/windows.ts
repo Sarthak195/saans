@@ -1,6 +1,7 @@
 import { pm25Level } from '@/core/aqi';
-import { DAY_MINUTES, fromMinutes, toMinutes } from '@/core/plan/clock';
-import { bandRank, displayPm25, meanOver } from '@/core/plan/pm25';
+import { displayPm25, fromMinutes, toMinutes } from '@/core/format';
+import { DAY_MINUTES } from '@/core/plan/clock';
+import { bandRank, meanOver } from '@/core/plan/pm25';
 import type { PmIndex } from '@/core/plan/pm25';
 import { CHILD_HOURS, POOR_DAY, WINDOW_GAIN } from '@/core/plan/rules-data';
 import type { Window } from '@/core/plan/types';

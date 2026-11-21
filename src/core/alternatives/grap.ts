@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { fillTemplate } from '@/core/advice/format';
+import { fillTemplate } from '@/core/format';
 import { sourceRefSchema } from '@/core/source';
 import type { AqiToday } from '@/core/aqi';
 import type { GrapNote } from '@/core/plan/types';

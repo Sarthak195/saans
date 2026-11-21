@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { sourceRefSchema } from '@/core/source';
+import { roundToFive } from '@/core/format';
 import { MODES } from '@/core/profile/schema';
 import type { Mode } from '@/core/types';
 import exposureJson from '@/data/commute-exposure.json';
@@ -48,7 +49,7 @@ export function exposureLessPercent(
   const raw = (1 - after.ratio / before.ratio) * 100;
   if (raw < EXPOSURE.minimumReportedPercent) return null;
   return {
-    less: Math.round(raw / 5) * 5,
+    less: roundToFive(raw),
     fromPhrase: before.phrase,
     toPhrase: after.phrase,
     source: after.source,

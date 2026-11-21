@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-import type { AirSeries, HourSample, HourStamp } from '@/core/air/types';
+import type { AirSeries, HourSample } from '@/core/air/types';
+import { addHours, istParts } from '@/core/time';
 import { AppError } from '@/server/errors';
 
 // This file holds everything about the Open-Meteo response that needs no network: the request URL,
@@ -17,8 +18,6 @@ const HOURLY = [
   'sulphur_dioxide',
 ] as const;
 
-const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
-const HOUR_MS = 60 * 60 * 1000;
 const PAST_HOURS = 24;
 const AHEAD_HOURS = 72;
 
@@ -43,14 +42,7 @@ export function airUrl(lat: number, lon: number, window?: DateWindow): string {
   );
 }
 
-/** Formats an instant as ISO 8601 on the Indian clock, e.g. '2026-11-21T22:05:00+05:30'. */
-export function istIso(at: Date): string {
-  return `${new Date(at.getTime() + IST_OFFSET_MS).toISOString().slice(0, 19)}+05:30`;
-}
-
-function istHourStamp(ms: number): HourStamp {
-  return `${new Date(ms + IST_OFFSET_MS).toISOString().slice(0, 13)}:00`;
-}
+export { istIso } from '@/core/time';
 
 const hourlySeries = z.array(z.number().nullable());
 
@@ -113,8 +105,9 @@ function hasValue(s: HourSample): boolean {
 export function toAirSeries(body: AirBody, ctx: MapContext): AirSeries {
   let hours = body.hourly.time.map((_, i) => sampleAt(body.hourly, i));
   if (ctx.anchor) {
-    const from = istHourStamp(ctx.anchor.getTime() - PAST_HOURS * HOUR_MS);
-    const to = istHourStamp(ctx.anchor.getTime() + AHEAD_HOURS * HOUR_MS);
+    const nowHour = istParts(ctx.anchor).hourStamp;
+    const from = addHours(nowHour, -PAST_HOURS);
+    const to = addHours(nowHour, AHEAD_HOURS);
     // Stamps share one fixed-width format, so text order is time order.
     hours = hours.filter((s) => s.hour >= from && s.hour <= to);
   }

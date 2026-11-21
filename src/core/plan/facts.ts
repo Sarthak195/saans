@@ -1,5 +1,5 @@
+import { displayPm25, roundToFive } from '@/core/format';
 import { clockNumbers } from '@/core/plan/clock';
-import { displayPm25 } from '@/core/plan/pm25';
 import type {
   Alternative,
   CommunityPlan,
@@ -65,7 +65,7 @@ export function planFacts(plan: Plan, extras: PlanExtras = {}): number[] {
   if (air.aqi.kind === 'ok') {
     add(air.aqi.aqi);
     if (air.aqi.pm25Avg !== null) add(displayPm25(air.aqi.pm25Avg));
-    if (air.aqi.pm10Avg !== null) add(Math.round(air.aqi.pm10Avg / 5) * 5);
+    if (air.aqi.pm10Avg !== null) add(roundToFive(air.aqi.pm10Avg));
   }
   for (const hour of air.hourly) {
     stamp(hour.hour);

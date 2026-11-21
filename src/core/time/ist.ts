@@ -51,6 +51,11 @@ export function istWallMs(now: Date): number {
   return now.getTime() + IST_OFFSET_MS;
 }
 
+/** ISO 8601 on the Indian clock, e.g. '2026-11-21T22:05:00+05:30'. */
+export function istIso(at: Date): string {
+  return `${new Date(istWallMs(at)).toISOString().slice(0, 19)}+05:30`;
+}
+
 export function istParts(now: Date): IstParts {
   const wall = istWallMs(now);
   const d = new Date(wall);

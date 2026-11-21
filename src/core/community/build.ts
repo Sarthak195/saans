@@ -1,4 +1,4 @@
-import { fillTemplate } from '@/core/advice/format';
+import { fillTemplate } from '@/core/format';
 import { isPoorOrWorse, planLevel } from '@/core/advice/level';
 import { DELHI_NCR_ID, cityOf } from '@/core/alternatives/cities';
 import { COMMUNITY, COMMUNITY_RULES } from '@/core/community/data';

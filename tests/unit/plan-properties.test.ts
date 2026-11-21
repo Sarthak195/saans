@@ -7,7 +7,7 @@ import { planDayBand } from '@/core/plan/glance';
 import { atLeast, bandRank, meanOver, pmIndex } from '@/core/plan/pm25';
 import { POOR_DAY } from '@/core/plan/rules-data';
 import type { Plan } from '@/core/plan/types';
-import { toMinutes } from '@/core/plan/clock';
+import { toMinutes } from '@/core/format';
 import {
   AGE_BANDS,
   CONDITIONS,
