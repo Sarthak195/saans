@@ -37,6 +37,13 @@ export function termsForValue(value: string): string[] {
   );
 }
 
+/** Every health-condition term, normalised and split into words. */
+export function conditionPhrases(): string[][] {
+  return LEXICON_ENTRIES.filter((e) => e.category === 'condition').flatMap((e) =>
+    e.terms.map((t) => normalizeText(t).split(' ')),
+  );
+}
+
 /** Every reassurance phrase in every language, normalised and split into words. */
 export function reassurancePhrases(): string[][] {
   return LEXICON_ENTRIES.filter((e) => e.category === 'reassurance').flatMap((e) =>
