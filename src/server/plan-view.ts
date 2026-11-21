@@ -21,6 +21,8 @@ import type { Household } from '@/core/types';
 import { getAirSeries } from '@/server/air/get-air';
 import { fetchRecordedSeries } from '@/server/air/recorded';
 import { SMOG_DAY_ID } from '@/server/air/recorded-targets';
+import { AppError } from '@/server/errors';
+import type { AppErrorKind } from '@/server/errors';
 
 export type AirMode = 'live' | 'smog-day';
 
@@ -36,6 +38,8 @@ export interface PlanView {
   /** Every number the page shows, for checking written text against. */
   facts: number[];
   mode: AirMode;
+  /** Why there is no air data, when the plan was built without any. */
+  unavailable?: AppErrorKind;
 }
 
 export interface PlanViewInput {
@@ -58,14 +62,34 @@ function pad(n: number): string {
  * A recording is read on its own date. Keeping the real time of day means "this evening" still
  * means the evening of the recorded day, and no hour already gone is offered as a window.
  */
-function anchoredTo(now: Date, recordedOn: string): Date {
+export function anchoredTo(now: Date, recordedOn: string): Date {
   const parts = istParts(now);
   return new Date(`${recordedOn}T${pad(parts.hour)}:${pad(parts.minute)}:00+05:30`);
 }
 
-function seriesFor(household: Household, air: AirMode): Promise<AirSeries> {
-  if (air === 'smog-day') return fetchRecordedSeries(SMOG_DAY_ID);
-  return getAirSeries(household.place.lat, household.place.lon);
+/**
+ * The air data for the household's place. When it cannot be had, the plan is still built, from an
+ * empty series, so the home advice and the alternatives (which need no readings) still show.
+ */
+async function seriesFor(
+  household: Household,
+  air: AirMode,
+  now: Date,
+): Promise<{ series: AirSeries; unavailable?: AppErrorKind }> {
+  if (air === 'smog-day') return { series: await fetchRecordedSeries(SMOG_DAY_ID) };
+  try {
+    return { series: await getAirSeries(household.place.lat, household.place.lon) };
+  } catch (error) {
+    if (!(error instanceof AppError) || error.kind === 'outside_india') throw error;
+    const series: AirSeries = {
+      source: 'open-meteo-cams',
+      gridLat: household.place.lat,
+      gridLon: household.place.lon,
+      hours: [],
+      fetchedAt: now.toISOString(),
+    };
+    return { series, unavailable: error.kind };
+  }
 }
 
 /** The schema allows an explicit undefined that the plan's own type does not, so the keys are copied when set. */
@@ -84,7 +108,7 @@ export async function loadPlanView(input: PlanViewInput): Promise<PlanView> {
   const mode = input.air ?? 'live';
   const household: Household =
     mode === 'smog-day' ? { ...input.household, place: { ...DELHI } } : input.household;
-  const series = await seriesFor(household, mode);
+  const { series, unavailable } = await seriesFor(household, mode, input.now);
 
   const now =
     series.source === 'recorded' && series.recordedOn !== undefined
@@ -117,5 +141,6 @@ export async function loadPlanView(input: PlanViewInput): Promise<PlanView> {
     ...(community === undefined ? {} : { community }),
     facts: planFacts(plan, { home, alternatives, community }),
     mode,
+    ...(unavailable === undefined ? {} : { unavailable }),
   };
 }

@@ -96,6 +96,12 @@ const draftSchema = z.strictObject({
   options: z.array(placeSchema).max(MAX_DRAFT_OPTIONS),
   /** Why the text could not be turned into a plan straight away. */
   reason: z.string().max(300).optional(),
+  /** The household form as it was sent, by field name, so a form with mistakes keeps what was typed. */
+  values: z.record(z.string().max(40), z.string().max(200)).optional(),
+  errors: z
+    .array(z.strictObject({ field: z.string().max(40), message: z.string().max(200) }))
+    .max(40)
+    .optional(),
 });
 
 /** What is carried between a reading that needs one more answer and the page that asks for it. */

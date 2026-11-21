@@ -98,3 +98,13 @@ export function field(form: FormData, name: string, max = 200): string {
   const value = form.get(name);
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
 }
+
+/** Runs a step and hands back the AppError instead of throwing it, so a page can show it without a try block around its markup. */
+export async function settle<T>(run: () => Promise<T> | T): Promise<T | AppError> {
+  try {
+    return await run();
+  } catch (error) {
+    if (error instanceof AppError) return error;
+    throw error;
+  }
+}
