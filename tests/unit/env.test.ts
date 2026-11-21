@@ -29,7 +29,8 @@ describe('parseEnv', () => {
   it('applies defaults when only the required keys are present', () => {
     const env = parseEnv(valid());
     expect(env.GEMINI_MODEL_READER).toBe('gemini-3.5-flash-lite');
-    expect(env.GEMINI_MODEL_WRITER).toBe('gemini-3.6-flash');
+    expect(env.GEMINI_MODEL_WRITER).toBe('gemini-3.5-flash-lite');
+    expect(env.GEMINI_MODEL_FALLBACK).toBe('gemini-3.1-flash-lite');
     expect(env.NODE_ENV).toBe('development');
     expect(env.GEMINI_API_KEY).toBeUndefined();
     expect(env.OPENAQ_API_KEY).toBeUndefined();

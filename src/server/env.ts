@@ -24,7 +24,8 @@ const envSchema = z.object({
   FORM_KEY: key,
   OPENAQ_API_KEY: z.string().min(1).optional(),
   GEMINI_MODEL_READER: z.string().min(1).default('gemini-3.5-flash-lite'),
-  GEMINI_MODEL_WRITER: z.string().min(1).default('gemini-3.6-flash'),
+  GEMINI_MODEL_WRITER: z.string().min(1).default('gemini-3.5-flash-lite'),
+  GEMINI_MODEL_FALLBACK: z.string().min(1).default('gemini-3.1-flash-lite'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 });
 
