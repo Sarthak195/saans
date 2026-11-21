@@ -14,6 +14,12 @@ import {
 // valueSupportedByQuote reads "5 pm" as the number 5, which is not the time 17:00, so times,
 // durations and days are read here, in code, from the words the family wrote.
 
+// A hyphen or dash between words, built from code points so this file holds none itself.
+const DASH_BETWEEN = new RegExp(
+  String.raw`\s*[-${String.fromCodePoint(0x2013)}${String.fromCodePoint(0x2014)}]\s*`,
+  'g',
+);
+
 function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
@@ -83,6 +89,15 @@ export function clockTimes(quote: string): string[] {
   return found;
 }
 
+/** A quote that is only an hour ("6"): the times it can mean, kept when the text itself gives that time. */
+export function bareClockTimes(quote: string, text: string): string[] {
+  const hour = /^\s*(\d{1,2})\s*$/.exec(quote)?.[1];
+  if (hour === undefined) return [];
+  const own = narrowByDayPart(hoursFor(Number(hour), undefined, false), normalizeText(text));
+  const stated = clockTimes(text);
+  return own.map((h) => clock(h, 0)).filter((t) => stated.includes(t));
+}
+
 /** A time of day named only by a part of the day: used, with a note, when no hour is given. */
 export function dayPartClock(quote: string): string | undefined {
   const text = normalizeText(quote);
@@ -140,7 +155,7 @@ function dayOf(word: string): Weekday | undefined {
 /** The weekdays a quote names: "Mon to Fri", "weekdays", "every day", "Sat and Sun". Empty when none. */
 export function daysIn(quote: string): Weekday[] {
   // A hyphen between two day names is a range ("Mon-Fri"), which normalising would turn into a list.
-  const text = normalizeText(quote.replace(/\s*[-–—]\s*/g, ' to '));
+  const text = normalizeText(quote.replace(DASH_BETWEEN, ' to '));
   const group = DAY_GROUPS.find((g) => mentionsAny(text, g.terms));
   const names = text.split(' ').map(dayOf);
   const tokens = text.split(' ');

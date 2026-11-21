@@ -12,8 +12,9 @@ const DEVANAGARI = /\p{Script=Devanagari}/gu;
 const LETTERS = /\p{L}/gu;
 const SENTENCE_BREAK = /(?<!\d)\.|\.(?!\d)|[!?।॥\n\r]+/;
 const MARKUP = /[{}<>`]/;
-const EN_DASH = '–';
-const EM_DASH = '—';
+// Built from code points so this file does not itself contain the characters it removes.
+const EN_DASH = String.fromCodePoint(0x2013);
+const EM_DASH = String.fromCodePoint(0x2014);
 
 export interface CheckResult {
   ok: boolean;

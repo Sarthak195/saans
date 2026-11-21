@@ -1,5 +1,12 @@
 import { WEEKDAYS } from '@/core/profile/schema';
-import { clockTimes, dayPartClock, daysIn, minutesIn, tidyClock } from '@/core/reader/clock';
+import {
+  bareClockTimes,
+  clockTimes,
+  dayPartClock,
+  daysIn,
+  minutesIn,
+  tidyClock,
+} from '@/core/reader/clock';
 import type { ReadMembers } from '@/core/reader/members';
 import type { Quoted, ReaderOutput } from '@/core/reader/schema';
 import {
@@ -78,7 +85,9 @@ function startOf(
   quotes: string[],
 ): { start: string; assumed: boolean } | undefined {
   const claimed = draft.start ? tidyClock(draft.start.value) : undefined;
-  const times = quotes.filter((q) => quoteInText(text, q)).flatMap(clockTimes);
+  const times = quotes
+    .filter((q) => quoteInText(text, q))
+    .flatMap((q) => [...clockTimes(q), ...bareClockTimes(q, text)]);
   if (claimed !== undefined && times.includes(claimed)) return { start: claimed, assumed: false };
   const first = times[0];
   if (first !== undefined) return { start: first, assumed: false };
@@ -89,13 +98,19 @@ function startOf(
 function minutesOf(text: string, draft: RoutineDraft, quotes: string[]): number | undefined {
   const heard = quotes.filter((q) => quoteInText(text, q)).flatMap(minutesIn);
   const claimed = draft.minutes?.value;
-  const pick = claimed !== undefined && heard.includes(claimed) ? claimed : heard[0];
+  // A quote that is only the number ("30") counts when the text gives that duration with its unit.
+  const stated =
+    claimed !== undefined && (heard.includes(claimed) || minutesIn(text).includes(claimed));
+  const pick = stated ? claimed : heard[0];
   return pick !== undefined && pick >= 1 && pick <= 480 ? pick : undefined;
 }
 
 function kmOf(text: string, draft: RoutineDraft): number | undefined {
   const km = draft.km;
-  if (!km || !inText(text, km) || !mentionsAny(km.quote, KM_WORDS)) return undefined;
+  // A quote that is only the number ("9") counts when the text says that number with km.
+  const unit = String.raw`\b${String(km?.value)}\s*(?:${KM_WORDS.join('|')})`;
+  const withUnit = new RegExp(unit, 'iu').test(text);
+  if (!km || !inText(text, km) || !(mentionsAny(km.quote, KM_WORDS) || withUnit)) return undefined;
   const ok = valueSupportedByQuote(km.value, km.quote) && km.value > 0 && km.value <= MAX_KM;
   return ok ? km.value : undefined;
 }
