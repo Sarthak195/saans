@@ -56,6 +56,11 @@ computed. What fails a check is dropped, and the family sees a labelled fallback
 - File: `prompts/briefing.ts`. Version: `briefing-1`.
 - Purpose: a short, kind summary of the day for the family, 4 to 6 sentences, in English or Hindi.
 - Settings: temperature 0.3, thinking `minimal`, up to 1200 output tokens, plain text.
+- When it runs: the plan page asks for the English summary when it loads (live air data only; the
+  recorded smog-day view and a page with no air data never ask), waits up to 4 seconds, and shows
+  the code-built summary if the wait ends or the text is not accepted. The two buttons on the page
+  ask again by POST, one of them for Hindi, and a reply from a button is carried back sealed in the
+  address.
 - Gemini does: words the plan. It is sent a facts object with placeholders only (`member_1`,
   `routine_2`), no names, ages or health conditions beyond the plan's sensitivity word, plus the
   rounded numbers, decisions, windows and impact sentences. For Hindi it is sent the structure
