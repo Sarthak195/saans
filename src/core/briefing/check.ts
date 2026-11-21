@@ -77,6 +77,17 @@ export function polarityRefs(plan: Plan): PolarityRef[] {
 }
 
 /**
+ * Members whose routines the plan changes, each with one of those decisions. A text may not
+ * reassure about such a member ("member_2 is safe to play outside"), but need not mention them.
+ */
+export function memberGuards(plan: Plan): PolarityRef[] {
+  return plan.members.flatMap((m) => {
+    const changed = plan.routines.find((r) => r.memberRef === m.memberRef && r.decision !== 'keep');
+    return changed === undefined ? [] : [{ ref: m.memberRef, decision: changed.decision }];
+  });
+}
+
+/**
  * Decides whether written text may be shown. Every number must be one the plan computed, every
  * routine the plan changes must be named and not reassured about, no placeholder may be made up,
  * and the text must be in the language asked for and free of markup.
@@ -87,6 +98,7 @@ export function checkWritten(
     lang: Language;
     allowedNumbers: readonly number[];
     refs: readonly PolarityRef[];
+    memberGuards?: readonly PolarityRef[];
     noReassurance?: boolean;
   },
 ): CheckResult {
@@ -109,6 +121,8 @@ export function checkWritten(
   if (polarity.missing.length > 0) reasons.push(`missing ${polarity.missing.join(' ')}`);
   if (polarity.reassuringAboutNonKeep.length > 0) reasons.push('reassurance about a change');
   if (polarity.invented.length > 0) reasons.push(`invented ${polarity.invented.join(' ')}`);
+  const guarded = checkPolarity(text, options.memberGuards ?? []);
+  if (guarded.reassuringAboutNonKeep.length > 0) reasons.push('reassurance about a member');
   if (options.noReassurance === true && reassuresAnywhere(text)) reasons.push('reassurance');
   return { ok: reasons.length === 0, reasons };
 }

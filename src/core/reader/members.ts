@@ -83,7 +83,8 @@ function ageOf(
   // An unknown age is guessed from the role: son and daughter are children, grandparents are
   // older, anyone else an adult. The guess is always listed, so the family can correct it.
   const band = isSpeaker(label) ? 'adult' : (roleBand(label) ?? 'adult');
-  notes.push(`Assumed ${BAND_PHRASE[band]} for ${label.toLowerCase()}. Change it in the form.`);
+  const who = isSpeaker(label) ? 'you' : label.toLowerCase();
+  notes.push(`Assumed ${BAND_PHRASE[band]} for ${who}. Change it in the form.`);
   return band;
 }
 

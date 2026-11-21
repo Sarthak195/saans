@@ -9,7 +9,7 @@ const WORD = String.raw`[\p{L}\p{M}\p{N}]`;
 // Inflections people write: "candles", "smoking", "walked".
 const ENDINGS = '(?:s|es|ing|ning|ting|ping|ed)?';
 
-function escapeRegex(s: string): string {
+export function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }
 

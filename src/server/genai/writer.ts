@@ -3,6 +3,7 @@ import {
   briefingFacts,
   checkWritten,
   noticeFacts,
+  memberGuards,
   polarityRefs,
   substituteNames,
   templateBriefing,
@@ -97,6 +98,7 @@ export async function briefingWithDeps(
   const { plan, lang } = input;
   const allowedNumbers = planFacts(plan, { home: input.home, alternatives: input.alternatives });
   const refs = polarityRefs(plan);
+  const guards = memberGuards(plan);
   const written = await writeChecked(
     {
       audience: 'family',
@@ -104,7 +106,8 @@ export async function briefingWithDeps(
       system: BRIEFING_SYSTEM,
       facts: briefingFacts(input, lang === 'en'),
       lang,
-      check: (text) => checkWritten(text, { lang, allowedNumbers, refs }).reasons,
+      check: (text) =>
+        checkWritten(text, { lang, allowedNumbers, refs, memberGuards: guards }).reasons,
     },
     deps,
   );
