@@ -1,8 +1,8 @@
 import 'server-only';
 
 import { withQuery } from '@/components/links';
-import { MODES } from '@/core/profile/schema';
-import type { Household, Mode, Place } from '@/core/types';
+import { COMMUNITY_KINDS, MODES } from '@/core/profile/schema';
+import type { CommunityKind, Household, Mode, Place } from '@/core/types';
 import { field } from '@/server/http';
 import type { PlaceMatch } from '@/server/geo/geocode';
 import { sealDraft } from '@/server/seal';
@@ -80,4 +80,17 @@ export function draftPath(
   extra: Readonly<Record<string, string | undefined>> = {},
 ): string {
   return withQuery(path, { ...extra, draft: sealDraft(draft) });
+}
+
+/** A community kind from a query or a form, or the fallback when it is not one of the three. */
+export function communityKindOf(value: string | undefined, fallback: CommunityKind): CommunityKind {
+  return COMMUNITY_KINDS.find((k) => k === value) ?? fallback;
+}
+
+/** The household as a society, school or office sees it: same family, the audience chosen. */
+export function withCommunityKind(household: Household, kind: CommunityKind): Household {
+  return {
+    ...household,
+    community: { kind, outdoorSlots: household.community?.outdoorSlots ?? [] },
+  };
 }

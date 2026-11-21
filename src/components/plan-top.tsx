@@ -2,7 +2,6 @@ import type { ReactElement } from 'react';
 
 import type { Band } from '@/core/aqi';
 import type { Plan, QuestionAnswer } from '@/core/plan/types';
-import type { Language } from '@/core/types';
 import type { WrittenText } from '@/server/genai';
 
 import { bandClass } from './format';
@@ -82,7 +81,7 @@ export function JumpBar({
 }): ReactElement {
   const links: [string, string][] = [
     ...(hasAnswer ? ([['#answer', 'Answer']] as [string, string][]) : []),
-    ...(hasBriefing ? ([['#briefing', 'In short']] as [string, string][]) : []),
+    ...(hasBriefing ? ([['#summary', 'In short']] as [string, string][]) : []),
     ['#air', 'Air today'],
     ['#timeline', 'Timeline'],
     ['#home', 'Home'],
@@ -138,32 +137,44 @@ export function AnswerCard({
 
 export function BriefingSection({
   briefing,
-  ctx,
-  lang,
+  action,
+  formToken,
+  keep,
 }: {
   readonly briefing: WrittenText;
-  readonly ctx: PlanContext;
-  readonly lang: Language;
+  readonly action: string;
+  readonly formToken: string;
+  readonly keep: Readonly<Record<string, string>>;
 }): ReactElement {
   const source =
     briefing.by === 'gemini'
       ? 'Written by Gemini from your plan'
       : 'Written by Saans from your plan';
   return (
-    <section id="briefing" aria-labelledby="briefing-title" className="section">
+    <section id="summary" tabIndex={-1} aria-labelledby="briefing-title" className="section">
       <h2 id="briefing-title">In short</h2>
       <p lang={briefing.lang}>{briefing.text}</p>
       <p className="small">
         {source}.{briefing.note === undefined ? '' : ` ${briefing.note}`}
       </p>
-      <p>
-        <a
-          className="link-button"
-          href={withQuery(ctx.base, { ...ctx.keep, lang: lang === 'hi' ? 'en' : 'hi' })}
-        >
-          {lang === 'hi' ? 'Explain in English' : 'Explain in Hindi'}
-        </a>
-      </p>
+      <form method="post" action={action}>
+        <input type="hidden" name="formToken" value={formToken} />
+        {Object.entries(keep).map(([name, value]) => (
+          <input key={name} type="hidden" name={name} value={value} />
+        ))}
+        <p className="small">
+          Gemini rewrites this summary in its own words. It is sent the plan&apos;s readings and
+          times, with no names, and its text is checked against the plan before it is shown.
+        </p>
+        <p className="actions">
+          <button className="button" type="submit" name="lang" value="en">
+            Explain my plan with Gemini
+          </button>
+          <button className="button" type="submit" name="lang" value="hi">
+            Explain in Hindi with Gemini
+          </button>
+        </p>
+      </form>
     </section>
   );
 }

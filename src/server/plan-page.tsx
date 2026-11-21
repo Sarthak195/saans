@@ -7,15 +7,16 @@ import { statusLine } from '@/components/copy';
 import { PlanBody } from '@/components/plan-body';
 import type { RoutineAdvice } from '@/core/plan/types';
 import type { PlanDay } from '@/core/time';
-import type { Household, Language } from '@/core/types';
+import { templateBriefing } from '@/core/briefing';
+import type { Household } from '@/core/types';
 import { AppError, userMessage } from '@/server/errors';
 import { issueFormToken } from '@/server/guards';
-import { readPlanQuery } from '@/server/query';
+import { airOf, dayOf, readPlanQuery } from '@/server/query';
 import type { SearchParams } from '@/server/query';
-import { writeBriefing } from '@/server/genai';
 import { loadPlanView } from '@/server/plan-view';
 import type { AirMode, PlanView } from '@/server/plan-view';
 import { openDraft, openHousehold } from '@/server/seal';
+import { openWritten } from '@/server/written-draft';
 
 export interface PlanPageProps {
   household: Household;
@@ -28,12 +29,6 @@ export interface PlanPageProps {
   shareable: boolean;
   communityHref: string;
   intro?: ReactNode;
-}
-
-const DAYS: readonly PlanDay['relative'][] = ['today', 'tomorrow', 'day_after'];
-
-function dayOf(value: string | undefined): PlanDay['relative'] | undefined {
-  return DAYS.find((d) => d === value);
 }
 
 /** The routine as an earlier version of the household planned it, so the page can show before and after. */
@@ -76,8 +71,7 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
   const q = readPlanQuery(props.searchParams);
   const now = new Date();
   const day = dayOf(q.day);
-  const air: AirMode | undefined = q.air === 'smog-day' ? 'smog-day' : undefined;
-  const lang: Language = q.lang === 'hi' || q.lang === 'en' ? q.lang : props.household.lang;
+  const air: AirMode | undefined = airOf(q.air);
 
   let view: PlanView;
   try {
@@ -95,18 +89,17 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
     );
   }
 
-  const [briefing, before] = await Promise.all([
+  // A page view never calls the model (the free allowance is tiny): the summary is built in code
+  // unless a sealed one from the explain step rides along in the address.
+  const briefing =
     view.unavailable === undefined
-      ? writeBriefing({
-          plan: view.plan,
-          home: view.home,
-          alternatives: view.alternatives,
-          household: view.household,
-          lang,
+      ? (openWritten(q.b) ?? {
+          by: 'template' as const,
+          text: templateBriefing(view.plan),
+          lang: 'en' as const,
         })
-      : Promise.resolve(undefined),
-    routineBefore(q.from, q.r, now, day, air),
-  ]);
+      : undefined;
+  const before = await routineBefore(q.from, q.r, now, day, air);
 
   return (
     <>
@@ -119,12 +112,11 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
       <PlanBody
         view={view}
         briefing={briefing}
-        lang={lang}
         ctx={{
           base: props.base,
           actionBase: `/plan/${props.token}`,
           formToken: issueFormToken(now),
-          keep: { air: q.air === 'smog-day' ? 'smog-day' : undefined, lang: q.lang },
+          keep: { air, lang: q.lang },
         }}
         status={joinStatus(statusLine(q.status), noteOf(q.note))}
         before={before}

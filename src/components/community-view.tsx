@@ -47,6 +47,15 @@ function KindLinks({
   );
 }
 
+/** What the "Write it with Gemini" button posts: where, the audience and the language to write in. */
+export interface WriteForm {
+  readonly action: string;
+  readonly formToken: string;
+  readonly kind: CommunityKind;
+  readonly lang: string;
+  readonly air: string | undefined;
+}
+
 /** What a society, school or office can do today, and a notice it can send round. */
 export function CommunityView({
   plan,
@@ -54,6 +63,7 @@ export function CommunityView({
   base,
   planHref,
   notice,
+  writeForm,
   smogDay,
 }: {
   readonly plan: Plan;
@@ -61,7 +71,10 @@ export function CommunityView({
   /** This page's own path, for the audience links and the notice link. */
   readonly base: string;
   readonly planHref: string;
-  readonly notice?: WrittenText | undefined;
+  /** The notice as written in code, or the sealed one from the notice step. */
+  readonly notice: WrittenText;
+  /** Left out once a notice has been written, so a second press does not spend more of the allowance. */
+  readonly writeForm?: WriteForm | undefined;
   readonly smogDay: boolean;
 }): ReactElement {
   const { bestOutdoorWindow: window, aggregate } = community;
@@ -104,37 +117,42 @@ export function CommunityView({
 
       <section id="notice" aria-labelledby="notice-title" className="section">
         <h2 id="notice-title">A notice to send round</h2>
-        {notice === undefined ? (
-          <p>
-            <a
-              className="link-button"
-              href={withQuery(base, { kind: community.kind, notice: '1' })}
-            >
-              Write a notice for my building
-            </a>
-          </p>
-        ) : (
-          <>
-            <p lang={notice.lang} className="notice-text">
-              {notice.text}
-            </p>
+        <p lang={notice.lang} className="notice-text">
+          {notice.text}
+        </p>
+        <p className="small">
+          {notice.by === 'gemini'
+            ? 'Written by Gemini from your plan'
+            : 'Written by Saans from your plan'}
+          .{notice.note === undefined ? '' : ` ${notice.note}`}
+        </p>
+        <p className="actions">
+          <CopyButton text={notice.text} />
+          <a className="link-button" href={whatsappLink(notice.text)} rel="noopener noreferrer">
+            Share on WhatsApp
+          </a>
+        </p>
+        <p className="small">
+          The WhatsApp message holds only the notice text, not a link to your family&apos;s plan.
+        </p>
+        {writeForm === undefined ? null : (
+          <form method="post" action={writeForm.action}>
+            <input type="hidden" name="formToken" value={writeForm.formToken} />
+            <input type="hidden" name="kind" value={writeForm.kind} />
+            <input type="hidden" name="lang" value={writeForm.lang} />
+            {writeForm.air === undefined ? null : (
+              <input type="hidden" name="air" value={writeForm.air} />
+            )}
             <p className="small">
-              {notice.by === 'gemini'
-                ? 'Written by Gemini from your plan'
-                : 'Written by Saans from your plan'}
-              .{notice.note === undefined ? '' : ` ${notice.note}`}
+              Gemini rewrites this notice in its own words. It is sent the plan&apos;s readings and
+              times, with no names, and its text is checked against the plan before it is shown.
             </p>
-            <p className="actions">
-              <CopyButton text={notice.text} />
-              <a className="link-button" href={whatsappLink(notice.text)} rel="noopener noreferrer">
-                Share on WhatsApp
-              </a>
+            <p>
+              <button className="button" type="submit">
+                Write it with Gemini
+              </button>
             </p>
-            <p className="small">
-              The WhatsApp message holds only the notice text, not a link to your family&apos;s
-              plan.
-            </p>
-          </>
+          </form>
         )}
       </section>
 

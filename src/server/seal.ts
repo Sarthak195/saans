@@ -102,6 +102,10 @@ const draftSchema = z.strictObject({
     .array(z.strictObject({ field: z.string().max(40), message: z.string().max(200) }))
     .max(40)
     .optional(),
+  /** Set when the text is a written summary or notice: who wrote it, in which language, and any note to show. */
+  by: z.enum(['gemini', 'template']).optional(),
+  lang: z.enum(['en', 'hi']).optional(),
+  note: z.string().max(300).optional(),
 });
 
 /** What is carried between a reading that needs one more answer and the page that asks for it. */

@@ -126,6 +126,7 @@ export async function loadPlanView(input: PlanViewInput): Promise<PlanView> {
   });
   const home = buildHomeAdvice({ household, plan });
   const alternatives = buildAlternatives({ household, plan });
+  const grap = grapNote(plan.place, plan.air.aqi);
   const community =
     household.community !== undefined || input.withCommunity === true
       ? buildCommunity({ household, plan })
@@ -137,9 +138,9 @@ export async function loadPlanView(input: PlanViewInput): Promise<PlanView> {
     home,
     alternatives,
     transit: transitOptionsFor(plan.place).options.filter((o) => o.url !== ''),
-    grap: grapNote(plan.place, plan.air.aqi),
+    grap,
     ...(community === undefined ? {} : { community }),
-    facts: planFacts(plan, { home, alternatives, community }),
+    facts: planFacts(plan, { home, alternatives, community, grap }),
     mode,
     ...(unavailable === undefined ? {} : { unavailable }),
   };

@@ -6,6 +6,7 @@ import { sampleById } from '@/core/profile/samples';
 import { CommunityPage } from '@/server/community-page';
 import type { SearchParams } from '@/server/query';
 import { householdOfSample } from '@/server/sample';
+import { sealHousehold } from '@/server/seal';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -24,8 +25,11 @@ export default async function CommunitySamplePage({
   const { id } = await params;
   const sample = sampleById(id);
   if (sample === undefined) notFound();
+  const household = householdOfSample(sample);
   return CommunityPage({
-    household: householdOfSample(sample),
+    household,
+    // Forms on a sample page change a copy, so they post to its sealed household.
+    token: sealHousehold(household),
     base: `/plan/sample/${id}/community`,
     planHref: `/plan/sample/${id}`,
     searchParams: await searchParams,

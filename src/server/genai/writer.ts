@@ -10,6 +10,7 @@ import {
   templateNotice,
   tidyText,
 } from '@/core/briefing';
+import { grapNote } from '@/core/alternatives';
 import type { Alternative, CommunityPlan, HomeAdvice, Plan } from '@/core/plan/types';
 import { planFacts } from '@/core/plan/facts';
 import type { Household, Language } from '@/core/types';
@@ -96,7 +97,11 @@ export async function briefingWithDeps(
   deps: GenaiDeps,
 ): Promise<WrittenText> {
   const { plan, lang } = input;
-  const allowedNumbers = planFacts(plan, { home: input.home, alternatives: input.alternatives });
+  const allowedNumbers = planFacts(plan, {
+    home: input.home,
+    alternatives: input.alternatives,
+    grap: grapNote(plan.place, plan.air.aqi),
+  });
   const refs = polarityRefs(plan);
   const guards = memberGuards(plan);
   const written = await writeChecked(
@@ -127,7 +132,7 @@ export async function noticeWithDeps(
   deps: GenaiDeps,
 ): Promise<WrittenText> {
   const { plan, community, lang } = input;
-  const allowedNumbers = planFacts(plan, { community });
+  const allowedNumbers = planFacts(plan, { community, grap: grapNote(plan.place, plan.air.aqi) });
   const written = await writeChecked(
     {
       audience: 'community',

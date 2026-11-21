@@ -67,7 +67,7 @@ describe('the household form without JavaScript', () => {
     const html = renderToStaticMarkup(page);
     expect(html).toContain('Plan for ');
     expect(html).toContain('Son');
-    expect(html).toContain('A short summary.');
+    expect(html).toContain('Written by Saans from your plan');
     expect(html).toContain('This link contains your family&#x27;s profile.');
   });
 

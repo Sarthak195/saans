@@ -27,6 +27,7 @@ export default async function CommunityTokenPage({
       household: openHousehold(token),
       base: `/plan/${token}/community`,
       planHref: `/plan/${token}`,
+      token,
       searchParams: await searchParams,
     });
   } catch (error) {

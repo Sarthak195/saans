@@ -12,6 +12,7 @@ import { sampleById } from '@/core/profile/samples';
 import { readQuestion, writeNotice } from '@/server/genai';
 import { loadPlanView } from '@/server/plan-view';
 import { openDraft, openHousehold, sealHousehold } from '@/server/seal';
+import { sealWritten } from '@/server/written-draft';
 
 import { ORIGIN, formPost, locationOf, stubKeys } from '../helpers/form';
 import { DASHES } from '../helpers/plan';
@@ -224,19 +225,19 @@ describe('POST /plan/[token]/ask', () => {
 describe('plan pages and the community notice', () => {
   const NOTICE = 'Please keep outdoor play indoors today. Air is poor.';
 
-  beforeEach(() => {
-    vi.mocked(writeNotice).mockResolvedValue({ by: 'template', lang: 'en', text: NOTICE });
-  });
-
   function hrefsOf(html: string): string[] {
     return [...html.matchAll(/href="([^"]+)"/g)].map((m) => (m[1] ?? '').replaceAll('&amp;', '&'));
   }
 
+  const sealedNotice = (): string =>
+    sealWritten({ by: 'gemini', lang: 'en', text: NOTICE }, 'plain');
+
   it('builds a WhatsApp link that carries only the notice, on a sample and on a shared link', async () => {
+    const n = sealedNotice();
     const onSample = renderToStaticMarkup(
       await CommunitySamplePage({
         params: Promise.resolve({ id: 's6' }),
-        searchParams: Promise.resolve({ notice: '1' }),
+        searchParams: Promise.resolve({ n }),
       }),
     );
     const school = sampleById('s6');
@@ -245,7 +246,7 @@ describe('plan pages and the community notice', () => {
     const onToken = renderToStaticMarkup(
       await CommunityTokenPage({
         params: Promise.resolve({ token: schoolToken }),
-        searchParams: Promise.resolve({ notice: '1' }),
+        searchParams: Promise.resolve({ n }),
       }),
     );
 
@@ -261,9 +262,11 @@ describe('plan pages and the community notice', () => {
       expect(decodeURIComponent(link.split('text=')[1] ?? '')).toBe(NOTICE);
     }
     expect(onToken).toContain('Copy the notice');
+    expect(onToken).toContain('Written by Gemini from your plan');
+    expect(onToken).not.toContain('Write it with Gemini');
   });
 
-  it('offers to write the notice before it is written, without calling the writer', async () => {
+  it('shows the code-built notice and offers Gemini, without calling the writer', async () => {
     vi.mocked(writeNotice).mockClear();
     const html = renderToStaticMarkup(
       await CommunityTokenPage({
@@ -271,7 +274,25 @@ describe('plan pages and the community notice', () => {
         searchParams: Promise.resolve({}),
       }),
     );
-    expect(html).toContain('Write a notice for my building');
+    expect(html).toContain('Written by Saans from your plan');
+    expect(html).toContain('Write it with Gemini');
+    expect(html).toContain(`action="/plan/${TOKEN}/community/notice"`);
+    expect(writeNotice).not.toHaveBeenCalled();
+  });
+
+  it('ignores the old notice trigger and a tampered notice parameter', async () => {
+    vi.mocked(writeNotice).mockClear();
+    const n = sealedNotice();
+    for (const searchParams of [{ notice: '1' }, { n: `${n.slice(0, -4)}AAAA` }]) {
+      const html = renderToStaticMarkup(
+        await CommunityTokenPage({
+          params: Promise.resolve({ token: TOKEN }),
+          searchParams: Promise.resolve(searchParams),
+        }),
+      );
+      expect(html).toContain('Written by Saans from your plan');
+      expect(html).not.toContain(NOTICE);
+    }
     expect(writeNotice).not.toHaveBeenCalled();
   });
 

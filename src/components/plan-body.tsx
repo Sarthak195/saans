@@ -1,7 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 
 import type { RoutineAdvice } from '@/core/plan/types';
-import type { Language } from '@/core/types';
 import type { WrittenText } from '@/server/genai';
 import type { PlanView } from '@/server/plan-view';
 
@@ -23,7 +22,6 @@ export interface PlanBodyProps {
   view: PlanView;
   /** Left out when there is no air data to write about. */
   briefing?: WrittenText | undefined;
-  lang: Language;
   ctx: PlanContext;
   /** A fixed line announced after an action. */
   status?: string | undefined;
@@ -39,7 +37,7 @@ export interface PlanBodyProps {
 
 /** Every section of a plan, in reading order. Sample pages and shared links render the same body. */
 export function PlanBody(props: PlanBodyProps): ReactElement {
-  const { view, briefing, lang, ctx, status, before, intro } = props;
+  const { view, briefing, ctx, status, before, intro } = props;
   const { plan } = view;
   const smogDay = view.mode === 'smog-day';
   const noAir = view.unavailable !== undefined;
@@ -69,7 +67,12 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
       )}
       {intro}
       {noAir || briefing === undefined ? null : (
-        <BriefingSection briefing={briefing} ctx={ctx} lang={lang} />
+        <BriefingSection
+          briefing={briefing}
+          action={`${ctx.actionBase}/explain`}
+          formToken={ctx.formToken}
+          keep={keep}
+        />
       )}
       <AirSection air={plan.air} smogDay={smogDay} unavailable={view.unavailable !== undefined} />
       {noAir ? null : (
