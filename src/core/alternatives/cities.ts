@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { sourceRefSchema } from '@/core/advice/source-schema';
+import { sourceRefSchema } from '@/core/source';
 import transitJson from '@/data/transit.json';
 import { normalizeText } from '@/core/text/normalize';
 import type { Place } from '@/core/types';

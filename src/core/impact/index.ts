@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { displayPm25, percentLess } from '@/core/plan/pm25';
-import { sourceRefSchema } from '@/core/plan/source-schema';
+import { sourceRefSchema } from '@/core/source';
 import type { Impact } from '@/core/plan/types';
 import { AGE_BANDS } from '@/core/profile/schema';
 import type { SourceRef } from '@/core/source';

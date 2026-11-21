@@ -3,6 +3,7 @@ import { z } from 'zod';
 import samplesData from '@/data/samples.json';
 import type { QuestionTarget } from '@/core/plan/types';
 import { householdSchema } from '@/core/profile/schema';
+import { sourceRefSchema } from '@/core/source';
 import type { SourceRef } from '@/core/source';
 import type { Household } from '@/core/types';
 
@@ -37,13 +38,7 @@ const sampleSchema = z.strictObject({
     })
     .exactOptional(),
   recordedId: z.string().min(1),
-  source: z.strictObject({
-    id: z.string().min(1),
-    title: z.string().min(1),
-    url: z.string(),
-    quote: z.string().exactOptional(),
-    status: z.enum(['P-READ', 'P-FETCH', 'APP']),
-  }),
+  source: sourceRefSchema,
 });
 
 const samplesSchema = z.array(sampleSchema).superRefine((samples, ctx) => {

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-import { impactTemplateSchema, sourceRefSchema } from '@/core/advice/source-schema';
+import { impactTemplateSchema } from '@/core/advice/impact-template';
+import { sourceRefSchema } from '@/core/source';
 import { COOKING, HEATING } from '@/core/profile/schema';
 import type { Rule } from '@/core/rules/evaluate';
 import indoorJson from '@/data/indoor.json';

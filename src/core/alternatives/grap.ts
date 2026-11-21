@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { fillTemplate } from '@/core/advice/format';
-import { sourceRefSchema } from '@/core/advice/source-schema';
+import { sourceRefSchema } from '@/core/source';
 import type { AqiToday } from '@/core/aqi';
 import type { GrapNote } from '@/core/plan/types';
 import type { Place } from '@/core/types';

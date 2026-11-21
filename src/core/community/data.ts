@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { sourceRefSchema } from '@/core/advice/source-schema';
+import { sourceRefSchema } from '@/core/source';
 import { COMMUNITY_KINDS } from '@/core/profile/schema';
 import type { Rule } from '@/core/rules/evaluate';
 import communityJson from '@/data/community.json';

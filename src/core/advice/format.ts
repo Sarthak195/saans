@@ -1,4 +1,4 @@
-import type { ImpactTemplate } from '@/core/advice/source-schema';
+import type { ImpactTemplate } from '@/core/advice/impact-template';
 import type { Impact } from '@/core/plan/types';
 
 /** Concentrations shown to people are rounded to the nearest 5, so a model estimate never looks exact. */

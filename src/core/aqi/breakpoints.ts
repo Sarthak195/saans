@@ -1,14 +1,7 @@
 import { z } from 'zod';
 
+import { sourceRefSchema } from '@/core/source';
 import naqiJson from '@/data/naqi.json';
-
-const sourceSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  url: z.url(),
-  quote: z.exactOptional(z.string().min(1)),
-  status: z.enum(['P-READ', 'P-FETCH', 'APP']),
-});
 
 export const BANDS = ['good', 'satisfactory', 'moderate', 'poor', 'very_poor', 'severe'] as const;
 export type Band = (typeof BANDS)[number];
@@ -46,7 +39,7 @@ const naqiSchema = z.object({
         unit: z.enum(['ug/m3', 'mg/m3']),
         averaging: z.enum(['24h', '8h']),
         bands: z.array(bandRowSchema).length(BANDS.length),
-        source: sourceSchema,
+        source: sourceRefSchema,
       }),
     )
     .length(TABLE_POLLUTANTS.length),
@@ -58,18 +51,18 @@ const naqiSchema = z.object({
         indexLo: z.number().int(),
         indexHi: z.number().int(),
         healthStatement: z.string().min(1),
-        source: sourceSchema,
+        source: sourceRefSchema,
       }),
     )
     .length(BANDS.length),
   appRules: z.object({
-    rounding: z.object({ decimals: decimalsSchema, source: sourceSchema }),
+    rounding: z.object({ decimals: decimalsSchema, source: sourceRefSchema }),
     severeTop: z.object({
       factor: z.number().gt(1),
       indexCap: z.number().int().positive(),
-      source: sourceSchema,
+      source: sourceRefSchema,
     }),
-    coUnit: z.object({ divisor: z.number().positive(), source: sourceSchema }),
+    coUnit: z.object({ divisor: z.number().positive(), source: sourceRefSchema }),
   }),
 });
 

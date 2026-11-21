@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import placesData from '@/data/places.json';
 import { INDIA_LAT, INDIA_LON } from '@/core/profile/schema';
-import type { SourceRef } from '@/core/source';
+import { sourceRefSchema } from '@/core/source';
 
 export const INDIA_BOUNDS = {
   minLat: INDIA_LAT.min,
@@ -19,14 +19,6 @@ export interface PlaceMatch {
   source: 'static' | 'geocoder';
 }
 
-const sourceSchema = z.strictObject({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  url: z.string().min(1),
-  quote: z.string().exactOptional(),
-  status: z.enum(['P-READ', 'P-FETCH', 'APP']),
-}) satisfies z.ZodType<SourceRef>;
-
 const staticPlacesSchema = z.array(
   z.strictObject({
     name: z.string().min(1),
@@ -36,7 +28,7 @@ const staticPlacesSchema = z.array(
     kind: z.enum(['city', 'locality']),
     aliases: z.array(z.string()),
     retrievedOn: z.string(),
-    source: sourceSchema,
+    source: sourceRefSchema,
   }),
 );
 

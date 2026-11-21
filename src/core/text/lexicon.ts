@@ -2,23 +2,15 @@ import { z } from 'zod';
 
 import lexiconData from '@/data/lexicon.json';
 import { AGE_BANDS, CONDITIONS, MODES, ROUTINE_KINDS } from '@/core/profile/schema';
+import { sourceRefSchema } from '@/core/source';
 import { normalizeText } from '@/core/text/normalize';
-
-// Every row says where it comes from, even though these are the app's own word lists, so the
-// rule "every data row has a source" holds without exceptions.
-const sourceSchema = z.strictObject({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  url: z.string(),
-  status: z.literal('APP'),
-});
 
 function rows<C extends string, V extends z.ZodType>(category: C, value: V) {
   return z.strictObject({
     category: z.literal(category),
     value,
     terms: z.array(z.string().min(1)).min(1),
-    source: sourceSchema,
+    source: sourceRefSchema,
   });
 }
 

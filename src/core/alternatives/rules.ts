@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-import { impactTemplateSchema, sourceRefSchema } from '@/core/advice/source-schema';
+import { impactTemplateSchema } from '@/core/advice/impact-template';
+import { sourceRefSchema } from '@/core/source';
 import { TRANSIT } from '@/core/alternatives/cities';
 import type { PlanLevel } from '@/core/advice/level';
 import { MODES, ROUTINE_KINDS } from '@/core/profile/schema';

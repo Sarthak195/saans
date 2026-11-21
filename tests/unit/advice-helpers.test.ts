@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { clockOf, fillImpact, fillTemplate, oneDecimal, roundToFive } from '@/core/advice/format';
 import { isPoorOrWorse, planLevel } from '@/core/advice/level';
-import { sourceRefSchema } from '@/core/advice/source-schema';
+import { sourceRefSchema } from '@/core/source';
 
 import { INSUFFICIENT, aqiOk, makePlan, windowOf } from '../helpers/plan-doubles';
 

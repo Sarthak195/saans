@@ -6,7 +6,7 @@ import { healthStatement } from '@/core/aqi';
 import { DECISIONS } from '@/core/decision';
 import type { Decision } from '@/core/decision';
 import { AGE_BANDS, INTENSITIES, MODES, ROUTINE_KINDS, WEEKDAYS } from '@/core/profile/schema';
-import { sourceRefSchema } from '@/core/plan/source-schema';
+import { sourceRefSchema } from '@/core/source';
 import type { FactValue, Rule } from '@/core/rules/evaluate';
 import type { SourceRef } from '@/core/source';
 import type { AgeBand, Intensity, Mode, RoutineKind, Sensitivity, Weekday } from '@/core/types';

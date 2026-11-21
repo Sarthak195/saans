@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { sourceRefSchema } from '@/core/advice/source-schema';
+import { sourceRefSchema } from '@/core/source';
 import { MODES } from '@/core/profile/schema';
 import type { Mode } from '@/core/types';
 import exposureJson from '@/data/commute-exposure.json';

@@ -16,7 +16,8 @@
         "id": "cpcb-naqi-2014",
         "title": "CPCB National Air Quality Index (2014)",
         "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
-        "status": "P-READ"
+        "status": "P-READ",
+        "quote": "PM10 24-hour (ug/m3): Good 0-50, Satisfactory 51-100, Moderately polluted 101-250, Poor 251-350, Very poor 351-430, Severe 430+"
       }
     },
     {
@@ -35,7 +36,8 @@
         "id": "cpcb-naqi-2014",
         "title": "CPCB National Air Quality Index (2014)",
         "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
-        "status": "P-READ"
+        "status": "P-READ",
+        "quote": "PM2.5 24-hour (ug/m3): Good 0-30, Satisfactory 31-60, Moderately polluted 61-90, Poor 91-120, Very poor 121-250, Severe 250+"
       }
     },
     {
@@ -54,7 +56,8 @@
         "id": "cpcb-naqi-2014",
         "title": "CPCB National Air Quality Index (2014)",
         "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
-        "status": "P-READ"
+        "status": "P-READ",
+        "quote": "NO2 24-hour (ug/m3): Good 0-40, Satisfactory 41-80, Moderately polluted 81-180, Poor 181-280, Very poor 281-400, Severe 400+"
       }
     },
     {
@@ -73,7 +76,8 @@
         "id": "cpcb-naqi-2014",
         "title": "CPCB National Air Quality Index (2014)",
         "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
-        "status": "P-READ"
+        "status": "P-READ",
+        "quote": "O3 8-hour (ug/m3): Good 0-50, Satisfactory 51-100, Moderately polluted 101-168, Poor 169-208, Very poor 209-748, Severe 748+"
       }
     },
     {
@@ -92,7 +96,8 @@
         "id": "cpcb-naqi-2014",
         "title": "CPCB National Air Quality Index (2014)",
         "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
-        "status": "P-READ"
+        "status": "P-READ",
+        "quote": "CO 8-hour (mg/m3): Good 0-1, Satisfactory 1.1-2, Moderately polluted 2.1-10, Poor 10-17, Very poor 17-34, Severe 34+"
       }
     },
     {
@@ -111,7 +116,8 @@
         "id": "cpcb-naqi-2014",
         "title": "CPCB National Air Quality Index (2014)",
         "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
-        "status": "P-READ"
+        "status": "P-READ",
+        "quote": "SO2 24-hour (ug/m3): Good 0-40, Satisfactory 41-80, Moderately polluted 81-380, Poor 381-800, Very poor 801-1600, Severe 1600+"
       }
     },
     {
@@ -130,7 +136,8 @@
         "id": "cpcb-naqi-2014",
         "title": "CPCB National Air Quality Index (2014)",
         "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
-        "status": "P-READ"
+        "status": "P-READ",
+        "quote": "NH3 24-hour (ug/m3): Good 0-200, Satisfactory 201-400, Moderately polluted 401-800, Poor 801-1200, Very poor 1200-1800, Severe 1800+"
       }
     },
     {
@@ -149,7 +156,8 @@
         "id": "cpcb-naqi-2014",
         "title": "CPCB National Air Quality Index (2014)",
         "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
-        "status": "P-READ"
+        "status": "P-READ",
+        "quote": "Pb 24-hour (ug/m3): Good 0-0.5, Satisfactory 0.5-1, Moderately polluted 1.1-2, Poor 2.1-3, Very poor 3.1-3.5, Severe 3.5+"
       }
     }
   ],
