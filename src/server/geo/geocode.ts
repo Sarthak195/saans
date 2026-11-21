@@ -18,7 +18,6 @@ export type Resolution =
 
 const ENDPOINT = 'https://geocoding-api.open-meteo.com/v1/search';
 const TIMEOUT_MS = 3000;
-const REVALIDATE_SECONDS = 86_400;
 const MAX_QUERY_LENGTH = 80;
 const MAX_OPTIONS = 5;
 
@@ -108,7 +107,8 @@ async function search(query: string): Promise<unknown> {
   let response: Response;
   try {
     response = await fetch(geocoderUrl(query), {
-      next: { revalidate: REVALIDATE_SECONDS },
+      // Typed queries are never repeated by anyone else; keeping each one would only fill the cache.
+      cache: 'no-store',
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (error) {

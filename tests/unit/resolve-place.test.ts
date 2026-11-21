@@ -37,6 +37,14 @@ describe('resolvePlace', () => {
     expect(init.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it('never caches a typed query, so scripted traffic cannot fill the cache', async () => {
+    const mock = replyWith(recorded('mysuru'));
+    await resolvePlace('Mysuru');
+    const [, init] = mock.mock.calls[0] as [string, RequestInit & { next?: unknown }];
+    expect(init.cache).toBe('no-store');
+    expect(init.next).toBeUndefined();
+  });
+
   it('encodes what the person typed', async () => {
     const mock = replyWith({});
     await resolvePlace('Shivaji Nagar & more');
