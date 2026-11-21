@@ -6,7 +6,7 @@ import { ErrorNotice } from '@/components/notice';
 import { AppError, userMessage } from '@/server/errors';
 import { issueFormToken } from '@/server/guards';
 import { settle } from '@/server/http';
-import { valuesOfHousehold } from '@/server/household-form';
+import { valuesOfHousehold } from '@/server/household-values';
 import { first } from '@/server/query';
 import type { SearchParams } from '@/server/query';
 import { openDraft, openHousehold } from '@/server/seal';
