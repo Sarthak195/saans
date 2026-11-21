@@ -253,7 +253,7 @@
       "source": {
         "id": "saans-naqi-application",
         "title": "Saans rule: round a concentration to the printed table precision before the band lookup",
-        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -263,7 +263,7 @@
       "source": {
         "id": "saans-naqi-application",
         "title": "Saans rule: the Severe band runs from its printed lower edge to twice that edge, mapped to 401 to 500, and no sub-index exceeds 500",
-        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -272,7 +272,7 @@
       "source": {
         "id": "saans-naqi-application",
         "title": "Saans rule: Open-Meteo delivers CO in ug/m3, so it is divided by 1000 to mg/m3 before the band lookup",
-        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "url": "",
         "status": "APP"
       }
     }

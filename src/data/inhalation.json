@@ -75,7 +75,7 @@
       "source": {
         "id": "saans-inhalation-small",
         "title": "Saans rule: for children under 5 the nearest EPA row read (6 to under 11 years) stands in, because no row for them was read",
-        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -84,7 +84,7 @@
       "source": {
         "id": "saans-inhalation-small",
         "title": "Saans rule: for children under 5 the nearest EPA row read (6 to under 11 years) stands in, because no row for them was read",
-        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -93,7 +93,7 @@
       "source": {
         "id": "saans-inhalation-child",
         "title": "Saans rule: children (5 to 12) use the EPA row for 6 to under 11 years",
-        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -102,7 +102,7 @@
       "source": {
         "id": "saans-inhalation-teen",
         "title": "Saans rule: teenagers (13 to 17) use the nearest EPA row read (11 to under 16 years)",
-        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -111,7 +111,7 @@
       "source": {
         "id": "saans-inhalation-adult",
         "title": "Saans rule: adults (18 to 59) use the EPA row for 31 to under 41 years",
-        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "url": "",
         "status": "APP"
       }
     },
@@ -120,7 +120,7 @@
       "source": {
         "id": "saans-inhalation-older",
         "title": "Saans rule: older adults (60 and over) use the EPA row for 61 to under 71 years",
-        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "url": "",
         "status": "APP"
       }
     }

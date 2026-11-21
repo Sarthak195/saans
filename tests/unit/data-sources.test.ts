@@ -42,6 +42,19 @@ describe('every data file', () => {
       expect(result.success, `${at}: ${result.success ? '' : result.error.message}`).toBe(true);
     }
   });
+
+  it.each(dataFiles())(
+    '%s keeps Saans rules without links and fetched pages without quotes',
+    (file) => {
+      const json: unknown = JSON.parse(readFileSync(path.join(DATA_DIR, file), 'utf8'));
+      for (const { at, value } of sourcesIn(json, file)) {
+        const source = value as { status?: string; url?: string; quote?: unknown };
+        // A Saans rule must not read as a government statement, and a paraphrase must not claim verbatim words.
+        if (source.status === 'APP') expect(source.url, at).toBe('');
+        if (source.status === 'P-FETCH') expect(source.quote, at).toBeUndefined();
+      }
+    },
+  );
 });
 
 describe('source schema rules', () => {
