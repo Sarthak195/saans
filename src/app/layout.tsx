@@ -2,7 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import { connection } from 'next/server';
 import type { ReactElement, ReactNode } from 'react';
 
+import { DISCLAIMER_LINE, GEONAMES_URL, OPEN_METEO_URL } from '@/components/copy';
+
 import './globals.css';
+import './components.css';
 
 export const metadata: Metadata = {
   // Each page names itself; the template keeps the product name last so browser tabs stay distinct.
@@ -28,7 +31,9 @@ export default async function RootLayout({
         </a>
         <header className="site-header">
           <div className="site-header__inner">
-            <p className="site-name">Saans</p>
+            <p className="site-name">
+              <a href="/">Saans</a>
+            </p>
             <p className="site-subtitle">A daily air plan for your household</p>
           </div>
         </header>
@@ -37,13 +42,19 @@ export default async function RootLayout({
         </main>
         <footer className="site-footer">
           <div className="site-footer__inner">
-            <p>General public-health guidance, not medical advice</p>
+            <p>
+              {DISCLAIMER_LINE} <a href="/about">About Saans, sources and the full disclaimer</a>
+            </p>
             <p>
               Air quality data:{' '}
-              <a href="https://open-meteo.com/" rel="noopener noreferrer">
+              <a href={OPEN_METEO_URL} rel="noopener noreferrer">
                 Open-Meteo.com
               </a>{' '}
-              (CC BY 4.0), CAMS
+              (CC BY 4.0), CAMS; place names:{' '}
+              <a href={GEONAMES_URL} rel="noopener noreferrer">
+                GeoNames
+              </a>
+              .
             </p>
           </div>
         </footer>
