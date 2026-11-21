@@ -18,7 +18,12 @@ import {
   makePlan,
   makeRoutine,
   windowOf,
+<<<<<<< HEAD
 } from '../helpers/plan-doubles';
+=======
+} from '../helpers/plan-doubles';
+import { CLAIMS_SAFE, DASHES, UNFILLED } from '../helpers/text';
+>>>>>>> 1c42240 (test(core): helper coverage and lint-clean fact types for home, alternatives and community)
 
 const DATE = '2026-11-24'; // a Tuesday
 
@@ -308,9 +313,9 @@ describe('community text', () => {
         });
         for (const a of result.actions) {
           const text = [a.title, a.body, a.reason.text].join(' ');
-          expect(text, a.id).not.toMatch(/[{}]/);
-          expect(text, a.id).not.toMatch(/[–—]/);
-          expect(text, a.id).not.toMatch(/\bsafe(r|ly)?\b/i);
+          expect(text, a.id).not.toMatch(UNFILLED);
+          expect(text, a.id).not.toMatch(DASHES);
+          expect(text, a.id).not.toMatch(CLAIMS_SAFE);
         }
       }
     }

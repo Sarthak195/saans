@@ -18,7 +18,12 @@ import {
   makeHousehold,
   makePlan,
   makeRoutine,
+<<<<<<< HEAD
 } from '../helpers/plan-doubles';
+=======
+} from '../helpers/plan-doubles';
+import { CLAIMS_SAFE, DASHES, UNFILLED } from '../helpers/text';
+>>>>>>> 1c42240 (test(core): helper coverage and lint-clean fact types for home, alternatives and community)
 
 interface Trip {
   place?: Place;
@@ -209,7 +214,8 @@ describe('which trips get alternatives', () => {
   });
 
   it('gives a car trip with no distance only the idling tip', () => {
-    const { km: _km, ...noKm } = makeRoutine();
+    const noKm = makeRoutine();
+    delete noKm.km;
     const list = buildAlternatives({
       household: makeHousehold({ routines: [noKm] }),
       plan: makePlan({ routines: [makeAdvice()] }),
@@ -270,9 +276,9 @@ describe('every alternative', () => {
   it('has no unfilled placeholder, no dash and no claim that anything is safe', () => {
     for (const a of all) {
       const text = [a.title, a.body, a.reason.text, a.impact.text].join(' ');
-      expect(text, a.id).not.toMatch(/[{}]/);
-      expect(text, a.id).not.toMatch(/[–—]/);
-      expect(text, a.id).not.toMatch(/\bsafe(r|ly)?\b/i);
+      expect(text, a.id).not.toMatch(UNFILLED);
+      expect(text, a.id).not.toMatch(DASHES);
+      expect(text, a.id).not.toMatch(CLAIMS_SAFE);
     }
   });
 

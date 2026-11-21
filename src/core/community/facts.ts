@@ -1,3 +1,4 @@
+import type { FactValue } from '@/core/rules/evaluate';
 import type { PlanLevel } from '@/core/advice/level';
 import type { CommunityKind } from '@/core/types';
 
@@ -6,8 +7,8 @@ import type { CommunityKind } from '@/core/types';
  * 3-hour block of the plan day), and `ncr` is true for places in Delhi NCR, where GRAP and the
  * city reporting apps apply.
  */
-export type CommunityFacts = {
+export interface CommunityFacts extends Record<string, FactValue> {
   kind: CommunityKind;
   level: PlanLevel;
   ncr: boolean;
-};
+}

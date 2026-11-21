@@ -4,11 +4,11 @@ import { impactTemplateSchema, sourceRefSchema } from '@/core/advice/source-sche
 import { TRANSIT } from '@/core/alternatives/cities';
 import type { PlanLevel } from '@/core/advice/level';
 import { MODES, ROUTINE_KINDS } from '@/core/profile/schema';
-import type { Rule } from '@/core/rules/evaluate';
+import type { FactValue, Rule } from '@/core/rules/evaluate';
 import type { Mode, RoutineKind } from '@/core/types';
 
 /** What the alternative rules can test about one trip. */
-export type TripFacts = {
+export interface TripFacts extends Record<string, FactValue> {
   band: 'short' | 'mid' | 'long' | 'unknown';
   mode: Mode;
   /** The trip's own level on the plan day; 'unknown' when the plan has none. */
@@ -18,7 +18,7 @@ export type TripFacts = {
   rail: boolean;
   /** The trip happens on two or more days a week. */
   repeats: boolean;
-};
+}
 
 const LEVELS = [
   'good',

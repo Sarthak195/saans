@@ -1,3 +1,4 @@
+import type { FactValue } from '@/core/rules/evaluate';
 import { planLevel } from '@/core/advice/level';
 import type { PlanLevel } from '@/core/advice/level';
 import { INDOOR } from '@/core/home/data';
@@ -10,7 +11,7 @@ import type { Cooking, Heating, Household } from '@/core/types';
  * What the home rules can test. `level` is the worst 3-hour block of the plan day (the AQI band
  * stands in when the day has no block, and 'unknown' when there is neither).
  */
-export type HomeFacts = {
+export interface HomeFacts extends Record<string, FactValue> {
   level: PlanLevel;
   airing: Plan['glance']['airing']['kind'];
   cooking: Cooking;
@@ -23,7 +24,7 @@ export type HomeFacts = {
   roomKnown: boolean;
   purifierFit: PurifierFit;
   festivalSeason: boolean;
-};
+}
 
 /** Diwali falls in October or November, so the whole of both months counts as festival season. */
 function inFestivalSeason(date: string): boolean {
