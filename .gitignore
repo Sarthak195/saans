@@ -1,0 +1,13 @@
+# Private notes and the contest brief: never commit
+.planning/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+node_modules/
+.next/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
