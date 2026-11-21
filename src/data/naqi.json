@@ -1,0 +1,272 @@
+{
+  "breakpoints": [
+    {
+      "pollutant": "pm10",
+      "unit": "ug/m3",
+      "averaging": "24h",
+      "bands": [
+        { "band": "good", "cLo": 0, "cHi": 50, "iLo": 0, "iHi": 50 },
+        { "band": "satisfactory", "cLo": 51, "cHi": 100, "iLo": 51, "iHi": 100 },
+        { "band": "moderate", "cLo": 101, "cHi": 250, "iLo": 101, "iHi": 200 },
+        { "band": "poor", "cLo": 251, "cHi": 350, "iLo": 201, "iHi": 300 },
+        { "band": "very_poor", "cLo": 351, "cHi": 430, "iLo": 301, "iHi": 400 },
+        { "band": "severe", "cLo": 430, "cHi": null, "iLo": 401, "iHi": 500 }
+      ],
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ"
+      }
+    },
+    {
+      "pollutant": "pm25",
+      "unit": "ug/m3",
+      "averaging": "24h",
+      "bands": [
+        { "band": "good", "cLo": 0, "cHi": 30, "iLo": 0, "iHi": 50 },
+        { "band": "satisfactory", "cLo": 31, "cHi": 60, "iLo": 51, "iHi": 100 },
+        { "band": "moderate", "cLo": 61, "cHi": 90, "iLo": 101, "iHi": 200 },
+        { "band": "poor", "cLo": 91, "cHi": 120, "iLo": 201, "iHi": 300 },
+        { "band": "very_poor", "cLo": 121, "cHi": 250, "iLo": 301, "iHi": 400 },
+        { "band": "severe", "cLo": 250, "cHi": null, "iLo": 401, "iHi": 500 }
+      ],
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ"
+      }
+    },
+    {
+      "pollutant": "no2",
+      "unit": "ug/m3",
+      "averaging": "24h",
+      "bands": [
+        { "band": "good", "cLo": 0, "cHi": 40, "iLo": 0, "iHi": 50 },
+        { "band": "satisfactory", "cLo": 41, "cHi": 80, "iLo": 51, "iHi": 100 },
+        { "band": "moderate", "cLo": 81, "cHi": 180, "iLo": 101, "iHi": 200 },
+        { "band": "poor", "cLo": 181, "cHi": 280, "iLo": 201, "iHi": 300 },
+        { "band": "very_poor", "cLo": 281, "cHi": 400, "iLo": 301, "iHi": 400 },
+        { "band": "severe", "cLo": 400, "cHi": null, "iLo": 401, "iHi": 500 }
+      ],
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ"
+      }
+    },
+    {
+      "pollutant": "o3",
+      "unit": "ug/m3",
+      "averaging": "8h",
+      "bands": [
+        { "band": "good", "cLo": 0, "cHi": 50, "iLo": 0, "iHi": 50 },
+        { "band": "satisfactory", "cLo": 51, "cHi": 100, "iLo": 51, "iHi": 100 },
+        { "band": "moderate", "cLo": 101, "cHi": 168, "iLo": 101, "iHi": 200 },
+        { "band": "poor", "cLo": 169, "cHi": 208, "iLo": 201, "iHi": 300 },
+        { "band": "very_poor", "cLo": 209, "cHi": 748, "iLo": 301, "iHi": 400 },
+        { "band": "severe", "cLo": 748, "cHi": null, "iLo": 401, "iHi": 500 }
+      ],
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ"
+      }
+    },
+    {
+      "pollutant": "co",
+      "unit": "mg/m3",
+      "averaging": "8h",
+      "bands": [
+        { "band": "good", "cLo": 0, "cHi": 1, "iLo": 0, "iHi": 50 },
+        { "band": "satisfactory", "cLo": 1.1, "cHi": 2, "iLo": 51, "iHi": 100 },
+        { "band": "moderate", "cLo": 2.1, "cHi": 10, "iLo": 101, "iHi": 200 },
+        { "band": "poor", "cLo": 10, "cHi": 17, "iLo": 201, "iHi": 300 },
+        { "band": "very_poor", "cLo": 17, "cHi": 34, "iLo": 301, "iHi": 400 },
+        { "band": "severe", "cLo": 34, "cHi": null, "iLo": 401, "iHi": 500 }
+      ],
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ"
+      }
+    },
+    {
+      "pollutant": "so2",
+      "unit": "ug/m3",
+      "averaging": "24h",
+      "bands": [
+        { "band": "good", "cLo": 0, "cHi": 40, "iLo": 0, "iHi": 50 },
+        { "band": "satisfactory", "cLo": 41, "cHi": 80, "iLo": 51, "iHi": 100 },
+        { "band": "moderate", "cLo": 81, "cHi": 380, "iLo": 101, "iHi": 200 },
+        { "band": "poor", "cLo": 381, "cHi": 800, "iLo": 201, "iHi": 300 },
+        { "band": "very_poor", "cLo": 801, "cHi": 1600, "iLo": 301, "iHi": 400 },
+        { "band": "severe", "cLo": 1600, "cHi": null, "iLo": 401, "iHi": 500 }
+      ],
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ"
+      }
+    },
+    {
+      "pollutant": "nh3",
+      "unit": "ug/m3",
+      "averaging": "24h",
+      "bands": [
+        { "band": "good", "cLo": 0, "cHi": 200, "iLo": 0, "iHi": 50 },
+        { "band": "satisfactory", "cLo": 201, "cHi": 400, "iLo": 51, "iHi": 100 },
+        { "band": "moderate", "cLo": 401, "cHi": 800, "iLo": 101, "iHi": 200 },
+        { "band": "poor", "cLo": 801, "cHi": 1200, "iLo": 201, "iHi": 300 },
+        { "band": "very_poor", "cLo": 1200, "cHi": 1800, "iLo": 301, "iHi": 400 },
+        { "band": "severe", "cLo": 1800, "cHi": null, "iLo": 401, "iHi": 500 }
+      ],
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ"
+      }
+    },
+    {
+      "pollutant": "pb",
+      "unit": "ug/m3",
+      "averaging": "24h",
+      "bands": [
+        { "band": "good", "cLo": 0, "cHi": 0.5, "iLo": 0, "iHi": 50 },
+        { "band": "satisfactory", "cLo": 0.5, "cHi": 1, "iLo": 51, "iHi": 100 },
+        { "band": "moderate", "cLo": 1.1, "cHi": 2, "iLo": 101, "iHi": 200 },
+        { "band": "poor", "cLo": 2.1, "cHi": 3, "iLo": 201, "iHi": 300 },
+        { "band": "very_poor", "cLo": 3.1, "cHi": 3.5, "iLo": 301, "iHi": 400 },
+        { "band": "severe", "cLo": 3.5, "cHi": null, "iLo": 401, "iHi": 500 }
+      ],
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ"
+      }
+    }
+  ],
+  "bands": [
+    {
+      "band": "good",
+      "label": "Good",
+      "indexLo": 0,
+      "indexHi": 50,
+      "healthStatement": "Minimal Impact",
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ",
+        "quote": "Minimal Impact"
+      }
+    },
+    {
+      "band": "satisfactory",
+      "label": "Satisfactory",
+      "indexLo": 51,
+      "indexHi": 100,
+      "healthStatement": "May cause minor breathing discomfort to sensitive people",
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ",
+        "quote": "May cause minor breathing discomfort to sensitive people"
+      }
+    },
+    {
+      "band": "moderate",
+      "label": "Moderately polluted",
+      "indexLo": 101,
+      "indexHi": 200,
+      "healthStatement": "May cause breathing discomfort to the people with lung disease such as asthma and discomfort to people with heart disease, children and older adults",
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ",
+        "quote": "May cause breathing discomfort to the people with lung disease such as asthma and discomfort to people with heart disease, children and older adults"
+      }
+    },
+    {
+      "band": "poor",
+      "label": "Poor",
+      "indexLo": 201,
+      "indexHi": 300,
+      "healthStatement": "May cause breathing discomfort to people on prolonged exposure and discomfort to people with heart disease",
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ",
+        "quote": "May cause breathing discomfort to people on prolonged exposure and discomfort to people with heart disease"
+      }
+    },
+    {
+      "band": "very_poor",
+      "label": "Very Poor",
+      "indexLo": 301,
+      "indexHi": 400,
+      "healthStatement": "May cause respiratory illness to the people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases",
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ",
+        "quote": "May cause respiratory illness to the people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases"
+      }
+    },
+    {
+      "band": "severe",
+      "label": "Severe",
+      "indexLo": 401,
+      "indexHi": 500,
+      "healthStatement": "May cause respiratory effects even on healthy people and serious health impacts on people with lung/heart diseases. The health impacts may be experienced even during light physical activity",
+      "source": {
+        "id": "cpcb-naqi-2014",
+        "title": "CPCB National Air Quality Index (2014)",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "P-READ",
+        "quote": "May cause respiratory effects even on healthy people and serious health impacts on people with lung/heart diseases. The health impacts may be experienced even during light physical activity"
+      }
+    }
+  ],
+  "appRules": {
+    "rounding": {
+      "decimals": { "pm10": 0, "pm25": 0, "no2": 0, "o3": 0, "co": 1, "so2": 0, "nh3": 0, "pb": 1 },
+      "source": {
+        "id": "saans-naqi-application",
+        "title": "Saans rule: round a concentration to the printed table precision before the band lookup",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "APP"
+      }
+    },
+    "severeTop": {
+      "factor": 2,
+      "indexCap": 500,
+      "source": {
+        "id": "saans-naqi-application",
+        "title": "Saans rule: the Severe band runs from its printed lower edge to twice that edge, mapped to 401 to 500, and no sub-index exceeds 500",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "APP"
+      }
+    },
+    "coUnit": {
+      "divisor": 1000,
+      "source": {
+        "id": "saans-naqi-application",
+        "title": "Saans rule: Open-Meteo delivers CO in ug/m3, so it is divided by 1000 to mg/m3 before the band lookup",
+        "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+        "status": "APP"
+      }
+    }
+  }
+}
