@@ -160,7 +160,7 @@ describe('POST /ask', () => {
       household,
       target: { routineId: 'play', aboutToday: true },
       notes: ['Assumed: age band child.'],
-      by: 'keywords',
+      by: 'gemini',
     });
     const response = await askPost(formPost('/ask', { text: 'We live in Delhi.', place: '' }));
     expect(response.status).toBe(303);
