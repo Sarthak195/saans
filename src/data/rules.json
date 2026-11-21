@@ -1,0 +1,514 @@
+{
+  "sources": {
+    "mohfw-restrict": {
+      "id": "mohfw-advisory-2025",
+      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "quote": "pregnant women, young children and elderly should restrict outdoor movements as far as possible",
+      "status": "P-READ"
+    },
+    "mohfw-reschedule": {
+      "id": "mohfw-advisory-2025",
+      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025 (quote corrected for scan errors)",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "quote": "Reschedule outdoor activities as per AQI, and remain indoors on days with poor to severe AQI",
+      "status": "P-READ"
+    },
+    "mohfw-no-exercise": {
+      "id": "mohfw-advisory-2025",
+      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025 (quote corrected for scan errors)",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "quote": "Avoid outdoor morning and late evening walk, run, jog and physical exercise",
+      "status": "P-READ"
+    },
+    "mohfw-school": {
+      "id": "mohfw-advisory-2025",
+      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025, schools annexure",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "quote": "Physical activities like running, jogging, playing may be avoided or postponed",
+      "status": "P-READ"
+    },
+    "mohfw-car": {
+      "id": "mohfw-advisory-2025",
+      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025, driving advice",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "quote": "re-circulate",
+      "status": "P-READ"
+    },
+    "mohfw-n95": {
+      "id": "mohfw-advisory-2025",
+      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025, masks",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "quote": "Masks should have proper fitting on users' mouth and nose.",
+      "status": "P-READ"
+    },
+    "mohfw-airing": {
+      "id": "mohfw-advisory-2025",
+      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025 (quote corrected for scan errors)",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "quote": "Do not open external doors and windows during morning and late evening hours, it may ventilate if necessary, between 12 p.m. to 4 p.m. in afternoon",
+      "status": "P-READ"
+    },
+    "grap-iv-charter": {
+      "id": "caqm-grap-stage-iv-charter",
+      "title": "CAQM, Graded Response Action Plan schedule (revision 21.11.2025), Stage IV Citizens Charter",
+      "url": "https://web.archive.org/web/2025/https://caqm.nic.in/WriteReadData/LINKS/GRAP%20Order47928aa8-d026-4478-9407-2eba0a328a2d.pdf",
+      "quote": "Children, elderly and those with respiratory, cardiovascular, cerebrovascular or other chronic diseases to avoid outdoor activities and stay indoors, as much as possible. If required to move outdoors, they are advised to wear mask.",
+      "status": "P-READ"
+    },
+    "epa-small-children": {
+      "id": "epa-wildfire-smoke-protection",
+      "title": "US EPA, Protect yourself from wildfire smoke and ash: respirators do not come in sizes for young children",
+      "url": "https://www.epa.gov/wildfires/protect-yourself-wildfire-smoke-and-ash",
+      "status": "P-FETCH"
+    },
+    "app-no-data": {
+      "id": "saans-no-data",
+      "title": "Saans rule: with no air data for the hours of a routine, leave it as planned and say so",
+      "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+      "status": "APP"
+    },
+    "app-not-scheduled": {
+      "id": "saans-not-scheduled",
+      "title": "Saans rule: a routine that is not on the plan day's weekday is left as it is",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "status": "APP"
+    },
+    "app-essential-kinds": {
+      "id": "saans-essential-kinds",
+      "title": "Saans rule: a commute or a school run is a trip that cannot be dropped, so it gets protection instead of a cancellation",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "status": "APP"
+    },
+    "app-window-gain": {
+      "id": "saans-window-gain",
+      "title": "Saans rule: offer another time only if it lowers the air quality level or cuts PM2.5 by at least 20 percent",
+      "url": "https://web.archive.org/web/2015/http://www.indiaenvironmentportal.org.in/files/file/Air%20Quality%20Index.pdf",
+      "status": "APP"
+    },
+    "app-poor-day-hours": {
+      "id": "saans-poor-day-hours",
+      "title": "Saans rule: on a Poor or worse day, offer no time before 10:00 or after 19:00 (MoHFW advises against outdoor exercise in the morning and late evening)",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "status": "APP"
+    },
+    "app-child-hours": {
+      "id": "saans-child-hours",
+      "title": "Saans rule: children and teenagers stay within 07:00 to 19:00 and, on weekdays, outside school hours (08:00 to 14:00) unless free hours are given",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "status": "APP"
+    },
+    "app-airing-length": {
+      "id": "saans-airing-length",
+      "title": "Saans rule: open the windows for one hour, in the cleanest hour between 12:00 and 16:00 (MoHFW names that window)",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "status": "APP"
+    },
+    "app-top-action": {
+      "id": "saans-top-action",
+      "title": "Saans rule: the one action at the top is the most serious thing the plan asks of the family that day",
+      "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
+      "status": "APP"
+    }
+  },
+  "grid": [
+    {
+      "id": "essential-severe-sensitive",
+      "when": { "level": ["severe"], "sensitivity": ["high", "raised"], "essential": [true] },
+      "then": {
+        "decision": "essential",
+        "text": "The air is {level}. Children, older adults and people with lung or heart conditions are advised to stay indoors as much as possible. If this trip cannot wait, protect against the air as below."
+      },
+      "source": "grap-iv-charter"
+    },
+    {
+      "id": "essential-severe-general",
+      "when": { "level": ["severe"], "essential": [true] },
+      "then": {
+        "decision": "essential",
+        "text": "The air is {level} and can affect even healthy people, even during light activity. This trip stays, so protect against the air as below."
+      },
+      "source": "cpcb:severe"
+    },
+    {
+      "id": "essential-very-poor",
+      "when": { "level": ["very_poor"], "essential": [true] },
+      "then": {
+        "decision": "essential",
+        "text": "The air is {level}, and a long time in it can cause respiratory illness, more so for people with lung or heart conditions. This trip stays, so protect against the air as below."
+      },
+      "source": "cpcb:very_poor"
+    },
+    {
+      "id": "essential-poor-sensitive",
+      "when": { "level": ["poor"], "sensitivity": ["high", "raised"], "essential": [true] },
+      "then": {
+        "decision": "essential",
+        "text": "The air is {level}. Pregnant women, young children and older adults are advised to limit time outdoors. This trip stays, so protect against the air as below."
+      },
+      "source": "mohfw-restrict"
+    },
+    {
+      "id": "essential-poor-general",
+      "when": { "level": ["poor"], "essential": [true] },
+      "then": {
+        "decision": "essential",
+        "text": "The air is {level}, and a long time in it can cause breathing discomfort. This trip stays, so protect against the air as below."
+      },
+      "source": "cpcb:poor"
+    },
+    {
+      "id": "essential-moderate-high",
+      "when": { "level": ["moderate"], "sensitivity": ["high"], "essential": [true] },
+      "then": {
+        "decision": "essential",
+        "text": "The air is {level} and can cause breathing discomfort to people with lung or heart conditions, children and older adults. This trip stays, so protect against the air as below."
+      },
+      "source": "cpcb:moderate"
+    },
+    {
+      "id": "essential-moderate-vigorous",
+      "when": { "level": ["moderate"], "intensity": ["vigorous"], "essential": [true] },
+      "then": {
+        "decision": "essential",
+        "text": "The air is {level} and this trip is hard effort. It stays, so protect against the air as below."
+      },
+      "source": "cpcb:moderate"
+    },
+    {
+      "id": "essential-satisfactory-high-vigorous",
+      "when": {
+        "level": ["satisfactory"],
+        "sensitivity": ["high"],
+        "intensity": ["vigorous"],
+        "essential": [true]
+      },
+      "then": {
+        "decision": "essential",
+        "text": "The air is {level}, which can cause minor breathing discomfort to sensitive people, and this trip is hard effort. It stays, so protect against the air as below."
+      },
+      "source": "cpcb:satisfactory"
+    },
+    {
+      "id": "severe-sensitive",
+      "when": { "level": ["severe"], "sensitivity": ["high", "raised"] },
+      "then": {
+        "decision": "indoors",
+        "text": "The air is {level}. Children, older adults and people with lung or heart conditions are advised to stay indoors as much as possible."
+      },
+      "source": "grap-iv-charter"
+    },
+    {
+      "id": "severe-general",
+      "when": { "level": ["severe"] },
+      "then": {
+        "decision": "indoors",
+        "text": "The air is {level} and can affect even healthy people, even during light activity. Stay indoors for this."
+      },
+      "source": "cpcb:severe"
+    },
+    {
+      "id": "very-poor-high",
+      "when": { "level": ["very_poor"], "sensitivity": ["high"] },
+      "then": {
+        "decision": "indoors",
+        "text": "The air is {level}. On days this polluted, health advice is to reschedule outdoor activity and stay indoors."
+      },
+      "source": "mohfw-reschedule"
+    },
+    {
+      "id": "very-poor-raised-active",
+      "when": {
+        "level": ["very_poor"],
+        "sensitivity": ["raised"],
+        "intensity": ["moderate", "vigorous"]
+      },
+      "then": {
+        "decision": "indoors",
+        "text": "The air is {level}. For children and teenagers, running, jogging and playing outdoors are best skipped or postponed."
+      },
+      "source": "mohfw-school"
+    },
+    {
+      "id": "very-poor-raised-light",
+      "when": { "level": ["very_poor"], "sensitivity": ["raised"] },
+      "then": {
+        "decision": "move",
+        "fallback": "lighten",
+        "text": "The air is {level}, and time outdoors can cause respiratory illness. Choose a cleaner hour for this, or keep it short."
+      },
+      "source": "cpcb:very_poor"
+    },
+    {
+      "id": "very-poor-general-active",
+      "when": {
+        "level": ["very_poor"],
+        "sensitivity": ["general"],
+        "intensity": ["moderate", "vigorous"]
+      },
+      "then": {
+        "decision": "move",
+        "fallback": "indoors",
+        "text": "The air is {level}. Health advice is to avoid outdoor walks, runs and exercise now, so choose a cleaner hour or stay in."
+      },
+      "source": "mohfw-no-exercise"
+    },
+    {
+      "id": "very-poor-general-light",
+      "when": { "level": ["very_poor"] },
+      "then": {
+        "decision": "lighten",
+        "text": "The air is {level}. Keep this short and gentle, because a long time in it can cause respiratory illness."
+      },
+      "source": "cpcb:very_poor"
+    },
+    {
+      "id": "poor-high",
+      "when": { "level": ["poor"], "sensitivity": ["high"] },
+      "then": {
+        "decision": "move",
+        "fallback": "indoors",
+        "text": "The air is {level}. Pregnant women, young children, older adults and people with lung or heart conditions are advised to limit time outdoors, so choose a cleaner hour or stay in."
+      },
+      "source": "mohfw-restrict"
+    },
+    {
+      "id": "poor-raised-active",
+      "when": {
+        "level": ["poor"],
+        "sensitivity": ["raised"],
+        "intensity": ["moderate", "vigorous"]
+      },
+      "then": {
+        "decision": "move",
+        "fallback": "lighten",
+        "text": "The air is {level}. Running, jogging and playing outdoors are best moved to a cleaner hour."
+      },
+      "source": "mohfw-school"
+    },
+    {
+      "id": "poor-raised-light",
+      "when": { "level": ["poor"], "sensitivity": ["raised"] },
+      "then": {
+        "decision": "lighten",
+        "text": "The air is {level}. Keep this short and gentle, because a long time in it can cause breathing discomfort."
+      },
+      "source": "cpcb:poor"
+    },
+    {
+      "id": "poor-general-vigorous",
+      "when": { "level": ["poor"], "sensitivity": ["general"], "intensity": ["vigorous"] },
+      "then": {
+        "decision": "move",
+        "fallback": "lighten",
+        "text": "The air is {level}. Hard exercise outdoors is best moved to a cleaner hour."
+      },
+      "source": "mohfw-no-exercise"
+    },
+    {
+      "id": "poor-general-easier",
+      "when": { "level": ["poor"] },
+      "then": {
+        "decision": "lighten",
+        "text": "The air is {level}. Keep this shorter and gentler, because a long time in it can cause breathing discomfort."
+      },
+      "source": "cpcb:poor"
+    },
+    {
+      "id": "moderate-high-vigorous",
+      "when": { "level": ["moderate"], "sensitivity": ["high"], "intensity": ["vigorous"] },
+      "then": {
+        "decision": "move",
+        "fallback": "indoors",
+        "text": "The air is {level} and can cause breathing discomfort to people with lung or heart conditions, children and older adults. Hard effort is best moved to a cleaner hour."
+      },
+      "source": "cpcb:moderate"
+    },
+    {
+      "id": "moderate-high",
+      "when": { "level": ["moderate"], "sensitivity": ["high"] },
+      "then": {
+        "decision": "lighten",
+        "text": "The air is {level} and can cause breathing discomfort to people with lung or heart conditions, children and older adults. Keep this lighter and shorter."
+      },
+      "source": "cpcb:moderate"
+    },
+    {
+      "id": "moderate-raised-vigorous",
+      "when": { "level": ["moderate"], "sensitivity": ["raised"], "intensity": ["vigorous"] },
+      "then": {
+        "decision": "lighten",
+        "text": "The air is {level} and can cause breathing discomfort to children. Swap hard effort for an easier pace."
+      },
+      "source": "cpcb:moderate"
+    },
+    {
+      "id": "satisfactory-high-vigorous",
+      "when": { "level": ["satisfactory"], "sensitivity": ["high"], "intensity": ["vigorous"] },
+      "then": {
+        "decision": "lighten",
+        "text": "The air is {level}, which can cause minor breathing discomfort to sensitive people. An easier pace is better than hard effort."
+      },
+      "source": "cpcb:satisfactory"
+    },
+    {
+      "id": "keep-good",
+      "when": { "level": ["good"] },
+      "then": { "decision": "keep", "text": "The air is {level}. No change is needed." },
+      "source": "cpcb:good"
+    },
+    {
+      "id": "keep-satisfactory",
+      "when": { "level": ["satisfactory"] },
+      "then": { "decision": "keep", "text": "The air is {level}. No change is needed for this." },
+      "source": "cpcb:satisfactory"
+    },
+    {
+      "id": "keep-moderate",
+      "when": { "level": ["moderate"] },
+      "then": {
+        "decision": "keep",
+        "text": "The air is {level}. It mainly affects people with lung or heart conditions, so no change is needed here. Ease off if breathing feels uncomfortable."
+      },
+      "source": "cpcb:moderate"
+    }
+  ],
+  "noWindow": {
+    "indoors": "No cleaner time was found, so indoors is the better choice.",
+    "lighten": "No cleaner time was found, so keep it shorter and gentler."
+  },
+  "defaults": {
+    "noData": {
+      "id": "no-data",
+      "text": "There is no air data for these hours, so this is left as planned.",
+      "source": "app-no-data"
+    },
+    "notScheduled": {
+      "id": "not-scheduled",
+      "text": "This routine is not on {weekdays}, so there is nothing to change.",
+      "source": "app-not-scheduled"
+    }
+  },
+  "guards": {
+    "essentialKinds": { "kinds": ["commute", "school_run"], "source": "app-essential-kinds" },
+    "windowGain": { "minCutPercent": 20, "source": "app-window-gain" },
+    "poorDay": { "earliestHour": 10, "latestHour": 19, "source": "app-poor-day-hours" },
+    "childHours": {
+      "bands": ["child", "teen"],
+      "fromHour": 7,
+      "toHour": 19,
+      "schoolFromHour": 8,
+      "schoolToHour": 14,
+      "schoolDays": ["mon", "tue", "wed", "thu", "fri"],
+      "source": "app-child-hours"
+    }
+  },
+  "airing": {
+    "fromHour": 12,
+    "toHour": 16,
+    "source": "mohfw-airing",
+    "lengthSource": "app-airing-length"
+  },
+  "protection": [
+    {
+      "id": "car",
+      "modes": ["car"],
+      "ages": ["infant", "under5", "child", "teen", "adult", "older"],
+      "lines": ["Keep the car windows up and set the air conditioning to recirculate."],
+      "source": "mohfw-car"
+    },
+    {
+      "id": "open-adult",
+      "modes": ["two_wheeler", "cycle", "walk", "auto", "unspecified"],
+      "ages": ["teen", "adult", "older"],
+      "lines": [
+        "Wear a well-fitted N95 mask. It helps only when it seals around the nose and mouth.",
+        "Cloth, paper and scarf masks are not effective."
+      ],
+      "source": "mohfw-n95"
+    },
+    {
+      "id": "open-small",
+      "modes": ["two_wheeler", "cycle", "walk", "auto", "unspecified"],
+      "ages": ["infant", "under5", "child"],
+      "lines": [
+        "Respirator masks are not made in small children's sizes, so do not rely on a mask for a child.",
+        "Keep the trip as short as you can and choose quieter streets, away from traffic exhaust."
+      ],
+      "source": "epa-small-children"
+    },
+    {
+      "id": "transit-adult",
+      "modes": ["bus", "metro_rail"],
+      "ages": ["teen", "adult", "older"],
+      "lines": ["Wear a well-fitted N95 mask while you wait outside at the stop or platform."],
+      "source": "mohfw-n95"
+    },
+    {
+      "id": "transit-small",
+      "modes": ["bus", "metro_rail"],
+      "ages": ["infant", "under5", "child"],
+      "lines": [
+        "Respirator masks are not made in small children's sizes, so do not rely on a mask for a child.",
+        "Wait away from the road and traffic exhaust where you can, and keep the trip as short as possible."
+      ],
+      "source": "epa-small-children"
+    }
+  ],
+  "topActions": [
+    {
+      "id": "top-severe",
+      "when": { "severe": [true] },
+      "then": "Keep hard exercise and outdoor play indoors {when}, and wear a well-fitted N95 mask on any adult trip you cannot skip.",
+      "source": "app-top-action"
+    },
+    {
+      "id": "top-indoors",
+      "when": { "outcome": ["indoors"] },
+      "then": "Bring the routines marked indoors inside {when}.",
+      "source": "app-top-action"
+    },
+    {
+      "id": "top-move",
+      "when": { "outcome": ["move"] },
+      "then": "Move the routines marked for a cleaner time {when}.",
+      "source": "app-top-action"
+    },
+    {
+      "id": "top-essential",
+      "when": { "outcome": ["essential"] },
+      "then": "Protect the trips that cannot change {when}, as listed below.",
+      "source": "app-top-action"
+    },
+    {
+      "id": "top-lighten",
+      "when": { "outcome": ["lighten"] },
+      "then": "Keep outdoor time shorter and gentler {when}.",
+      "source": "app-top-action"
+    },
+    {
+      "id": "top-poor-day",
+      "when": { "outcome": ["keep"], "poorDay": [true] },
+      "then": "The air is {level} {when}, so check the cleaner hours before heading out.",
+      "source": "app-top-action"
+    },
+    {
+      "id": "top-no-routines",
+      "when": { "outcome": ["none"], "hasBest": [true] },
+      "then": "The cleanest 3 hours {when} are {best}. Add your routines to get a plan for each person.",
+      "source": "app-top-action"
+    },
+    {
+      "id": "top-no-data",
+      "when": { "outcome": ["none"] },
+      "then": "There is no air forecast for {when} yet. Check back later.",
+      "source": "app-top-action"
+    },
+    {
+      "id": "top-keep",
+      "when": {},
+      "then": "Your routines can go ahead as planned {when}.",
+      "source": "app-top-action"
+    }
+  ]
+}

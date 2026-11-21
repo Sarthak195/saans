@@ -1,0 +1,82 @@
+{
+  "unit": "m3 per minute",
+  "source": {
+    "id": "epa-efh-2011-table-6-2",
+    "title": "US EPA, Exposure Factors Handbook 2011, Chapter 6, Table 6-2 (mean short-term inhalation rates, males and females combined)",
+    "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+    "status": "P-READ",
+    "quote": "Table 6-2 means in m3/minute (sleep, sedentary, light, moderate, high): 6 to <11 years 4.5E-03, 4.8E-03, 1.1E-02, 2.2E-02, 4.2E-02; 11 to <16 years 5.0E-03, 5.4E-03, 1.3E-02, 2.5E-02, 4.9E-02; 31 to <41 years 4.6E-03, 4.3E-03, 1.2E-02, 2.7E-02, 4.9E-02; 61 to <71 years 5.2E-03, 4.9E-03, 1.2E-02, 2.6E-02, 4.7E-02"
+  },
+  "rows": [
+    {
+      "years": "6 to <11",
+      "sleep": 0.0045,
+      "sedentary": 0.0048,
+      "light": 0.011,
+      "moderate": 0.022,
+      "high": 0.042
+    },
+    {
+      "years": "11 to <16",
+      "sleep": 0.005,
+      "sedentary": 0.0054,
+      "light": 0.013,
+      "moderate": 0.025,
+      "high": 0.049
+    },
+    {
+      "years": "31 to <41",
+      "sleep": 0.0046,
+      "sedentary": 0.0043,
+      "light": 0.012,
+      "moderate": 0.027,
+      "high": 0.049
+    },
+    {
+      "years": "61 to <71",
+      "sleep": 0.0052,
+      "sedentary": 0.0049,
+      "light": 0.012,
+      "moderate": 0.026,
+      "high": 0.047
+    }
+  ],
+  "ageBands": {
+    "infant": {
+      "row": "6 to <11",
+      "source": {
+        "id": "saans-inhalation-small",
+        "title": "Saans rule: for children under 5 the nearest EPA row read (6 to under 11 years) stands in, because no row for them was read",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "status": "APP"
+      }
+    },
+    "under5": {
+      "row": "6 to <11",
+      "source": {
+        "id": "saans-inhalation-small",
+        "title": "Saans rule: for children under 5 the nearest EPA row read (6 to under 11 years) stands in, because no row for them was read",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "status": "APP"
+      }
+    },
+    "child": { "row": "6 to <11" },
+    "teen": {
+      "row": "11 to <16",
+      "source": {
+        "id": "saans-inhalation-teen",
+        "title": "Saans rule: for teenagers (13 to 17) the nearest EPA row read (11 to under 16 years) stands in",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "status": "APP"
+      }
+    },
+    "adult": { "row": "31 to <41" },
+    "older": { "row": "61 to <71" }
+  },
+  "ratioSource": {
+    "id": "saans-breathing-ratio",
+    "title": "Saans calculation: the breathing-rate ratio is our arithmetic on the EPA means, not a figure EPA publishes",
+    "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+    "status": "APP"
+  }
+}
