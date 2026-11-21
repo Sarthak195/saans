@@ -92,6 +92,8 @@ export interface QuestionTarget {
 export interface QuestionAnswer {
   text: string;
   routineRef?: string;
+  /** The level of the day the sentence is about, which is a later day for a routine not on the plan day. */
+  level: Band | null;
   numbers: number[];
   /** True when the question was about a time already past, so the answer is for the next day. */
   shiftedToNextDay: boolean;

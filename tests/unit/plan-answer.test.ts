@@ -173,6 +173,8 @@ describe('answering a question', () => {
     const { answer, plan } = answerFor(series, { routineId: 'r1' }, [sundayOnly]);
     expect(answer?.text).toContain('Yes, go ahead tomorrow evening');
     expect(answer?.text).toContain('about 20 (Good)');
+    // The chip is for the day the answer speaks about, not the plan day, whose air is worse.
+    expect(answer?.level).toBe('good');
     const facts = planFacts(plan);
     for (const n of answer?.numbers ?? []) expect(facts).toContain(n);
   });
@@ -182,6 +184,9 @@ describe('answering a question', () => {
     expect(answerFor(byHour({}, 100), { routineId: 'r1' }, [wednesdayOnly]).answer?.text).toBe(
       'That routine is not on Saturdays. It next runs on Wednesday, which this plan does not cover, so nothing changes yet.',
     );
+    expect(
+      answerFor(byHour({}, 100), { routineId: 'r1' }, [wednesdayOnly]).answer?.level,
+    ).toBeNull();
   });
 
   it('keeps the evening-over notice together with the next day the routine runs', () => {

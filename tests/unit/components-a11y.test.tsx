@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { BandBadge, DecisionTag } from '@/components/band';
 import { DayRibbon, placeMarkers } from '@/components/day-ribbon';
 import { RoutineItem } from '@/components/routine-item';
+import { SevereBanner } from '@/components/plan-day';
 import { AnswerCard } from '@/components/plan-top';
 import { BANDS } from '@/core/aqi/breakpoints';
 import { DECISIONS } from '@/core/decision';
@@ -100,7 +101,7 @@ describe('answer card and routine item', () => {
     if (plan.answer === undefined) return;
     const play = plan.routines.find((r) => r.routineId === 'play');
     if (play === undefined) throw new Error('no play routine');
-    const card = <AnswerCard answer={plan.answer} level={play.level} question="Can he play?" />;
+    const card = <AnswerCard answer={plan.answer} question="Can he play?" />;
     expect(await violationsIn(card)).toEqual([]);
     const item = (
       <ol>
@@ -124,6 +125,21 @@ describe('answer card and routine item', () => {
         </section>,
       ),
     ).toEqual([]);
+  });
+
+  it('shows a level chip on the answer only when the answer has a level', () => {
+    const answer = { text: 'Yes.', numbers: [], shiftedToNextDay: false };
+    const withLevel = renderToStaticMarkup(<AnswerCard answer={{ ...answer, level: 'poor' }} />);
+    expect(withLevel).toContain('band--poor');
+    const without = renderToStaticMarkup(<AnswerCard answer={{ ...answer, level: null }} />);
+    expect(without).not.toContain('class="band');
+    expect(without).toContain('answer--none');
+  });
+
+  it('words the severe banner as a consideration, not an order', () => {
+    const html = renderToStaticMarkup(<SevereBanner />);
+    expect(html).toContain('consider a well-fitted N95 or N99 mask; it may help on a short trip');
+    expect(html).not.toMatch(/should wear|must wear/i);
   });
 
   it('links the reason to its source when there is a url', async () => {

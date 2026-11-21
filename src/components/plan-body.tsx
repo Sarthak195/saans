@@ -41,10 +41,6 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
   const { plan } = view;
   const smogDay = view.mode === 'smog-day';
   const noAir = view.unavailable !== undefined;
-  const answered =
-    plan.answer === undefined
-      ? undefined
-      : plan.routines.find((r) => r.ref === plan.answer?.routineRef);
   const keep = { day: plan.day.relative, ...(smogDay ? { air: 'smog-day' } : {}) };
   const markers = plan.routines
     .filter((r) => r.scheduled)
@@ -59,11 +55,7 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
         hasBriefing={!noAir && briefing !== undefined}
       />
       {plan.answer === undefined ? null : (
-        <AnswerCard
-          answer={plan.answer}
-          level={answered?.level ?? null}
-          question={view.household.question}
-        />
+        <AnswerCard answer={plan.answer} question={view.household.question} />
       )}
       {intro}
       {noAir || briefing === undefined ? null : (

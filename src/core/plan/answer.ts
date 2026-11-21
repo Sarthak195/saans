@@ -54,6 +54,11 @@ export interface NextRun {
   later?: { found: Evaluated; day: PlanDay };
 }
 
+/** The routine a sentence ends up describing: the next run's day when the asked one is not on the plan day. */
+function spokenAbout(found: Evaluated, next?: NextRun): Evaluated {
+  return !found.advice.scheduled && next?.later ? next.later.found : found;
+}
+
 function sentenceFor(found: Evaluated, day: PlanDay, next?: NextRun): string {
   const { advice } = found;
   if (!advice.scheduled) {
@@ -115,6 +120,7 @@ export function buildAnswer(args: {
   return {
     text,
     routineRef: found.advice.ref,
+    level: spokenAbout(found, next).advice.level,
     numbers: numbersIn(text),
     shiftedToNextDay: args.shifted,
   };

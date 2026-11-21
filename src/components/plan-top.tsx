@@ -1,9 +1,9 @@
 import type { ReactElement } from 'react';
 
-import type { Band } from '@/core/aqi';
 import type { Plan, QuestionAnswer } from '@/core/plan/types';
 import type { WrittenText } from '@/server/genai';
 
+import { BandBadge } from './band';
 import { bandClass } from './format';
 import { withQuery } from './links';
 import type { PlanContext } from './links';
@@ -110,15 +110,15 @@ export function StatusLine({ text }: { readonly text: string | undefined }): Rea
   );
 }
 
+/** The level chip comes from the day the answer speaks about, and is left out when that has no reading. */
 export function AnswerCard({
   answer,
-  level,
   question,
 }: {
   readonly answer: QuestionAnswer;
-  readonly level: Band | null;
   readonly question?: string | undefined;
 }): ReactElement {
+  const { level } = answer;
   return (
     <section
       id="answer"
@@ -127,6 +127,11 @@ export function AnswerCard({
       className={`answer answer--${level === null ? 'none' : bandClass(level)}`}
     >
       <h2 id="answer-title">Your answer</h2>
+      {level === null ? null : (
+        <p>
+          <BandBadge band={level} />
+        </p>
+      )}
       {question === undefined || question === '' ? null : (
         <p className="small">You asked: {question}</p>
       )}
