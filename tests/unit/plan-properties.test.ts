@@ -17,6 +17,7 @@ import {
   WEEKDAYS,
 } from '@/core/profile/schema';
 import { hoursOf } from '@/core/time';
+import { numbersIn } from '@/core/plan/words';
 import { extractNumbers } from '@/core/text';
 import type { Household, Routine } from '@/core/types';
 import { DASHES, at, household, seriesOf } from '../helpers/plan';
@@ -244,6 +245,10 @@ describe('plan properties over seeded random days', () => {
       }
       for (const advice of plan.routines) {
         for (const n of advice.impact.numbers) expect(facts.has(n)).toBe(true);
+        // An impact lists every number its text shows, apart from the 2.5 in the name PM2.5.
+        for (const n of numbersIn(advice.impact.text)) {
+          expect(advice.impact.numbers, advice.impact.text).toContain(n);
+        }
         if (advice.pm25 !== null) expect(advice.pm25 % 5).toBe(0);
       }
     }

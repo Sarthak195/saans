@@ -2,10 +2,10 @@
   "unit": "m3 per minute",
   "source": {
     "id": "epa-efh-2011-table-6-2",
-    "title": "US EPA, Exposure Factors Handbook 2011, Chapter 6, Table 6-2 (mean short-term inhalation rates, males and females combined)",
+    "title": "US EPA, Exposure Factors Handbook 2011, Chapter 6, Table 6-2",
     "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
-    "status": "P-READ",
-    "quote": "Table 6-2 means in m3/minute (sleep, sedentary, light, moderate, high): 6 to <11 years 4.5E-03, 4.8E-03, 1.1E-02, 2.2E-02, 4.2E-02; 11 to <16 years 5.0E-03, 5.4E-03, 1.3E-02, 2.5E-02, 4.9E-02; 31 to <41 years 4.6E-03, 4.3E-03, 1.2E-02, 2.7E-02, 4.9E-02; 61 to <71 years 5.2E-03, 4.9E-03, 1.2E-02, 2.6E-02, 4.7E-02"
+    "quote": "Recommended Short-Term Exposure Values for Inhalation (males and females combined)",
+    "status": "P-READ"
   },
   "rows": [
     {
@@ -14,7 +14,14 @@
       "sedentary": 0.0048,
       "light": 0.011,
       "moderate": 0.022,
-      "high": 0.042
+      "high": 0.042,
+      "source": {
+        "id": "epa-efh-2011-table-6-2",
+        "title": "US EPA, Exposure Factors Handbook 2011, Chapter 6, Table 6-2: mean rates for 6 to <11 years",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "quote": "Recommended Short-Term Exposure Values for Inhalation (males and females combined)",
+        "status": "P-READ"
+      }
     },
     {
       "years": "11 to <16",
@@ -22,7 +29,14 @@
       "sedentary": 0.0054,
       "light": 0.013,
       "moderate": 0.025,
-      "high": 0.049
+      "high": 0.049,
+      "source": {
+        "id": "epa-efh-2011-table-6-2",
+        "title": "US EPA, Exposure Factors Handbook 2011, Chapter 6, Table 6-2: mean rates for 11 to <16 years",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "quote": "Recommended Short-Term Exposure Values for Inhalation (males and females combined)",
+        "status": "P-READ"
+      }
     },
     {
       "years": "31 to <41",
@@ -30,7 +44,14 @@
       "sedentary": 0.0043,
       "light": 0.012,
       "moderate": 0.027,
-      "high": 0.049
+      "high": 0.049,
+      "source": {
+        "id": "epa-efh-2011-table-6-2",
+        "title": "US EPA, Exposure Factors Handbook 2011, Chapter 6, Table 6-2: mean rates for 31 to <41 years",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "quote": "Recommended Short-Term Exposure Values for Inhalation (males and females combined)",
+        "status": "P-READ"
+      }
     },
     {
       "years": "61 to <71",
@@ -38,7 +59,14 @@
       "sedentary": 0.0049,
       "light": 0.012,
       "moderate": 0.026,
-      "high": 0.047
+      "high": 0.047,
+      "source": {
+        "id": "epa-efh-2011-table-6-2",
+        "title": "US EPA, Exposure Factors Handbook 2011, Chapter 6, Table 6-2: mean rates for 61 to <71 years",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "quote": "Recommended Short-Term Exposure Values for Inhalation (males and females combined)",
+        "status": "P-READ"
+      }
     }
   ],
   "ageBands": {
@@ -60,23 +88,41 @@
         "status": "APP"
       }
     },
-    "child": { "row": "6 to <11" },
-    "teen": {
-      "row": "11 to <16",
+    "child": {
+      "row": "6 to <11",
       "source": {
-        "id": "saans-inhalation-teen",
-        "title": "Saans rule: for teenagers (13 to 17) the nearest EPA row read (11 to under 16 years) stands in",
+        "id": "saans-inhalation-child",
+        "title": "Saans rule: children (5 to 12) use the EPA row for 6 to under 11 years",
         "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
         "status": "APP"
       }
     },
-    "adult": { "row": "31 to <41" },
-    "older": { "row": "61 to <71" }
-  },
-  "ratioSource": {
-    "id": "saans-breathing-ratio",
-    "title": "Saans calculation: the breathing-rate ratio is our arithmetic on the EPA means, not a figure EPA publishes",
-    "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
-    "status": "APP"
+    "teen": {
+      "row": "11 to <16",
+      "source": {
+        "id": "saans-inhalation-teen",
+        "title": "Saans rule: teenagers (13 to 17) use the nearest EPA row read (11 to under 16 years)",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "status": "APP"
+      }
+    },
+    "adult": {
+      "row": "31 to <41",
+      "source": {
+        "id": "saans-inhalation-adult",
+        "title": "Saans rule: adults (18 to 59) use the EPA row for 31 to under 41 years",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "status": "APP"
+      }
+    },
+    "older": {
+      "row": "61 to <71",
+      "source": {
+        "id": "saans-inhalation-older",
+        "title": "Saans rule: older adults (60 and over) use the EPA row for 61 to under 71 years",
+        "url": "https://www.epa.gov/sites/production/files/2015-09/documents/efh-chapter06.pdf",
+        "status": "APP"
+      }
+    }
   }
 }

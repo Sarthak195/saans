@@ -40,9 +40,7 @@ describe('today at a glance', () => {
     expect(routines).toEqual([]);
     expect(glance.best?.start).toBe('06:00');
     expect(glance.worst?.start).toBe('06:00');
-    expect(glance.topAction).toBe(
-      'The cleanest 3 hours today are 06:00 to 09:00. Add your routines to get a plan for each person.',
-    );
+    expect(glance.topAction).toBe('The cleanest 3 hours today are 06:00 to 09:00.');
   });
 
   it('only counts blocks with data in every hour', () => {
@@ -186,9 +184,7 @@ describe('the one action at the top', () => {
 
   it('offers the cleanest hours when no routine is on the plan day', () => {
     const p = plan(flatSeries(100), [routine({ id: 'r1', memberId: 'm1', days: ['mon'] })]);
-    expect(p.glance.topAction).toBe(
-      'The cleanest 3 hours today are 06:00 to 09:00. Add your routines to get a plan for each person.',
-    );
+    expect(p.glance.topAction).toBe('The cleanest 3 hours today are 06:00 to 09:00.');
     const later = plan(
       flatSeries(100),
       [routine({ id: 'r1', memberId: 'm1', days: ['sun'] })],

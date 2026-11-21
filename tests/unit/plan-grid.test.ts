@@ -5,6 +5,7 @@ import type { Band } from '@/core/aqi';
 import type { Decision } from '@/core/decision';
 import { GRID, NO_WINDOW, PROTECTION, RULE_SOURCES, TOP_ACTIONS } from '@/core/plan/rules-data';
 import type { GridFacts } from '@/core/plan/rules-data';
+import { INHALATION } from '@/core/impact';
 import { firstMatch } from '@/core/rules/evaluate';
 import { INTENSITIES } from '@/core/profile/schema';
 import type { Intensity, Sensitivity } from '@/core/types';
@@ -132,6 +133,11 @@ describe('rule data', () => {
     ...TOP_ACTIONS.map((r) => [r.id, r.source] as const),
     ...PROTECTION.map((r) => [r.id, r.source] as const),
     ...Object.entries(RULE_SOURCES),
+    ['inhalation', INHALATION.source] as const,
+    ...INHALATION.rows.map((r) => ['inhalation ' + r.years, r.source] as const),
+    ...Object.entries(INHALATION.ageBands).map(
+      ([band, m]) => ['inhalation for ' + band, m.source] as const,
+    ),
   ];
 
   it.each(rows)('%s carries a complete source', (_id, source) => {
@@ -140,7 +146,7 @@ describe('rule data', () => {
     if (source.status === 'P-READ') expect(source.quote?.length).toBeGreaterThan(0);
     // A secondary fetch is paraphrase, so it never claims verbatim words.
     if (source.status === 'P-FETCH') expect(source.quote).toBeUndefined();
-    if (source.status === 'APP') expect(source.title).toMatch(/^Saans (rule|calculation):/);
+    if (source.status === 'APP') expect(source.title).toMatch(/^Saans rule:/);
   });
 
   it('keeps every rule text plain: no dashes, no "safe", no placeholders left over', () => {

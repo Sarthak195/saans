@@ -22,23 +22,23 @@ const inhalationSchema = z.strictObject({
       light: rateSchema,
       moderate: rateSchema,
       high: rateSchema,
+      source: sourceRefSchema,
     }),
   ),
   ageBands: z.record(
     z.enum(AGE_BANDS),
-    z.strictObject({ row: z.string(), source: z.exactOptional(sourceRefSchema) }),
+    z.strictObject({ row: z.string(), source: sourceRefSchema }),
   ),
-  ratioSource: sourceRefSchema,
 });
 
 // Parsed once at load, so a typo in the table fails every test instead of skewing an impact.
-const INHALATION = inhalationSchema.parse(inhalationJson);
+export const INHALATION = inhalationSchema.parse(inhalationJson);
 
 export const INDOORS_TEXT = 'Avoids the outdoor air. Indoor air is usually cleaner but not clean.';
 
 /**
  * EPA mean breathing rates for an age band at an intensity and at rest-like light activity, in m3 per
- * minute. `source` is where the stand-in row or the ratio built from the rows comes from.
+ * minute. `source` is the rule that picks the EPA row for this age band.
  */
 export function breathingRate(
   ageBand: AgeBand,
@@ -49,7 +49,7 @@ export function breathingRate(
   if (!row) throw new Error(`No inhalation row for ${mapping.row}`);
   const rate =
     intensity === 'vigorous' ? row.high : intensity === 'moderate' ? row.moderate : row.light;
-  return { rate, light: row.light, source: mapping.source ?? INHALATION.ratioSource };
+  return { rate, light: row.light, source: mapping.source };
 }
 
 /** Nothing changes, so there is nothing to quantify. */

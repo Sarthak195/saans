@@ -9,7 +9,7 @@
     },
     "mohfw-reschedule": {
       "id": "mohfw-advisory-2025",
-      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025 (quote corrected for scan errors)",
+      "title": "MoHFW, Advisory on Air Pollution and Health (NPCCHH), November 2025",
       "url": "https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf",
       "quote": "Reschedule outdoor activities as per AQI, and remain indoors on days with poor to severe AQI",
       "status": "P-READ"
@@ -446,7 +446,7 @@
       },
       "then": {
         "decision": "keep",
-        "text": "The air is {level}. It mainly affects people with lung or heart conditions, so no change is needed here. Ease off if breathing feels uncomfortable."
+        "text": "The air is {level}. No change is needed for this. Ease off if breathing feels uncomfortable."
       },
       "source": "cpcb:moderate"
     }
@@ -599,7 +599,7 @@
         "outcome": ["none"],
         "hasBest": [true]
       },
-      "then": "The cleanest 3 hours {when} are {best}. Add your routines to get a plan for each person.",
+      "then": "The cleanest 3 hours {when} are {best}.",
       "source": "app-top-action"
     },
     {
