@@ -11,6 +11,7 @@ import type {
   COMMUNITY_KINDS,
   CONDITIONS,
   COOKING,
+  HABITS,
   HEATING,
   INTENSITIES,
   LANGUAGES,
@@ -28,6 +29,7 @@ export type Intensity = (typeof INTENSITIES)[number];
 export type Mode = (typeof MODES)[number];
 export type Weekday = (typeof WEEKDAYS)[number];
 export type Cooking = (typeof COOKING)[number];
+export type Habit = (typeof HABITS)[number];
 export type Heating = (typeof HEATING)[number];
 export type CommunityKind = (typeof COMMUNITY_KINDS)[number];
 export type Language = (typeof LANGUAGES)[number];
