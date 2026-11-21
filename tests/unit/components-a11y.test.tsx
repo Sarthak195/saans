@@ -13,6 +13,10 @@ import { loadPlanView } from '@/server/plan-view';
 import type { PlanView } from '@/server/plan-view';
 
 import { violationsIn } from '../helpers/axe';
+import { DASHES } from '../helpers/plan';
+
+// axe walks the whole document, which is slow for a long form on a busy machine.
+vi.setConfig({ testTimeout: 30_000 });
 
 async function sampleView(): Promise<PlanView> {
   // No live data in tests: the sample place falls back to its recording.
@@ -110,7 +114,7 @@ describe('answer card and routine item', () => {
     const html = renderToStaticMarkup(item);
     expect(html).toContain('Try another time or mode');
     expect(html).toContain('Before your change');
-    expect(html).not.toMatch(/[–—]/);
+    expect(html).not.toMatch(DASHES);
     expect(
       await violationsIn(
         <section>

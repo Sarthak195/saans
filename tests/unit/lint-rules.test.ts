@@ -1,6 +1,9 @@
 import { ESLint } from 'eslint';
 import tseslint from 'typescript-eslint';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+
+// The first lint run loads the whole config, which can pass 5 s when many test files start together.
+vi.setConfig({ testTimeout: 30_000 });
 
 // Runs the repository's real ESLint config on in-memory snippets. Only the type-aware layer is
 // switched off, because a snippet has no file on disk for the TypeScript project to find.

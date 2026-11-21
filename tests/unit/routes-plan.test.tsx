@@ -14,6 +14,7 @@ import { loadPlanView } from '@/server/plan-view';
 import { openDraft, openHousehold, sealHousehold } from '@/server/seal';
 
 import { ORIGIN, formPost, locationOf, stubKeys } from '../helpers/form';
+import { DASHES } from '../helpers/plan';
 import { recorded, replyWith } from '../helpers/geocode';
 
 vi.mock('@/server/genai', () => ({
@@ -286,7 +287,7 @@ describe('plan pages and the community notice', () => {
     );
     expect(html).not.toContain('>Day after<');
     expect(html).toContain('Read it with Gemini');
-    expect(html).not.toMatch(/[–—]/);
+    expect(html).not.toMatch(DASHES);
   });
 });
 

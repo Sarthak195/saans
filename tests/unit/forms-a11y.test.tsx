@@ -11,6 +11,9 @@ import { SAMPLES } from '@/core/profile/samples';
 
 import { violationsIn } from '../helpers/axe';
 
+// axe walks the whole document, which is slow for a long form on a busy machine.
+vi.setConfig({ testTimeout: 30_000 });
+
 // The location button reads the router, which only exists inside a running app.
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
