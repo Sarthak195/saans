@@ -1,0 +1,11 @@
+.git
+.env*
+!.env.example
+.planning
+node_modules
+.next
+coverage
+tests
+.github
+*.md
+!README.md
