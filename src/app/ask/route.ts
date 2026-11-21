@@ -1,6 +1,6 @@
-import { INDIA_LAT, INDIA_LON, MAX_TEXT, placeSchema } from '@/core/profile/schema';
+import { INDIA_LAT, INDIA_LON, MAX_TEXT } from '@/core/profile/schema';
 import type { Place } from '@/core/types';
-import { draftPath, planPath, toPlace } from '@/server/edits';
+import { draftPath, pickedPlace, planPath, toPlace } from '@/server/edits';
 import { userMessage } from '@/server/errors';
 import { readHousehold } from '@/server/genai';
 import { nearestStaticPlace, resolvePlace } from '@/server/geo/geocode';
@@ -23,15 +23,10 @@ function inIndia(lat: number, lon: number): boolean {
 
 type Located = { place: PlaceMatch } | { problem: string } | { choose: Place[] } | undefined;
 
-/** The place the family gave, if any: a pick from a list, typed text, or a rounded device location. */
+/** The place the family gave, if any: a pick from a sealed list, typed text, or a rounded device location. */
 async function placeFrom(form: FormData): Promise<Located> {
-  const picked = placeSchema.safeParse({
-    name: field(form, 'placeName', 80),
-    admin1: field(form, 'placeAdmin1', 80),
-    lat: Number(field(form, 'placeLat', 12)),
-    lon: Number(field(form, 'placeLon', 12)),
-  });
-  if (picked.success) return { place: { ...picked.data, source: 'geocoder' } };
+  const picked = pickedPlace(form);
+  if (picked !== undefined) return { place: { ...picked, source: 'geocoder' } };
 
   const typed = field(form, 'place', 80);
   if (typed !== '') {
@@ -79,9 +74,8 @@ export function POST(request: Request): Promise<Response> {
           result.target === undefined
             ? result.household
             : { ...result.household, questionTarget: result.target };
-        const notes = result.notes.join(' ').slice(0, 300);
-        const query =
-          notes === '' ? {} : { note: sealDraft({ text: '', options: [], reason: notes }) };
+        // The notes quote the family's own labels, so only a fixed key goes into the address.
+        const query = result.notes.length === 0 ? {} : { note: 'filled' };
         const anchor = household.questionTarget === undefined ? 'plan-title' : 'answer';
         return seeOther(planPath(sealHousehold(household), { ...query, status: 'made' }, anchor));
       }

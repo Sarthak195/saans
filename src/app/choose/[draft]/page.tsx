@@ -45,6 +45,7 @@ export default async function ChoosePage({ params, searchParams }: Props): Promi
       options={opened.options}
       action={target === undefined ? '/ask' : `/plan/${target}/place`}
       formToken={issueFormToken(new Date())}
+      draft={draft}
       text={opened.text}
       keep={{ ...(day === undefined ? {} : { day }), ...(air === undefined ? {} : { air }) }}
     />

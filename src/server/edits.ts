@@ -5,7 +5,8 @@ import { COMMUNITY_KINDS, MODES } from '@/core/profile/schema';
 import type { CommunityKind, Household, Mode, Place } from '@/core/types';
 import { field } from '@/server/http';
 import type { PlaceMatch } from '@/server/geo/geocode';
-import { sealDraft } from '@/server/seal';
+import { AppError } from '@/server/errors';
+import { openDraft, sealDraft } from '@/server/seal';
 import type { Draft } from '@/server/seal';
 
 const CLOCK = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -31,6 +32,19 @@ export function toPlace(match: Pick<PlaceMatch, 'name' | 'admin1' | 'lat' | 'lon
     lat: round1(match.lat),
     lon: round1(match.lon),
   };
+}
+
+/**
+ * The place a family picked from a list: the sealed list we made and the position they chose, so
+ * a client cannot name a place of its own. None when the form is not a pick.
+ */
+export function pickedPlace(form: FormData): Place | undefined {
+  const draft = field(form, 'draft', 2000);
+  if (draft === '') return undefined;
+  const index = field(form, 'option', 2);
+  const place = /^\d$/.test(index) ? openDraft(draft).options[Number(index)] : undefined;
+  if (place === undefined) throw new AppError('token_invalid', 'no such place in the list');
+  return place;
 }
 
 /** The day and air choices a form carried along, checked, as query values for the next page. */

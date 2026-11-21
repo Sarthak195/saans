@@ -1,7 +1,8 @@
+import type { NoteKey } from '@/components/copy';
 import { keepFromForm, modeOf, planPath, withRoutineChange } from '@/server/edits';
 import { field, handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { readQuestion } from '@/server/genai';
-import { openHousehold, sealDraft, sealHousehold } from '@/server/seal';
+import { openHousehold, sealHousehold } from '@/server/seal';
 
 interface Context {
   params: Promise<{ token: string }>;
@@ -9,9 +10,9 @@ interface Context {
 
 const MAX_QUESTION = 300;
 
-/** A sealed line of our own words for the plan page to show after the redirect. */
-function note(reason: string): string {
-  return sealDraft({ text: '', options: [], reason: reason.slice(0, 300) });
+/** The fixed note that tells a reader why a question was not answered; the reason text itself never travels. */
+function noteFor(reason: string): NoteKey {
+  return reason.includes('AI reader') ? 'noAi' : 'notUnderstood';
 }
 
 /** Reads a question about the plan; a what-if is worked out again, any other question picks out its routine. */
@@ -23,12 +24,12 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
     const keep = keepFromForm(form);
     const text = field(form, 'text', MAX_QUESTION);
 
-    const unclear = (reason: string): Response =>
-      seeOther(planPath(token, { ...keep, note: note(reason) }, 'ask'));
-    if (text === '') return unclear('Type a question first.');
+    const unclear = (note: NoteKey): Response =>
+      seeOther(planPath(token, { ...keep, note }, 'ask'));
+    if (text === '') return unclear('noQuestion');
 
     const result = await readQuestion({ text, household });
-    if (result.kind === 'unclear') return unclear(result.reason);
+    if (result.kind === 'unclear') return unclear(noteFor(result.reason));
 
     const asked = { ...household, question: text, questionTarget: result.target };
     const { routineId } = result.target;
@@ -46,7 +47,7 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
             newMode: result.newMode === undefined ? undefined : modeOf(result.newMode),
           });
     if (changed === undefined || routineId === undefined) {
-      return unclear('Say which routine you mean, for example the evening walk.');
+      return unclear('whichRoutine');
     }
     return seeOther(
       planPath(

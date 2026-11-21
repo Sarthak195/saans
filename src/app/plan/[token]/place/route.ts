@@ -1,7 +1,5 @@
-import { placeSchema } from '@/core/profile/schema';
 import { withQuery } from '@/components/links';
-import { keepFromForm, planPath, toPlace } from '@/server/edits';
-import { userMessage } from '@/server/errors';
+import { keepFromForm, pickedPlace, planPath, toPlace } from '@/server/edits';
 import { resolvePlace } from '@/server/geo/geocode';
 import { field, handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { openHousehold, sealDraft, sealHousehold } from '@/server/seal';
@@ -26,14 +24,8 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
         ),
       );
 
-    // A place picked from the list arrives as four fields; it is checked like any other place.
-    const picked = placeSchema.safeParse({
-      name: field(form, 'placeName', 80),
-      admin1: field(form, 'placeAdmin1', 80),
-      lat: Number(field(form, 'placeLat', 12)),
-      lon: Number(field(form, 'placeLon', 12)),
-    });
-    if (picked.success) return moved(picked.data);
+    const picked = pickedPlace(form);
+    if (picked !== undefined) return moved(picked);
 
     const found = await resolvePlace(field(form, 'place', 80));
     if (found.kind === 'one') return moved(toPlace(found.place));
@@ -45,12 +37,6 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
         }),
       );
     }
-    const message = userMessage('geocode_none');
-    const reason = sealDraft({
-      text: '',
-      options: [],
-      reason: `${message.body} ${message.nextAction}`,
-    });
-    return seeOther(planPath(token, { ...keep, note: reason }, 'plan-title'));
+    return seeOther(planPath(token, { ...keep, note: 'placeNotFound' }, 'plan-title'));
   });
 }

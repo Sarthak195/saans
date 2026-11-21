@@ -8,7 +8,7 @@ import PlanTokenPage from '@/app/plan/[token]/page';
 import { sampleById } from '@/core/profile/samples';
 import { readHousehold } from '@/server/genai';
 import { issueFormToken } from '@/server/guards';
-import { openDraft, openHousehold } from '@/server/seal';
+import { openDraft, openHousehold, sealDraft } from '@/server/seal';
 
 import { ORIGIN, formPost, locationOf, stubKeys } from '../helpers/form';
 
@@ -168,8 +168,9 @@ describe('POST /ask', () => {
     expect(location).toMatch(/#answer$/);
     const token = pathOf(location).replace('/plan/', '');
     expect(openHousehold(token).questionTarget).toEqual({ routineId: 'play', aboutToday: true });
-    const note = new URL(location, ORIGIN).searchParams.get('note') ?? '';
-    expect(openDraft(note).reason).toBe('Assumed: age band child.');
+    // Only a fixed key travels in the address, never the wording the reader produced.
+    expect(new URL(location, ORIGIN).searchParams.get('note')).toBe('filled');
+    expect(location).not.toContain('Assumed');
   });
 
   it('lists the places when the text names a place that exists in several states', async () => {
@@ -212,6 +213,40 @@ describe('POST /ask', () => {
     const text = 'मेरा बेटा रोज़ शाम को खेलता है। '.repeat(45).slice(0, 1500);
     const response = await askPost(formPost('/ask', { text }));
     expect(response.status).toBe(303);
+  });
+
+  it('takes a picked place from the sealed list and not from fields the client sets', async () => {
+    vi.mocked(readHousehold).mockResolvedValue({ kind: 'form', reason: 'x', text: 'Hello' });
+    const list = sealDraft({
+      text: 'Hello',
+      options: [
+        { name: 'Rampur', admin1: 'Uttar Pradesh', lat: 28.8, lon: 79 },
+        { name: 'Rampur', admin1: 'Himachal Pradesh', lat: 31.5, lon: 77.6 },
+      ],
+    });
+    await askPost(
+      formPost('/ask', {
+        text: 'Hello',
+        draft: list,
+        option: '1',
+        placeName: 'Safe air zone, no masks needed',
+        placeAdmin1: 'Delhi',
+        placeLat: '28.6',
+        placeLon: '77.2',
+      }),
+    );
+    expect(vi.mocked(readHousehold).mock.calls.at(-1)?.[0].place).toEqual({
+      name: 'Rampur',
+      admin1: 'Himachal Pradesh',
+      lat: 31.5,
+      lon: 77.6,
+      source: 'geocoder',
+    });
+
+    vi.mocked(readHousehold).mockClear();
+    const refused = await askPost(formPost('/ask', { text: 'Hello', draft: list, option: '2' }));
+    expect(refused.status).toBe(400);
+    expect(readHousehold).not.toHaveBeenCalled();
   });
 
   it('says Saans covers India for a location outside it, and uses the nearest listed place inside it', async () => {

@@ -7,6 +7,7 @@ export function ChoosePlace({
   options,
   action,
   formToken,
+  draft,
   text,
   keep,
 }: {
@@ -14,6 +15,8 @@ export function ChoosePlace({
   /** Where each choice posts: '/ask' for a family's own words, or '/plan/<token>/place'. */
   readonly action: string;
   readonly formToken: string;
+  /** The sealed list these options came from; a choice posts this and a position in it. */
+  readonly draft: string;
   /** The family's own words, passed along unchanged when the choice continues a reading. */
   readonly text: string;
   readonly keep: Readonly<Record<string, string>>;
@@ -29,7 +32,7 @@ export function ChoosePlace({
         one you live in.
       </p>
       <ul className="plain-list">
-        {options.map((place) => (
+        {options.map((place, index) => (
           <li key={`${place.name}-${place.admin1}-${String(place.lat)}-${String(place.lon)}`}>
             <form method="post" action={action}>
               <input type="hidden" name="formToken" value={formToken} />
@@ -37,11 +40,8 @@ export function ChoosePlace({
               {Object.entries(keep).map(([field, value]) => (
                 <input key={field} type="hidden" name={field} value={value} />
               ))}
-              <input type="hidden" name="placeName" value={place.name} />
-              <input type="hidden" name="placeAdmin1" value={place.admin1} />
-              <input type="hidden" name="placeLat" value={String(place.lat)} />
-              <input type="hidden" name="placeLon" value={String(place.lon)} />
-              <button className="button" type="submit">
+              <input type="hidden" name="draft" value={draft} />
+              <button className="button" type="submit" name="option" value={String(index)}>
                 Plan for {place.name}, {place.admin1}
               </button>
             </form>

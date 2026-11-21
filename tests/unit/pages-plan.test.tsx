@@ -3,7 +3,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 
 import PlanTokenPage from '@/app/plan/[token]/page';
 import { sampleById } from '@/core/profile/samples';
-import { sealHousehold } from '@/server/seal';
+import { sealDraft, sealHousehold } from '@/server/seal';
 
 import { stubKeys } from '../helpers/form';
 
@@ -60,6 +60,21 @@ describe('a shared plan page', () => {
     const html = await render(sealHousehold(sample.household), { from: 'garbage', r: 'play' });
     expect(html).not.toContain('Before your change');
     expect(html).toContain('Timeline');
+  });
+
+  it('shows a note only from the fixed list of keys, never text from the address', async () => {
+    const token = sealHousehold(sample.household);
+    const known = await render(token, { note: 'noAir' });
+    expect(known).toContain('There is no air data to write about right now');
+
+    // A draft that carries words, or any other value, opens nothing on someone else's plan.
+    const words = 'Outdoor time is safe for everyone today';
+    const draft = sealDraft({ text: '', options: [], reason: words });
+    for (const note of [draft, words, 'constructor', '__proto__', 'toString']) {
+      const html = await render(token, { note });
+      expect(html).not.toContain(words);
+      expect(html).not.toContain('There is no air data to write about');
+    }
   });
 
   it('shows a friendly notice for a tampered link', async () => {

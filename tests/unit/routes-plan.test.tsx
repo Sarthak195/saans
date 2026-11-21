@@ -8,14 +8,16 @@ import { POST as whatIfPost } from '@/app/plan/[token]/whatif/route';
 import CommunitySamplePage from '@/app/plan/sample/[id]/community/page';
 import SamplePage from '@/app/plan/sample/[id]/page';
 import { whatsappLink } from '@/components/community-view';
+import { noteLine } from '@/components/copy';
 import { sampleById } from '@/core/profile/samples';
 import { readQuestion, writeNotice } from '@/server/genai';
 import { loadPlanView } from '@/server/plan-view';
-import { openDraft, openHousehold, sealHousehold } from '@/server/seal';
+import { openDraft, openHousehold, sealDraft, sealHousehold } from '@/server/seal';
 import { sealWritten } from '@/server/written-draft';
 
 import { ORIGIN, formPost, locationOf, stubKeys } from '../helpers/form';
 import { DASHES } from '../helpers/plan';
+import { writtenFor } from '../helpers/written';
 import { recorded, replyWith } from '../helpers/geocode';
 
 vi.mock('@/server/genai', () => ({
@@ -150,18 +152,53 @@ describe('POST /plan/[token]/place', () => {
     const draft = openDraft(location.split('?')[0]?.replace('/choose/', '') ?? '');
     expect(draft.options.length).toBeGreaterThan(1);
 
-    const pick = draft.options[0];
+    const pick = draft.options[1];
     if (pick === undefined) throw new Error('no option');
     const chosen = await placePost(
       formPost('/plan/x/place', {
-        placeName: pick.name,
-        placeAdmin1: pick.admin1,
-        placeLat: String(pick.lat),
-        placeLon: String(pick.lon),
+        draft: location.split('?')[0]?.replace('/choose/', '') ?? '',
+        option: '1',
       }),
       context(TOKEN),
     );
     expect(openHousehold(tokenOf(locationOf(chosen))).place).toEqual(pick);
+  });
+
+  it('takes a picked place from the sealed list and never from fields a client could set', async () => {
+    const list = sealDraft({
+      text: '',
+      options: [{ name: 'Rampur', admin1: 'Himachal Pradesh', lat: 31.5, lon: 77.6 }],
+    });
+    const forged = {
+      placeName: 'Safe air zone, no masks needed',
+      placeAdmin1: 'Delhi',
+      placeLat: '28.6',
+      placeLon: '77.2',
+    };
+    // The old four fields mean nothing now: with no list the text is read as a place name.
+    replyWith({ results: [] });
+    const ignored = locationOf(await placePost(formPost('/plan/x/place', forged), context(TOKEN)));
+    expect(query(ignored).get('note')).toBe('placeNotFound');
+
+    const chosen = locationOf(
+      await placePost(
+        formPost('/plan/x/place', { ...forged, draft: list, option: '0' }),
+        context(TOKEN),
+      ),
+    );
+    expect(openHousehold(tokenOf(chosen)).place.name).toBe('Rampur');
+    for (const option of ['1', '-1', 'x', '']) {
+      const refused = await placePost(
+        formPost('/plan/x/place', { draft: list, option }),
+        context(TOKEN),
+      );
+      expect(refused.status).toBe(400);
+    }
+    const notAList = await placePost(
+      formPost('/plan/x/place', { draft: 'abc', option: '0' }),
+      context(TOKEN),
+    );
+    expect(notAList.status).toBe(400);
   });
 
   it('says so when no place matches, and keeps the plan', async () => {
@@ -170,9 +207,8 @@ describe('POST /plan/[token]/place', () => {
       await placePost(formPost('/plan/x/place', { place: 'Qwertyland' }), context(TOKEN)),
     );
     expect(tokenOf(location)).toBe(TOKEN);
-    expect(openDraft(query(location).get('note') ?? '').reason).toContain(
-      'Nothing in India matched',
-    );
+    expect(query(location).get('note')).toBe('placeNotFound');
+    expect(noteLine('placeNotFound')).toContain('Nothing in India matched');
   });
 });
 
@@ -218,7 +254,8 @@ describe('POST /plan/[token]/ask', () => {
       await askPost(formPost('/plan/x/ask', { text: 'hmm' }), context(TOKEN)),
     );
     expect(tokenOf(location)).toBe(TOKEN);
-    expect(openDraft(query(location).get('note') ?? '').reason).toBe('Which routine do you mean?');
+    expect(query(location).get('note')).toBe('notUnderstood');
+    expect(noteLine('notUnderstood')).toContain('which routine you mean');
   });
 });
 
@@ -229,41 +266,57 @@ describe('plan pages and the community notice', () => {
     return [...html.matchAll(/href="([^"]+)"/g)].map((m) => (m[1] ?? '').replaceAll('&amp;', '&'));
   }
 
-  const sealedNotice = (): string =>
-    sealWritten({ by: 'gemini', lang: 'en', text: NOTICE }, 'plain');
+  const school = sampleById('s6');
+  if (school === undefined) throw new Error('no sample');
 
-  it('builds a WhatsApp link that carries only the notice, on a sample and on a shared link', async () => {
-    const n = sealedNotice();
-    const onSample = renderToStaticMarkup(
-      await CommunitySamplePage({
-        params: Promise.resolve({ id: 's6' }),
-        searchParams: Promise.resolve({ n }),
+  const sealedNotice = async (token: string): Promise<string> =>
+    sealWritten(
+      { by: 'gemini', lang: 'en', text: NOTICE },
+      'plain',
+      await writtenFor(school.household, token, {
+        audience: school.household.community?.kind ?? 'society',
       }),
     );
-    const school = sampleById('s6');
-    if (school === undefined) throw new Error('no sample');
+
+  it('builds a WhatsApp link that carries only the notice', async () => {
     const schoolToken = sealHousehold(school.household);
+    const n = await sealedNotice(schoolToken);
     const onToken = renderToStaticMarkup(
       await CommunityTokenPage({
         params: Promise.resolve({ token: schoolToken }),
         searchParams: Promise.resolve({ n }),
       }),
     );
-
-    for (const [html, token] of [
-      [onSample, schoolToken],
-      [onToken, schoolToken],
-    ] as const) {
-      const links = hrefsOf(html).filter((h) => h.startsWith('https://wa.me/'));
-      expect(links).toEqual([whatsappLink(NOTICE)]);
-      const link = links[0] ?? '';
-      expect(link).not.toContain(token);
-      expect(link).not.toContain('/plan/');
-      expect(decodeURIComponent(link.split('text=')[1] ?? '')).toBe(NOTICE);
-    }
+    const links = hrefsOf(onToken).filter((h) => h.startsWith('https://wa.me/'));
+    expect(links).toEqual([whatsappLink(NOTICE)]);
+    const link = links[0] ?? '';
+    expect(link).not.toContain(schoolToken);
+    expect(link).not.toContain('/plan/');
+    expect(decodeURIComponent(link.split('text=')[1] ?? '')).toBe(NOTICE);
     expect(onToken).toContain('Copy the notice');
     expect(onToken).toContain('Written by Gemini from your plan');
     expect(onToken).not.toContain('Write it with Gemini');
+  });
+
+  it('does not show a notice sealed for another link, on a sample or on a different plan', async () => {
+    const n = await sealedNotice(sealHousehold(school.household));
+    // A sample page seals its household afresh on every view, so a notice made elsewhere is not for it.
+    const onSample = renderToStaticMarkup(
+      await CommunitySamplePage({
+        params: Promise.resolve({ id: 's6' }),
+        searchParams: Promise.resolve({ n }),
+      }),
+    );
+    const other = renderToStaticMarkup(
+      await CommunityTokenPage({
+        params: Promise.resolve({ token: TOKEN }),
+        searchParams: Promise.resolve({ n }),
+      }),
+    );
+    for (const html of [onSample, other]) {
+      expect(html).not.toContain(NOTICE);
+      expect(html).toContain('Written by Saans from your plan');
+    }
   });
 
   it('shows the code-built notice and offers Gemini, without calling the writer', async () => {
@@ -282,7 +335,7 @@ describe('plan pages and the community notice', () => {
 
   it('ignores the old notice trigger and a tampered notice parameter', async () => {
     vi.mocked(writeNotice).mockClear();
-    const n = sealedNotice();
+    const n = await sealedNotice(TOKEN);
     for (const searchParams of [{ notice: '1' }, { n: `${n.slice(0, -4)}AAAA` }]) {
       const html = renderToStaticMarkup(
         await CommunityTokenPage({
