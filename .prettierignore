@@ -1,0 +1,6 @@
+package-lock.json
+.next
+coverage
+.planning
+next-env.d.ts
+tests/fixtures
