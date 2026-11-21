@@ -16,6 +16,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # Later steps run project code, which has no need of the workflow's token.
+          persist-credentials: false
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
@@ -40,6 +43,15 @@ jobs:
         run: |
           if git grep -nE 'AIza[0-9A-Za-z_-]{35}|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|-----BEGIN [A-Z ]*PRIVATE KEY-----' -- . ':!package-lock.json'; then
             echo 'A key-like string is committed. Remove it and rotate the key.'
+            exit 1
+          fi
+
+      # A real .env file holds keys the pattern scan above cannot recognise, such as base64 secrets.
+      - name: No tracked environment files
+        run: |
+          tracked="$(git ls-files '.env*' ':!.env.example')"
+          if [ -n "$tracked" ]; then
+            echo "Environment files are tracked: $tracked"
             exit 1
           fi
 

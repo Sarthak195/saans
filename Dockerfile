@@ -4,8 +4,9 @@
 FROM node:24.15.0-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-# Dev dependencies stay: the build needs TypeScript. They never reach the runner.
-RUN npm ci
+# Dev dependencies stay: the build needs TypeScript. They never reach the runner. Install
+# scripts are skipped so a dependency cannot run code while the image is built.
+RUN npm ci --ignore-scripts
 
 FROM node:24.15.0-slim AS builder
 WORKDIR /app
