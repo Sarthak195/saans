@@ -249,25 +249,23 @@ describe('where a cleaner time may be offered', () => {
   it.each(['infant', 'under5', 'older'] as const)(
     'keeps %s within 07:00 to 19:00 on a day that is not Poor',
     (band) => {
-      const dark = byHour({ 4: 5, 5: 5, 6: 5, 20: 5, 21: 5 }, 70);
-      const { advice } = planFor(
+      // 05:00 and 20:00 are far cleaner but outside the band; 07:00 and 17:00 are inside it.
+      const series = byHour({ 4: 5, 5: 5, 6: 85, 7: 30, 17: 30, 18: 85, 20: 5, 21: 5 }, 70);
+      const morning = planFor(
         band,
         { start: '06:00', flexHours: 3, intensity: 'vigorous' },
-        dark,
+        series,
         NOW,
       );
-      // The 06:00 routine is itself outside the band; no offered window may be.
-      if (advice.window) {
-        expect(advice.window.start >= '07:00').toBe(true);
-        expect(advice.window.end <= '19:00').toBe(true);
-      }
-      const late = planFor(
+      expect(morning.advice.level).toBe('moderate');
+      expect(morning.advice.window?.start).toBe('07:00');
+      const evening = planFor(
         band,
-        { start: '19:00', flexHours: 3, intensity: 'vigorous' },
-        dark,
+        { start: '18:00', flexHours: 3, intensity: 'vigorous' },
+        series,
         NOW,
       );
-      if (late.advice.window) expect(late.advice.window.end <= '19:00').toBe(true);
+      expect(evening.advice.window?.start).toBe('17:00');
     },
   );
 
@@ -279,8 +277,8 @@ describe('where a cleaner time may be offered', () => {
       clean,
       FRIDAY_MORNING,
     );
-    // 09:00 to 11:00 are the cleanest hours but fall in school time.
-    expect(advice.window === undefined || advice.window.start >= '14:00').toBe(true);
+    // 09:00 to 11:00 are the cleanest hours but fall in school time, so the first allowed hour is 15:00.
+    expect(advice.window?.start).toBe('15:00');
   });
 });
 

@@ -36,7 +36,7 @@ function exposureRow(mode: Mode): ModeRow {
 
 /**
  * How much less fine particle air a rider breathes after changing mode, as a share of what they
- * breathed before, from the in-vehicle to roadside ratios measured on one Delhi route. Returns
+ * breathed before, from the in-vehicle to ambient ratios measured on one Delhi route. Returns
  * null unless the measured difference is large enough to be worth saying, so a gap that is
  * within the study's noise is never shown as a gain. The share is rounded to the nearest 5.
  */

@@ -116,7 +116,7 @@
         "priority": 10,
         "title": "Open windows only from {start} to {end}",
         "body": "Keep outside doors and windows shut in the morning and late evening. If you need to air the home, do it between {start} and {end}, when outdoor fine particles are forecast to be lowest, at about {pm25} micrograms per cubic metre. How long to air is a Saans choice.",
-        "reason": "The health ministry advises keeping doors and windows shut in the morning and late evening on poor to severe days and airing only if needed around midday. Saans picks the cleanest spell in the forecast."
+        "reason": "The health ministry advises keeping doors and windows shut in the morning and late evening on poor to severe days and airing only if needed around midday. Saans picks the cleanest spell in the forecast, and also gives this advice when part of the waking day is forecast to be Poor or worse."
       },
       "source": {
         "id": "mohfw-windows-timing",
@@ -528,7 +528,7 @@
         "priority": 83,
         "myth": true,
         "title": "Myth: the air conditioner cleans the air",
-        "body": "An air conditioner on its own is not an air cleaner. A closed car measured cleaner than the roadside in one Delhi study, because less outside air gets in. On a poor-air day, set the air conditioning to recirculate so it does not pull in outside air, at home and in the car.",
+        "body": "An air conditioner on its own is not an air cleaner. A closed car measured cleaner than the ambient air in one Delhi study, because less outside air gets in. On a poor-air day, set the air conditioning to recirculate so it does not pull in outside air, at home and in the car.",
         "reason": "The health ministry advises recirculate mode to avoid contact with outside air. That limits what comes in but does not clean it."
       },
       "source": {

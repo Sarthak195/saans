@@ -4,7 +4,6 @@ import type { TransitOption } from '@/core/alternatives/cities';
 import { EXPOSURE, exposureLessPercent } from '@/core/alternatives/exposure';
 import { TRIP_RULES } from '@/core/alternatives/rules';
 import type { AlternativeThen, TripFacts } from '@/core/alternatives/rules';
-import { planLevel } from '@/core/advice/level';
 import { BAND_LABEL } from '@/core/aqi';
 import { fillTemplate, oneDecimal } from '@/core/format';
 import type { Alternative, Impact, Plan } from '@/core/plan/types';
@@ -93,7 +92,7 @@ function transitImpact(
         ? 'metro_rail'
         : null
       : 'bus';
-  // A car may be running with its windows shut, which the study found cleaner than the roadside,
+  // A car may be running with its windows shut, which the study found cleaner than the ambient air,
   // so a car trip is never given an air-quality gain; it gets the car-km saving alone.
   const change = toMode && mode !== 'car' ? exposureLessPercent(mode, toMode) : null;
   if (!change) return fillImpact(impact, vars);
@@ -126,12 +125,12 @@ export function buildAlternatives(input: { household: Household; plan: Plan }): 
     const routine = household.routines.find((r) => r.id === advice.routineId);
     const mode = advice.mode;
     // A trip is a weekly habit, so it is considered whatever the plan day's weekday is. A trip not on
-    // the plan day has no hours of its own to read, so the plan day's level stands in for it.
+    // the plan day has no air reading of its own, so only the rules that do not need one apply.
     if (!routine || mode === undefined || !TRIP_KINDS.includes(advice.kind)) continue;
     const facts: TripFacts = {
       band: bandOf(routine.km),
       mode,
-      level: advice.scheduled ? (advice.level ?? 'unknown') : planLevel(plan),
+      level: advice.level ?? 'unknown',
       kind: advice.kind,
       rail: transit.rail,
       repeats: routine.days.length >= 2,

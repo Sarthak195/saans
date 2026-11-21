@@ -199,16 +199,14 @@ describe('which trips get alternatives', () => {
     expect(list[0]?.impact.text).toContain('on 5 days a week');
   });
 
-  it('uses the plan day level for a trip that is not on the plan day', () => {
+  it('never suggests walking a trip that is not on the plan day, since it has no air of its own', () => {
     const off = { scheduled: false, level: null, pm25: null } as const;
-    const at = (worst: Band, pm25: number) =>
-      buildAlternatives({
-        household: makeHousehold({ routines: [makeRoutine({ km: 1.5 })] }),
-        plan: makePlan({ routines: [makeAdvice(off)], worst: windowOf(worst, pm25) }),
-      });
-    expect(ids(at('moderate', 80))).toContain('short-walk-cycle');
-    expect(ids(at('severe', 300))).not.toContain('short-walk-cycle');
-    expect(ids(at('poor', 110))).not.toContain('short-walk-cycle');
+    const list = buildAlternatives({
+      household: makeHousehold({ routines: [makeRoutine({ km: 1.5 })] }),
+      plan: makePlan({ routines: [makeAdvice(off)], worst: windowOf('good', 20) }),
+    });
+    // Only the rules that do not depend on the day's air apply.
+    expect(ids(list)).toEqual(['carpool', 'no-idling']);
   });
 
   it('skips routines that have no mode or are not trips', () => {
