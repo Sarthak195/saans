@@ -4,3 +4,4 @@ coverage
 .planning
 next-env.d.ts
 tests/fixtures
+src/data/recorded

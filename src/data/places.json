@@ -1,0 +1,617 @@
+[
+  {
+    "name": "Delhi",
+    "admin1": "Delhi",
+    "lat": 28.65,
+    "lon": 77.23,
+    "kind": "city",
+    "aliases": ["NCT of Delhi", "Dilli"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1273294",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Delhi&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "New Delhi",
+    "admin1": "Delhi",
+    "lat": 28.62,
+    "lon": 77.21,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1261481",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=New%20Delhi&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Noida",
+    "admin1": "Uttar Pradesh",
+    "lat": 28.58,
+    "lon": 77.33,
+    "kind": "city",
+    "aliases": ["Gautam Buddh Nagar"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-7279746",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Noida&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Gurugram",
+    "admin1": "Haryana",
+    "lat": 28.46,
+    "lon": 77.03,
+    "kind": "city",
+    "aliases": ["Gurgaon"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1270642",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Gurugram&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Ghaziabad",
+    "admin1": "Uttar Pradesh",
+    "lat": 28.67,
+    "lon": 77.44,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1271308",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Ghaziabad&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Faridabad",
+    "admin1": "Haryana",
+    "lat": 28.41,
+    "lon": 77.31,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1271951",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Faridabad&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Mumbai",
+    "admin1": "Maharashtra",
+    "lat": 19.07,
+    "lon": 72.88,
+    "kind": "city",
+    "aliases": ["Bombay"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1275339",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Mumbai&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Thane",
+    "admin1": "Maharashtra",
+    "lat": 19.2,
+    "lon": 72.96,
+    "kind": "city",
+    "aliases": ["Thana"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1254661",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Thane&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Pune",
+    "admin1": "Maharashtra",
+    "lat": 18.52,
+    "lon": 73.86,
+    "kind": "city",
+    "aliases": ["Poona"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1259229",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Pune&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Kolkata",
+    "admin1": "West Bengal",
+    "lat": 22.56,
+    "lon": 88.36,
+    "kind": "city",
+    "aliases": ["Calcutta"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1275004",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Kolkata&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Howrah",
+    "admin1": "West Bengal",
+    "lat": 22.58,
+    "lon": 88.32,
+    "kind": "city",
+    "aliases": ["Haora"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1270396",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Howrah&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Chennai",
+    "admin1": "Tamil Nadu",
+    "lat": 13.09,
+    "lon": 80.28,
+    "kind": "city",
+    "aliases": ["Madras"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1264527",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Chennai&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Bengaluru",
+    "admin1": "Karnataka",
+    "lat": 12.97,
+    "lon": 77.59,
+    "kind": "city",
+    "aliases": ["Bangalore"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1277333",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Bengaluru&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Hyderabad",
+    "admin1": "Telangana",
+    "lat": 17.38,
+    "lon": 78.46,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1269843",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Hyderabad&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Ahmedabad",
+    "admin1": "Gujarat",
+    "lat": 23.03,
+    "lon": 72.59,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1279233",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Ahmedabad&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Jaipur",
+    "admin1": "Rajasthan",
+    "lat": 26.92,
+    "lon": 75.79,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1269515",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Jaipur&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Lucknow",
+    "admin1": "Uttar Pradesh",
+    "lat": 26.84,
+    "lon": 80.92,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1264733",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Lucknow&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Kanpur",
+    "admin1": "Uttar Pradesh",
+    "lat": 26.47,
+    "lon": 80.35,
+    "kind": "city",
+    "aliases": ["Cawnpore"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1267995",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Kanpur&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Patna",
+    "admin1": "Bihar",
+    "lat": 25.59,
+    "lon": 85.14,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1260086",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Patna&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Varanasi",
+    "admin1": "Uttar Pradesh",
+    "lat": 25.32,
+    "lon": 83.01,
+    "kind": "city",
+    "aliases": ["Benares", "Banaras", "Kashi"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1253405",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Varanasi&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Agra",
+    "admin1": "Uttar Pradesh",
+    "lat": 27.18,
+    "lon": 78.02,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1279259",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Agra&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Chandigarh",
+    "admin1": "Chandigarh",
+    "lat": 30.74,
+    "lon": 76.79,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1274746",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Chandigarh&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Ludhiana",
+    "admin1": "Punjab",
+    "lat": 30.91,
+    "lon": 75.85,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1264728",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Ludhiana&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Bhopal",
+    "admin1": "Madhya Pradesh",
+    "lat": 23.25,
+    "lon": 77.4,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1275841",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Bhopal&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Indore",
+    "admin1": "Madhya Pradesh",
+    "lat": 22.72,
+    "lon": 75.83,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1269743",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Indore&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Nagpur",
+    "admin1": "Maharashtra",
+    "lat": 21.15,
+    "lon": 79.08,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1262180",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Nagpur&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Raipur",
+    "admin1": "Chhattisgarh",
+    "lat": 21.23,
+    "lon": 81.63,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1258980",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Raipur&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Ranchi",
+    "admin1": "Jharkhand",
+    "lat": 23.34,
+    "lon": 85.31,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1258526",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Ranchi&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Bhubaneswar",
+    "admin1": "Odisha",
+    "lat": 20.27,
+    "lon": 85.83,
+    "kind": "city",
+    "aliases": ["Bhubaneshwar"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1275817",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Bhubaneswar&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Guwahati",
+    "admin1": "Assam",
+    "lat": 26.18,
+    "lon": 91.75,
+    "kind": "city",
+    "aliases": ["Gauhati"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1271476",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Guwahati&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Kochi",
+    "admin1": "Kerala",
+    "lat": 9.94,
+    "lon": 76.26,
+    "kind": "city",
+    "aliases": ["Cochin", "Ernakulam"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1273874",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Kochi&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Thiruvananthapuram",
+    "admin1": "Kerala",
+    "lat": 8.49,
+    "lon": 76.95,
+    "kind": "city",
+    "aliases": ["Trivandrum"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1254163",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Thiruvananthapuram&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Coimbatore",
+    "admin1": "Tamil Nadu",
+    "lat": 11.01,
+    "lon": 76.97,
+    "kind": "city",
+    "aliases": ["Kovai"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1273865",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Coimbatore&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Visakhapatnam",
+    "admin1": "Andhra Pradesh",
+    "lat": 17.68,
+    "lon": 83.2,
+    "kind": "city",
+    "aliases": ["Vizag", "Vishakhapatnam"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1253102",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Visakhapatnam&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Srinagar",
+    "admin1": "Jammu and Kashmir",
+    "lat": 34.09,
+    "lon": 74.81,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1255634",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Srinagar&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Dehradun",
+    "admin1": "Uttarakhand",
+    "lat": 30.32,
+    "lon": 78.03,
+    "kind": "city",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1273313",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Dehradun&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Panaji",
+    "admin1": "Goa",
+    "lat": 15.5,
+    "lon": 73.83,
+    "kind": "city",
+    "aliases": ["Panjim"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1260607",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Panjim&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Lajpat Nagar",
+    "admin1": "Delhi",
+    "lat": 28.57,
+    "lon": 77.24,
+    "kind": "locality",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-6619398",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Lajpat%20Nagar&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Andheri",
+    "admin1": "Maharashtra",
+    "lat": 19.13,
+    "lon": 72.85,
+    "kind": "locality",
+    "aliases": [],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1278633",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Andheri&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Salt Lake (Bidhannagar)",
+    "admin1": "West Bengal",
+    "lat": 22.58,
+    "lon": 88.42,
+    "kind": "locality",
+    "aliases": ["Salt Lake", "Salt Lake City", "Bidhannagar", "Bidhan Nagar", "Sector V"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-1257591",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Salt%20Lake%20City&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  },
+  {
+    "name": "Indiranagar",
+    "admin1": "Karnataka",
+    "lat": 12.97,
+    "lon": 77.64,
+    "kind": "locality",
+    "aliases": ["Indira Nagar"],
+    "retrievedOn": "2026-11-21",
+    "source": {
+      "id": "geonames-6690273",
+      "title": "Open-Meteo Geocoding (GeoNames)",
+      "url": "https://geocoding-api.open-meteo.com/v1/search?name=Indiranagar&count=5&language=en&format=json&countryCode=IN",
+      "status": "P-FETCH"
+    }
+  }
+]
