@@ -155,7 +155,16 @@ describe('the keyword reader', () => {
       'child',
     ]);
     expect(ages('My son is seven and plays cricket at 4 pm.')).toEqual(['child']);
-    expect(ages('My father is 72 and walks at 6 am.')).toEqual(['older']);
+    expect(ages('My father is 72 years old and walks at 6 am.')).toEqual(['older']);
+  });
+
+  it('needs a year word next to the age and reads months as a baby', () => {
+    // A bare number is no age: the role is guessed and the guess is listed.
+    const bare = read('My son is 72 and walks at 6 am.');
+    expect(bare.notes.some((n) => n.startsWith('Assumed'))).toBe(true);
+    expect(
+      read('My son is 8 months old and sleeps at 6 pm.').members.map((m) => m.ageBand),
+    ).toEqual(['infant']);
   });
 
   it('keeps the injected number out', () => {

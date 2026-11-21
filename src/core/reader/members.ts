@@ -1,6 +1,6 @@
 import type { Quoted, ReaderOutput } from '@/core/reader/schema';
 import { SPEAKER_TERMS, hasTerm, mentionsAny, roleBand } from '@/core/reader/terms';
-import { normalizeText, quoteInText, valueSupportedByQuote } from '@/core/text';
+import { ageYearsFromQuote, normalizeText, quoteInText, valueSupportedByQuote } from '@/core/text';
 import type { AgeBand, Member } from '@/core/types';
 
 const MAX_LABEL = 40;
@@ -67,14 +67,10 @@ function ageOf(
   notes: string[],
 ): AgeBand {
   const years = draft.years;
-  if (
-    years &&
-    quoteInText(text, years.quote) &&
-    valueSupportedByQuote(years.value, years.quote) &&
-    years.value >= 0 &&
-    years.value <= 110
-  ) {
-    return ageBandOfYears(years.value);
+  if (years && quoteInText(text, years.quote) && years.value >= 0 && years.value <= 110) {
+    // The quote must carry a year word next to the number; months or weeks read as under one.
+    const supported = ageYearsFromQuote(years.value, years.quote);
+    if (supported !== undefined) return ageBandOfYears(supported);
   }
   const word = draft.ageWord;
   if (word && quoteInText(text, word.quote) && valueSupportedByQuote(word.value, word.quote)) {
