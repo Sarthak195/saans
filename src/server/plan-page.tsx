@@ -3,7 +3,7 @@ import 'server-only';
 import type { ReactElement, ReactNode } from 'react';
 
 import { ErrorNotice, AlertNotice } from '@/components/notice';
-import { statusLine } from '@/components/copy';
+import { noteLine, statusLine } from '@/components/copy';
 import { PlanBody } from '@/components/plan-body';
 import type { RoutineAdvice } from '@/core/plan/types';
 import type { PlanDay } from '@/core/time';
@@ -15,7 +15,7 @@ import { airOf, dayOf, readPlanQuery } from '@/server/query';
 import type { SearchParams } from '@/server/query';
 import { loadPlanView } from '@/server/plan-view';
 import type { AirMode, PlanView } from '@/server/plan-view';
-import { openDraft, openHousehold } from '@/server/seal';
+import { openHousehold } from '@/server/seal';
 import { openWritten } from '@/server/written-draft';
 
 export interface PlanPageProps {
@@ -45,17 +45,6 @@ async function routineBefore(
     return earlier.plan.routines.find((r) => r.routineId === routineId);
   } catch (error) {
     // The comparison is a courtesy: a stale or bad link just leaves the line out.
-    if (error instanceof AppError) return undefined;
-    throw error;
-  }
-}
-
-/** A sealed line from an earlier step, such as why a question could not be read; our own words, never the query's. */
-function noteOf(token: string | undefined): string | undefined {
-  if (token === undefined) return undefined;
-  try {
-    return openDraft(token).reason;
-  } catch (error) {
     if (error instanceof AppError) return undefined;
     throw error;
   }
@@ -93,7 +82,13 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
   // unless a sealed one from the explain step rides along in the address.
   const briefing =
     view.unavailable === undefined
-      ? (openWritten(q.b) ?? {
+      ? (openWritten(q.b, {
+          token: props.token,
+          view,
+          lang: q.lang === 'hi' ? 'hi' : 'en',
+          audience: 'family',
+          now,
+        }) ?? {
           by: 'template' as const,
           text: templateBriefing(view.plan),
           lang: 'en' as const,
@@ -118,7 +113,7 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
           formToken: issueFormToken(now),
           keep: { air, lang: q.lang },
         }}
-        status={joinStatus(statusLine(q.status), noteOf(q.note))}
+        status={joinStatus(statusLine(q.status), noteLine(q.note))}
         before={before}
         communityHref={props.communityHref}
         editHref={`/household?from=${props.token}`}

@@ -22,9 +22,10 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
     const air = airOf(keepFromForm(form).air);
     const lang = field(form, 'lang', 2) === 'hi' ? 'hi' : 'en';
 
+    const now = new Date();
     const view = await loadPlanView({
       household: withCommunityKind(household, kind),
-      now: new Date(),
+      now,
       air,
     });
     const { community } = view;
@@ -35,7 +36,13 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
     if (view.unavailable !== undefined) return seeOther(back);
 
     const written = await writeNotice({ plan: view.plan, community, lang });
-    const n = sealWritten(written, templateNotice(view.plan, community));
+    const n = sealWritten(written, templateNotice(view.plan, community), {
+      token,
+      view,
+      lang,
+      audience: kind,
+      now,
+    });
     return seeOther(`${withQuery(`/plan/${token}/community`, { kind, air, lang, n })}#notice`);
   });
 }

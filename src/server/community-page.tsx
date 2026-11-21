@@ -57,7 +57,13 @@ export async function CommunityPage(props: CommunityPageProps): Promise<ReactEle
     );
   }
 
-  const written = openWritten(first(props.searchParams, 'n'));
+  const written = openWritten(first(props.searchParams, 'n'), {
+    token: props.token,
+    view: loaded.view,
+    lang: first(props.searchParams, 'lang') === 'hi' ? 'hi' : 'en',
+    audience: kind,
+    now,
+  });
   return (
     <CommunityView
       plan={loaded.view.plan}

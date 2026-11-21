@@ -34,3 +34,27 @@ export function statusLine(key: string | undefined): string | undefined {
     ? STATUS_LINES[key as StatusKey]
     : undefined;
 }
+
+/**
+ * Why a step could not finish, one fixed line per key. A link carries only the key, so nothing a
+ * family wrote and nothing from another plan can be put in front of a reader through the address.
+ */
+export const NOTE_LINES = {
+  filled:
+    "Some details were not in your text, so Saans filled them in, for example an adult where no age was given. Check them under 'Change the family's details'.",
+  noQuestion: 'Type a question first.',
+  noAi: 'Questions need the AI reader, which is not available right now. Pick a routine from the plan instead.',
+  notUnderstood: 'We could not tell which routine you mean. Pick one from the plan instead.',
+  whichRoutine: 'Say which routine you mean, for example the evening walk.',
+  noAir: 'There is no air data to write about right now, so try again in a while.',
+  placeNotFound:
+    'Nothing in India matched what you typed. Check the spelling, or type the name of the nearest city.',
+} as const;
+
+export type NoteKey = keyof typeof NOTE_LINES;
+
+export function noteLine(key: string | undefined): string | undefined {
+  return key !== undefined && Object.hasOwn(NOTE_LINES, key)
+    ? NOTE_LINES[key as NoteKey]
+    : undefined;
+}

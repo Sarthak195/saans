@@ -4,7 +4,7 @@ import { field, handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { writeBriefing } from '@/server/genai';
 import { loadPlanView } from '@/server/plan-view';
 import { airOf, dayOf } from '@/server/query';
-import { openHousehold, sealDraft } from '@/server/seal';
+import { openHousehold } from '@/server/seal';
 import { sealWritten } from '@/server/written-draft';
 
 interface Context {
@@ -20,16 +20,15 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
     const keep = keepFromForm(form);
     const lang = field(form, 'lang', 2) === 'hi' ? 'hi' : 'en';
 
+    const now = new Date();
     const view = await loadPlanView({
       household,
-      now: new Date(),
+      now,
       day: dayOf(keep.day),
       air: airOf(keep.air),
     });
     if (view.unavailable !== undefined) {
-      const reason = 'There is no air data to write about right now, so try again in a while.';
-      const note = sealDraft({ text: '', options: [], reason });
-      return seeOther(planPath(token, { ...keep, note }, 'plan-title'));
+      return seeOther(planPath(token, { ...keep, note: 'noAir' }, 'plan-title'));
     }
 
     const written = await writeBriefing({
@@ -39,7 +38,13 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
       household: view.household,
       lang,
     });
-    const b = sealWritten(written, templateBriefing(view.plan));
+    const b = sealWritten(written, templateBriefing(view.plan), {
+      token,
+      view,
+      lang,
+      audience: 'family',
+      now,
+    });
     return seeOther(planPath(token, { ...keep, b, lang }, 'summary'));
   });
 }

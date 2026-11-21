@@ -14,6 +14,8 @@ import { AppError } from '@/server/errors';
 const HOUSEHOLD_VERSION = 1;
 // A draft has its own version byte, so a draft token can never open as a household or the reverse.
 const DRAFT_VERSION = 2;
+// Written text has its own version too, so a draft or a household can never open as written text.
+const WRITTEN_VERSION = 3;
 const IV_BYTES = 12;
 const TAG_BYTES = 16;
 const MAX_TOKEN_CHARS = 2000;
@@ -102,21 +104,17 @@ const draftSchema = z.strictObject({
     .array(z.strictObject({ field: z.string().max(40), message: z.string().max(200) }))
     .max(40)
     .optional(),
-  /** Set when the text is a written summary or notice: who wrote it, in which language, and any note to show. */
-  by: z.enum(['gemini', 'template']).optional(),
-  lang: z.enum(['en', 'hi']).optional(),
-  note: z.string().max(300).optional(),
 });
 
 /** What is carried between a reading that needs one more answer and the page that asks for it. */
 export type Draft = z.infer<typeof draftSchema>;
 
-/** The longest text a draft can hold: a long Devanagari text can overflow a link, so it is cut. */
-export function sealDraft(draft: Draft): string {
-  let text = draft.text;
+/** Seals a value with a text field, cutting the text until the token fits: a long Devanagari text can overflow a link. */
+function sealCutting(value: { text: string }, version: number): string {
+  let text = value.text;
   for (;;) {
     try {
-      return seal({ ...draft, text }, DRAFT_VERSION);
+      return seal({ ...value, text }, version);
     } catch (error) {
       if (!(error instanceof AppError && error.kind === 'token_too_large') || text.length < 50) {
         throw error;
@@ -126,6 +124,34 @@ export function sealDraft(draft: Draft): string {
   }
 }
 
+export function sealDraft(draft: Draft): string {
+  return sealCutting(draft, DRAFT_VERSION);
+}
+
 export function openDraft(token: string): Draft {
   return open(token, DRAFT_VERSION, draftSchema, 'a draft');
+}
+
+const writtenSchema = z.strictObject({
+  text: z.string().max(MAX_TEXT),
+  /** Who wrote it, in which language, and any note to show beside it. */
+  by: z.enum(['gemini', 'template']),
+  lang: z.enum(['en', 'hi']),
+  note: z.string().max(300).optional(),
+  /** Hash of what the text was written for, so it cannot be shown beside another plan. */
+  binding: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+  /** Seconds since the epoch when it was sealed. */
+  issuedAt: z.number().int().nonnegative(),
+});
+
+/** A written summary or notice together with the binding that ties it to one plan. */
+export type SealedWritten = z.infer<typeof writtenSchema>;
+
+/** The text is cut if it cannot fit; the caller compares what comes back and swaps in plain text when it differs. */
+export function sealWrittenText(written: SealedWritten): string {
+  return sealCutting(written, WRITTEN_VERSION);
+}
+
+export function openWrittenText(token: string): SealedWritten {
+  return open(token, WRITTEN_VERSION, writtenSchema, 'written text');
 }

@@ -14,6 +14,7 @@ import { openWritten, sealWritten } from '@/server/written-draft';
 
 import { ORIGIN, formPost, locationOf, stubKeys } from '../helpers/form';
 import { DASHES } from '../helpers/plan';
+import { HINDI_SUMMARY, SUMMARY, writtenFor } from '../helpers/written';
 
 vi.mock('@/server/genai', () => ({
   readHousehold: vi.fn(),
@@ -43,8 +44,6 @@ const context = (token: string): { params: Promise<{ token: string }> } => ({
   params: Promise.resolve({ token }),
 });
 const query = (location: string): URLSearchParams => new URL(location, ORIGIN).searchParams;
-
-const SUMMARY = 'Keep the evening walk short today.';
 
 function planHtml(searchParams: Record<string, string>): Promise<string> {
   return PlanTokenPage({
@@ -92,7 +91,8 @@ describe('no page view calls Gemini', () => {
 
 describe('a written summary in the address', () => {
   it('is shown with its own label', async () => {
-    const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, 'plain');
+    const target = await writtenFor(sample.household, TOKEN);
+    const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, 'plain', target);
     const html = await planHtml({ b });
     expect(html).toContain(SUMMARY);
     expect(html).toContain('Written by Gemini from your plan');
@@ -100,7 +100,11 @@ describe('a written summary in the address', () => {
   });
 
   it('shows the template label and the note when the model was unavailable', async () => {
-    const b = sealWritten({ by: 'template', lang: 'en', text: SUMMARY, note: 'Paused.' }, 'plain');
+    const b = sealWritten(
+      { by: 'template', lang: 'en', text: SUMMARY, note: 'Paused.' },
+      'plain',
+      await writtenFor(sample.household, TOKEN),
+    );
     const html = await planHtml({ b });
     expect(html).toContain(SUMMARY);
     expect(html).toContain('Written by Saans from your plan');
@@ -108,7 +112,8 @@ describe('a written summary in the address', () => {
   });
 
   it('ignores a tampered parameter', async () => {
-    const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, 'plain');
+    const target = await writtenFor(sample.household, TOKEN);
+    const b = sealWritten({ by: 'gemini', lang: 'en', text: SUMMARY }, 'plain', target);
     const html = await planHtml({ b: `${b.slice(0, -4)}AAAA` });
     expect(html).not.toContain(SUMMARY);
     expect(html).toContain('Written by Saans from your plan');
@@ -117,7 +122,7 @@ describe('a written summary in the address', () => {
 
 describe('POST /plan/[token]/explain', () => {
   it('writes the summary on request and redirects with a sealed draft, keeping day and air', async () => {
-    vi.mocked(writeBriefing).mockResolvedValue({ by: 'gemini', lang: 'hi', text: SUMMARY });
+    vi.mocked(writeBriefing).mockResolvedValue({ by: 'gemini', lang: 'hi', text: HINDI_SUMMARY });
     const response = await explainPost(
       formPost('/plan/x/explain', { lang: 'hi', day: 'tomorrow', air: 'smog-day' }),
       context(TOKEN),
@@ -130,7 +135,16 @@ describe('POST /plan/[token]/explain', () => {
     expect(params.get('lang')).toBe('hi');
     expect(params.get('day')).toBe('tomorrow');
     expect(params.get('air')).toBe('smog-day');
-    expect(openWritten(params.get('b') ?? '')).toEqual({ by: 'gemini', lang: 'hi', text: SUMMARY });
+    const target = await writtenFor(sample.household, TOKEN, {
+      lang: 'hi',
+      day: 'tomorrow',
+      air: 'smog-day',
+    });
+    expect(openWritten(params.get('b') ?? '', target)).toEqual({
+      by: 'gemini',
+      lang: 'hi',
+      text: HINDI_SUMMARY,
+    });
     expect(writeBriefing).toHaveBeenCalledTimes(1);
     expect(vi.mocked(writeBriefing).mock.calls[0]?.[0].lang).toBe('hi');
   });
@@ -145,7 +159,8 @@ describe('POST /plan/[token]/explain', () => {
     const location = locationOf(
       await explainPost(formPost('/plan/x/explain', { lang: 'en' }), context(TOKEN)),
     );
-    expect(openWritten(query(location).get('b') ?? '')).toEqual({
+    const target = await writtenFor(sample.household, TOKEN);
+    expect(openWritten(query(location).get('b') ?? '', target)).toEqual({
       by: 'template',
       lang: 'en',
       text: SUMMARY,
@@ -164,7 +179,8 @@ describe('POST /plan/[token]/explain', () => {
     const location = locationOf(
       await explainPost(formPost('/plan/x/explain', { lang: 'hi' }), context(TOKEN)),
     );
-    const shown = openWritten(query(location).get('b') ?? '');
+    const target = await writtenFor(sample.household, TOKEN, { lang: 'hi' });
+    const shown = openWritten(query(location).get('b') ?? '', target);
     expect(shown?.by).toBe('template');
     expect(shown?.text).not.toBe(noisy);
   });
@@ -196,7 +212,8 @@ describe('POST /plan/[token]/community/notice', () => {
     expect(location.startsWith(`/plan/${SCHOOL}/community?`)).toBe(true);
     expect(location).toMatch(/#notice$/);
     expect(query(location).get('kind')).toBe('office');
-    expect(openWritten(query(location).get('n') ?? '')?.text).toBe(SUMMARY);
+    const target = await writtenFor(school.household, SCHOOL, { audience: 'office' });
+    expect(openWritten(query(location).get('n') ?? '', target)?.text).toBe(SUMMARY);
     expect(vi.mocked(writeNotice).mock.calls[0]?.[0].community.kind).toBe('office');
   });
 
