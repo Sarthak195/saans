@@ -87,3 +87,8 @@ export function household(members: Member[], routines: Routine[]): Household {
     lang: 'en',
   };
 }
+
+// Built from code points so this file does not itself contain the characters it forbids.
+export const DASHES = new RegExp(
+  `[${String.fromCodePoint(0x2013)}${String.fromCodePoint(0x2014)}]`,
+);

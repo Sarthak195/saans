@@ -8,6 +8,7 @@ import type { GridFacts } from '@/core/plan/rules-data';
 import { firstMatch } from '@/core/rules/evaluate';
 import { INTENSITIES } from '@/core/profile/schema';
 import type { Intensity, Sensitivity } from '@/core/types';
+import { DASHES } from '../helpers/plan';
 
 type Row = readonly [light: Decision, moderate: Decision, vigorous: Decision];
 
@@ -150,7 +151,7 @@ describe('rule data', () => {
       ...Object.values(NO_WINDOW),
     ];
     for (const text of texts) {
-      expect(text).not.toMatch(/[–—]/);
+      expect(text).not.toMatch(DASHES);
       expect(text).not.toMatch(/\bsafe/i);
       expect(text.replaceAll(/\{(level|when|best|weekdays)\}/g, '')).not.toMatch(/[{}]/);
     }
