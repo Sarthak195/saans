@@ -13,9 +13,9 @@ import { PM25_NAME_NUMBER } from '@/core/plan/words';
 import { extractNumbers } from '@/core/text';
 
 export interface PlanExtras {
-  home?: HomeAdvice[];
-  alternatives?: Alternative[];
-  community?: CommunityPlan;
+  home?: HomeAdvice[] | undefined;
+  alternatives?: Alternative[] | undefined;
+  community?: CommunityPlan | undefined;
 }
 
 /**

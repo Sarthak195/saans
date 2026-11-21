@@ -33,8 +33,8 @@ export interface PlanInput {
    * so the plan reads the recorded day rather than the real date.
    */
   now: Date;
-  day?: PlanDay['relative'];
-  question?: QuestionTarget;
+  day?: PlanDay['relative'] | undefined;
+  question?: QuestionTarget | undefined;
 }
 
 function strongest(evaluated: Evaluated[]): Outcome {
