@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { BandBadge, DecisionTag } from '@/components/band';
 import { DayRibbon, placeMarkers } from '@/components/day-ribbon';
@@ -20,6 +20,15 @@ import { DASHES } from '../helpers/plan';
 // axe walks the whole document, which is slow for a long form on a busy machine.
 vi.setConfig({ testTimeout: 30_000 });
 
+// The sample plan reads the clock for the air data it keeps, so the clock is fixed to the plan's own time.
+const PLAN_NOW = new Date('2026-11-21T09:00:00+05:30');
+beforeEach(() => {
+  vi.setSystemTime(PLAN_NOW);
+});
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 async function sampleView(): Promise<PlanView> {
   // A fixed reply, so the plan never depends on a recording's date.
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(airBody())));
@@ -27,7 +36,7 @@ async function sampleView(): Promise<PlanView> {
   if (sample === undefined) throw new Error('no sample');
   const view = await loadPlanView({
     household: { ...sample.household, questionTarget: { routineId: 'play', aboutToday: true } },
-    now: new Date('2026-11-21T09:00:00+05:30'),
+    now: PLAN_NOW,
     day: 'today',
   });
   return view;

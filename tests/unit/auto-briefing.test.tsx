@@ -1,11 +1,11 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import SamplePage from '@/app/plan/sample/[id]/page';
 import type { GenaiDeps, ModelRequest } from '@/server/genai/model';
 
 import { stubKeys } from '../helpers/form';
-import { MODELS } from '../helpers/genai';
+import { MODELS, RECORDED_NOW } from '../helpers/genai';
 
 // The framework cache needs the running framework, so here a Map stands in for it. The facts
 // key is what decides whether two views share a call, and that is the real one.
@@ -36,11 +36,17 @@ vi.mock('@/server/genai/config', () => ({
 
 beforeAll(stubKeys);
 beforeEach(() => {
+  // The recording is read at its own day and the page keeps the real time of day, so the clock is fixed.
+  vi.setSystemTime(RECORDED_NOW);
   store.clear();
   requests.length = 0;
   failWith = undefined;
   // No live data: the sample place falls back to its recording.
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 503 })));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 function view(id: string, searchParams: Record<string, string> = {}): Promise<string> {

@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { templateBriefing, templateNotice } from '@/core/briefing';
 import { writtenAllowance } from '@/core/plan/facts';
@@ -25,8 +25,14 @@ beforeAll(() => {
   OTHER = sealHousehold(school.household);
 });
 beforeEach(() => {
+  // The recording is read at its own day and keeps the real time of day, so the clock is fixed.
+  vi.setSystemTime(RECORDED_NOW);
   // No live data: the sample place falls back to its recording.
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 503 })));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 const gemini = (text: string, lang: 'en' | 'hi' = 'en'): WrittenText => ({
