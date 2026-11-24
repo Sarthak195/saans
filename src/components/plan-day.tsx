@@ -61,12 +61,17 @@ export function GlanceSection({ glance }: { readonly glance: Glance }): ReactEle
   );
 }
 
-export function SevereBanner(): ReactElement {
+/** `scoped` when the plan lets some hard exercise or outdoor play go ahead at chosen hours. */
+export function SevereBanner({ scoped }: { readonly scoped: boolean }): ReactElement {
   return (
     <section aria-labelledby="severe-title" className="severe">
       <h2 id="severe-title">Very bad air: three things to do</h2>
       <ol>
-        <li>Keep hard exercise and play indoors.</li>
+        <li>
+          {scoped
+            ? 'Do hard exercise and outdoor play only at the times the plan below picks, shorter and gentler where it says so, and indoors otherwise.'
+            : 'Keep hard exercise and play indoors.'}
+        </li>
         <li>
           If an adult has to go out, consider a well-fitted N95 or N99 mask; it may help on a short
           trip. Respirators are not made in small children&apos;s sizes, so keep children away from

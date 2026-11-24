@@ -79,7 +79,7 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
             />
           </section>
           <GlanceSection glance={plan.glance} />
-          {plan.severe ? <SevereBanner /> : null}
+          {plan.severe ? <SevereBanner scoped={plan.glance.activeStays} /> : null}
         </>
       )}
       <Timeline

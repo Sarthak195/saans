@@ -67,6 +67,7 @@ export function makePlan(options: PlanOptions = {}): Plan {
       worst: options.worst === undefined ? windowOf('moderate', 85) : options.worst,
       airing: options.airing ?? { kind: 'normal' },
       topAction: 'Keep outdoor time short.',
+      activeStays: false,
     },
     routines: options.routines ?? [],
     members: [],

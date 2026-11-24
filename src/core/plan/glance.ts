@@ -153,5 +153,6 @@ export function buildGlance(args: {
     worst,
     airing: airingAdvice(args.airingPm ?? args.pm, args.day, args.dayBand),
     topAction: topActionFor({ ...args, best }),
+    activeStays: args.activeStays,
   };
 }

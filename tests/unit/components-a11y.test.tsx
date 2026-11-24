@@ -146,9 +146,18 @@ describe('answer card and routine item', () => {
   });
 
   it('words the severe banner as a consideration, not an order', () => {
-    const html = renderToStaticMarkup(<SevereBanner />);
+    const html = renderToStaticMarkup(<SevereBanner scoped={false} />);
     expect(html).toContain('consider a well-fitted N95 or N99 mask; it may help on a short trip');
     expect(html).not.toMatch(/should wear|must wear/i);
+  });
+
+  it('keeps the severe banner in step with a routine that goes ahead', () => {
+    expect(renderToStaticMarkup(<SevereBanner scoped={false} />)).toContain(
+      'Keep hard exercise and play indoors.',
+    );
+    const scoped = renderToStaticMarkup(<SevereBanner scoped />);
+    expect(scoped).not.toContain('Keep hard exercise and play indoors');
+    expect(scoped).toContain('only at the times the plan below picks');
   });
 
   it('links the reason to its source when there is a url', async () => {

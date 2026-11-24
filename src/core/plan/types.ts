@@ -79,6 +79,8 @@ export interface Glance {
   worst: Window | null;
   airing: Airing;
   topAction: string;
+  /** A hard exercise or outdoor play routine goes ahead (kept, lightened or moved), so no line may say all of it stays indoors. */
+  activeStays: boolean;
 }
 
 /** What a family's question points at, once read: a routine, a member, an hour, or today rather than the plan day. */
