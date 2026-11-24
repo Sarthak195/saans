@@ -48,11 +48,14 @@ describe('sealHousehold and openHousehold', () => {
     expect(Buffer.from(token, 'base64url').toString('latin1')).not.toContain('Lajpat');
   });
 
-  it('rejects a token with any one character changed', () => {
-    const token = sealHousehold(s1.household);
-    for (const index of [0, 1, 15, Math.floor(token.length / 2), token.length - 1]) {
-      const swap = token[index] === 'A' ? 'B' : 'A';
-      const tampered = token.slice(0, index) + swap + token.slice(index + 1);
+  it('rejects a token with any one byte changed', () => {
+    // Changed as bytes, not as text: the last base64 character can differ only in padding bits,
+    // which decode to the same bytes.
+    const bytes = Buffer.from(sealHousehold(s1.household), 'base64url');
+    for (const index of [0, 1, 15, Math.floor(bytes.length / 2), bytes.length - 1]) {
+      const changed = Buffer.from(bytes);
+      changed[index] = (changed[index] ?? 0) ^ 1;
+      const tampered = changed.toString('base64url');
       expect(
         kindOf(() => openHousehold(tampered)),
         `index ${String(index)}`,
