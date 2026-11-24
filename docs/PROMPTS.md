@@ -59,7 +59,7 @@ computed. What fails a check is dropped, and the family sees a labelled fallback
 
 ## Briefing
 
-- File: `prompts/briefing.ts`. Version: `briefing-1`.
+- File: `prompts/briefing.ts`. Version: `briefing-2`.
 - Purpose: a short, kind summary of the day for the family, 4 to 6 sentences, in English or Hindi.
 - Settings: temperature 0.3, thinking `minimal`, up to 1200 output tokens, plain text.
 - When it runs: the plan page asks for the English summary when it loads (live air data only; the
@@ -108,4 +108,5 @@ prompt, bump its version, record again.
 | 2026-11-22 | reader   | reader-2   | An age quote must carry its year word; the purifier rating can be in cfm or m3/h, so its quote carries the unit and a bare rating is left out and asked for.                                            |
 | 2026-11-22 | question | question-1 | First version. Sorts one question into an intent, a target and a new time or mode, each with a quote.                                                                                                   |
 | 2026-11-22 | briefing | briefing-1 | First version. Placeholders only, 24-hour times, no reassurance, English or Hindi. Hindi gets structure without English prose after a first recording copied the English sentences into the Hindi text. |
+| 2026-11-24 | briefing | briefing-2 | Hindi facts carry Hindi words from code for each decision, the band and the day, so the Hindi text no longer copies English codes. Hindi reassurance phrases added to the tone check.                   |
 | 2026-11-22 | notice   | notice-1   | First version. Community facts only, no reassurance.                                                                                                                                                    |
