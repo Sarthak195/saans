@@ -30,8 +30,14 @@ computed. What fails a check is dropped, and the family sees a labelled fallback
   profile schema.
 - Checks: quote in text (case, accents, quotes and Devanagari digits ignored); value supported by
   its quote; times read in code from "5 pm", "6:30 am", "9 baje" and the like, so a model that
-  writes 05:00 for "5 pm" is corrected; a question is kept only when it points at someone in the
-  household, so a sentence that slipped in as a "question" is dropped.
+  writes 05:00 for "5 pm" is corrected; a stated age such as "father is 72" is read when the age
+  word or "is" sits next to the person, and a number followed by a unit, a temperature, a weight or
+  a floor is not taken as an age; a routine word is accepted in its inflected forms ("walks",
+  "jogging", "cycled") when the family wrote it that way; a daily phrase ("every morning") gives
+  seven days only when the quote names no weekday, so named weekdays win; a question is kept only
+  when it points at someone in the household and reads as a question (a question mark, a question
+  word such as "can" or "kya", or an opener such as "is", "do" or "safe"), so a statement echoed
+  back as a "question" is dropped.
 - Failure: the fallback model on quota, timeout or an outage; then a word-matching pass reads the
   same text and its output goes through the same checks, with a note that it was read by matching
   words.
@@ -89,7 +95,7 @@ computed. What fails a check is dropped, and the family sees a labelled fallback
 
 ## What is recorded
 
-`npx tsx --conditions=react-server scripts/record-genai.ts` makes real calls (about seven) and
+`npx tsx --conditions=react-server scripts/record-genai.ts` makes real calls (eight) and
 saves each reply, minified and with its provenance, in `tests/fixtures/genai/`. The tests replay
 those replies through the same code path the app uses. Replies are never edited by hand: change a
 prompt, bump its version, record again.

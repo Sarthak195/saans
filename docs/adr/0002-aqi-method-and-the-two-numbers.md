@@ -27,5 +27,5 @@ Saans shows two numbers and keeps them apart.
 
 - The breakpoints, the band wording and the three app rules live in `src/data/naqi.json`, each with a source and a status, and are parsed at load.
 - Tests pin the CPCB published vector (PM2.5 of 31, 45 and 60 give 51, 75 and 100), every band edge on both sides, the rounding rule, the CO unit change and the Severe cap.
-- The headline can differ from a station reading or an app such as Sameer, because the input is a model and the average is over 24 hours. The page says so.
+- The headline can differ from a station reading or an app such as Sameer, because the input is a model and the average is over 24 hours. The page says so. When an OpenAQ key is set the page also shows the nearest recent monitor reading beside the AQI. It never changes the AQI headline, and it affects the hourly decisions only through the precaution rule described in [ADR 0003](0003-data-sources-and-the-failure-ladder.md).
 - For tomorrow or the day after, the same method runs on the 24 hours ending at 23:00 of that day, which are forecast values. That result only sets the day's level for the rules (for example whether the Poor-day hours apply); the headline on the page is for today.

@@ -39,11 +39,11 @@ Do not put a source's name or a threshold in code. If the engine needs a new kin
 Two kinds of recording exist and neither is ever edited by hand. A hand-edited recording is not evidence of anything.
 
 - **Air data and place search.** `npx tsx scripts/record-fixtures.ts` makes real calls to Open-Meteo. It rewrites `src/data/recorded/*.json` (the five sample places and the recorded smog day) and `tests/fixtures/geocode/*.json`. Each file keeps its URL and retrieval time. Run it by hand, read the diff, and run `npm run verify`, because plans built on new air can change test expectations. Commit the recordings on their own.
-- **Gemini replies.** `npx tsx --conditions=react-server scripts/record-genai.ts` makes about seven real calls with the `GEMINI_API_KEY` from your `.env` and saves each reply, with its provenance (case, prompt version, model, date, status and input), under `tests/fixtures/genai`. The options are `--only <case>`, `--env <dir>` and `--dry`. It never prints the key. To change a recording, change the prompt, bump its version in `src/server/genai/prompts/`, add a line to the changelog in `docs/PROMPTS.md`, and record again.
+- **Gemini replies.** `npx tsx --conditions=react-server scripts/record-genai.ts` makes eight real calls with the `GEMINI_API_KEY` from your `.env` and saves each reply, with its provenance (case, prompt version, model, date, status and input), under `tests/fixtures/genai`. The options are `--only <case>`, `--env <dir>` and `--dry`. It never prints the key. To change a recording, change the prompt, bump its version in `src/server/genai/prompts/`, add a line to the changelog in `docs/PROMPTS.md`, and record again.
 
 ## Check your work
 
-`npm run verify` runs the type check, lint, format check, tests and the repository checks (no private paths tracked, no em-dashes or en-dashes in tracked text, size report). `npm run check:repo` reads `git ls-files`, so stage new files before running it. `npm run coverage` enforces the coverage thresholds, and `npm run build` makes the production build. Tests run offline: any unmocked network call fails.
+`npm run verify` runs the type check, lint, format check, tests and the repository checks (no private paths tracked, no em-dashes or en-dashes in tracked text, size report). `npm run check:repo` reads `git ls-files`, so stage new files before running it. `npm run coverage` enforces the coverage thresholds, and `npm run build` makes the production build. Tests run offline: any unmocked network call fails. The OpenAQ tests read `tests/fixtures/openaq.json`, which is trimmed from real replies (its `note` says how); the app only calls OpenAQ when `OPENAQ_API_KEY` is set.
 
 Formatting is Prettier (`npm run format`). Comments are brief and say why, not what.
 
