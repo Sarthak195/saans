@@ -36,9 +36,6 @@ export function LiveStripView({ strip }: { readonly strip: LiveStrip }): ReactEl
           <p className="small">
             CPCB 24-hour method, model estimate. Data hour {clockOf(strip.dataHour)} IST. Open-Meteo
             CAMS.
-            {strip.staleSince === undefined
-              ? ''
-              : ` Last updated ${clockOf(strip.staleSince)} IST; the live source is not reachable right now.`}
           </p>
         </>
       )}

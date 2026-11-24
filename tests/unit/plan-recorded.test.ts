@@ -189,16 +189,8 @@ describe('time of day', () => {
     expect(night.routines.find((r) => r.routineId === 'run')?.scheduled).toBe(true);
   });
 
-  it('reports a recorded series as recorded and a stale one as stale', async () => {
+  it('reports a recorded series as recorded', async () => {
     const recorded = await planOn('mumbai-andheri', family);
     expect(recorded.air).toMatchObject({ source: 'recorded', recordedOn: DAY });
-    const series = await fetchRecordedSeries('mumbai-andheri');
-    const stale = buildPlan({
-      household: family,
-      series: { ...series, stale: { lastGoodAt: '2026-11-21T14:05:00+05:30' } },
-      now: at(DAY, '15:00'),
-    });
-    expect(stale.air.staleSince).toBe('2026-11-21T14:05:00+05:30');
-    expect(planFacts(stale)).toEqual(expect.arrayContaining([14, 5]));
   });
 });

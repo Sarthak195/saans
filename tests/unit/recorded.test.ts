@@ -46,7 +46,6 @@ describe('fetchRecordedSeries', () => {
       expect(series.source).toBe('recorded');
       expect(series.recordedOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(series.fetchedAt).toBe(rawFixture(id).provenance.retrievedAt);
-      expect(series.stale).toBeUndefined();
 
       const stamps = series.hours.map((h) => h.hour);
       expect(stamps.every((s) => /^\d{4}-\d{2}-\d{2}T\d{2}:00$/.test(s))).toBe(true);

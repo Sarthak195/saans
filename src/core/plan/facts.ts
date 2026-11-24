@@ -80,7 +80,6 @@ export function writtenAllowance(plan: Plan, extras: PlanExtras = {}): WrittenAl
   const { air } = plan;
   stamp(air.dataHour);
   stamp(air.fetchedAt);
-  if (air.staleSince !== undefined) stamp(air.staleSince);
   if (air.recordedOn !== undefined) text(air.recordedOn);
   add(air.gridLat, air.gridLon, air.aqi.validHours);
   if (air.aqi.kind === 'ok') {

@@ -34,7 +34,5 @@ export interface AirSeries {
   fetchedAt: string;
   /** Set when the series is a dated recording rather than live data, as 'YYYY-MM-DD'. */
   recordedOn?: string;
-  /** Set when the live source failed and a cached copy is served instead. */
-  stale?: { lastGoodAt: string };
   station?: StationReading;
 }

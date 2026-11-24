@@ -37,7 +37,7 @@ export function stationDecision(args: {
   const { series, pm, day, now } = args;
   const none: StationDecision = { precaution: undefined, pm };
   const { station } = series;
-  if (series.source !== 'open-meteo-cams' || series.stale !== undefined) return none;
+  if (series.source !== 'open-meteo-cams') return none;
   if (station === undefined || day.relative !== 'today') return none;
   const stationPm = station.pm25;
   if (stationPm === null || !Number.isFinite(stationPm) || stationPm < 0) return none;

@@ -114,7 +114,6 @@ export function buildPlan(input: PlanInput): Plan {
     gridLon: series.gridLon,
     fetchedAt: series.fetchedAt,
     ...(series.recordedOn === undefined ? {} : { recordedOn: series.recordedOn }),
-    ...(series.stale === undefined ? {} : { staleSince: series.stale.lastGoodAt }),
     ...(series.station === undefined || series.source !== 'open-meteo-cams'
       ? {}
       : { station: series.station }),

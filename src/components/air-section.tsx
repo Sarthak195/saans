@@ -68,13 +68,6 @@ function Provenance({
       </p>
     );
   }
-  if (air.staleSince !== undefined) {
-    return (
-      <p className="notice notice--recorded">
-        Last updated {clockOf(air.staleSince)} IST. The live air data is not reachable right now.
-      </p>
-    );
-  }
   return null;
 }
 

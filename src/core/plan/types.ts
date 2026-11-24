@@ -116,7 +116,6 @@ export interface AirSummary {
   gridLon: number;
   fetchedAt: string;
   recordedOn?: string;
-  staleSince?: string;
   /** The nearby monitor's latest reading, shown beside the model value and never part of the AQI. */
   station?: StationReading;
   precaution?: StationPrecaution;

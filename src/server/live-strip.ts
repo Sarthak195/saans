@@ -12,7 +12,7 @@ import { anchoredTo } from '@/server/plan-view';
 const DELHI = { lat: 28.6, lon: 77.2 } as const;
 
 export type LiveStrip =
-  | { kind: 'now'; aqi: number; band: Band; dataHour: HourStamp; staleSince?: string }
+  | { kind: 'now'; aqi: number; band: Band; dataHour: HourStamp }
   | { kind: 'recorded'; aqi: number; band: Band; recordedOn: string }
   | { kind: 'unavailable' };
 
@@ -33,7 +33,6 @@ export async function loadLiveStrip(now: Date): Promise<LiveStrip> {
       aqi: aqi.aqi,
       band: aqi.band,
       dataHour: aqi.windowEnd,
-      ...(series.stale === undefined ? {} : { staleSince: series.stale.lastGoodAt }),
     };
   } catch (error) {
     if (error instanceof AppError) return { kind: 'unavailable' };
