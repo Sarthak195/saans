@@ -5,7 +5,7 @@ import { readMembers } from '@/core/reader/members';
 import { readRoutines } from '@/core/reader/routines';
 import type { ReaderOutput } from '@/core/reader/schema';
 import { hasSubject, resolveTarget } from '@/core/reader/target';
-import { hasTerm } from '@/core/reader/terms';
+import { hasTerm, mentionsAny } from '@/core/reader/terms';
 import { quoteInText } from '@/core/text';
 import type { Home, Household, Language, Member, Place, Routine } from '@/core/types';
 
@@ -29,6 +29,43 @@ export function detectLang(text: string): Language {
   const letters = text.match(LETTERS)?.length ?? 0;
   const hindi = text.match(DEVANAGARI)?.length ?? 0;
   return letters > 0 && hindi / letters > 0.3 ? 'hi' : 'en';
+}
+
+// A sentence asks something when it has a question mark or a question word. "My dadi walks at 7"
+// is a statement, even if the model echoes it back as the question.
+const QUESTION_WORDS = [
+  'what',
+  'when',
+  'where',
+  'which',
+  'who',
+  'why',
+  'how',
+  'can',
+  'could',
+  'should',
+  'would',
+  'will',
+  'shall',
+  'is it',
+  'are they',
+  'kya',
+  'kab',
+  'kahan',
+  'kaun',
+  'kaise',
+  'kyun',
+  'kyon',
+  'क्या',
+  'कब',
+  'कहाँ',
+  'कौन',
+  'कैसे',
+  'क्यों',
+];
+
+function asksSomething(question: string): boolean {
+  return /[?？]/u.test(question) || mentionsAny(question, QUESTION_WORDS);
 }
 
 function placeQueryOf(text: string, output: ReaderOutput): string | undefined {
@@ -58,7 +95,11 @@ export function readDraft(text: string, output: ReaderOutput): HouseholdDraft {
   // A question is kept only when it points at someone in the household. An instruction that
   // slipped into the text points at no one, so it is left out.
   const kept =
-    asked && target && hasSubject(target) && quoteInText(text, asked.text.value)
+    asked &&
+    target &&
+    hasSubject(target) &&
+    quoteInText(text, asked.text.value) &&
+    asksSomething(asked.text.value)
       ? asked.text.value
       : undefined;
 

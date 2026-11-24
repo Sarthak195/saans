@@ -1,5 +1,12 @@
 import type { Quoted, ReaderOutput } from '@/core/reader/schema';
-import { SPEAKER_TERMS, hasTerm, mentionsAny, roleBand } from '@/core/reader/terms';
+import {
+  SPEAKER_TERMS,
+  escapeRegex,
+  hasTerm,
+  mentionsAny,
+  roleBand,
+  wordsOf,
+} from '@/core/reader/terms';
 import { ageYearsFromQuote, normalizeText, quoteInText, valueSupportedByQuote } from '@/core/text';
 import type { AgeBand, Member } from '@/core/types';
 
@@ -60,6 +67,121 @@ export interface ReadMembers {
   notes: string[];
 }
 
+const YEAR_WORDS = new Set([
+  'year',
+  'years',
+  'yr',
+  'yrs',
+  'yo',
+  'saal',
+  'sal',
+  'saalon',
+  'साल',
+  'वर्ष',
+]);
+// Words after a number that make it a time, a distance, a length of time or a size, not an age.
+const NOT_AN_AGE = new Set([
+  'am',
+  'pm',
+  'baje',
+  'bje',
+  'bajey',
+  'बजे',
+  'oclock',
+  'km',
+  'kms',
+  'kilometre',
+  'kilometres',
+  'kilometer',
+  'kilometers',
+  'minute',
+  'minutes',
+  'min',
+  'mins',
+  'hour',
+  'hours',
+  'hr',
+  'hrs',
+  'day',
+  'days',
+  'week',
+  'weeks',
+  'month',
+  'months',
+  'mahine',
+  'mahina',
+  'hafte',
+  'hafta',
+  'sq',
+  'ft',
+  'cfm',
+  'aqi',
+  'percent',
+  'times',
+  'kids',
+  'people',
+  'members',
+]);
+// "is 72", "aged 72", "umar 72": the word that says the number that follows is how old someone is.
+const AGE_MARKERS = new Set([
+  'is',
+  'am',
+  'are',
+  'aged',
+  'age',
+  'hai',
+  'hain',
+  'hoon',
+  'umar',
+  'उम्र',
+]);
+// A bare number is an age only when it suits the role: a "son" of 72 is far likelier a slip.
+const PLAUSIBLE: Record<AgeBand, readonly [number, number] | undefined> = {
+  infant: undefined,
+  under5: [1, 4],
+  child: [1, 17],
+  teen: [10, 19],
+  adult: [16, 110],
+  older: [40, 110],
+};
+// "father also is 72": the marker may sit a word or two after the label, and a filler may follow it.
+const MARKER_REACH = 2;
+const FILLERS = new Set(['about', 'around', 'nearly', 'almost', 'just', 'only', 'abhi']);
+const CLAUSE_END = /(?:[.;!?\n।]+(?=\s|$))|\s+(?:and|aur|but|lekin|while)\s+/giu;
+
+/** The ages in years a text states about one person: next to a year word, after "is", or between commas. */
+function statedAgeFor(text: string, who: Quoted<string>, claimed: number): boolean {
+  const bare = String(claimed);
+  const label = wordsOf(who.quote);
+  for (const clause of text.split(CLAUSE_END)) {
+    const words = wordsOf(clause);
+    const at = words.findIndex((_, i) => label.every((w, k) => words[i + k] === w));
+    if (at < 0) continue;
+    const afterLabel = at + label.length;
+    const appositive = new RegExp(String.raw`${escapeRegex(who.quote)}\s*,\s*${bare}\s*,`, 'iu');
+    if (appositive.test(clause)) return plausible(who.value, claimed);
+    for (const [i, word] of words.entries()) {
+      if (word !== bare) continue;
+      const next = words[i + 1] ?? '';
+      if (YEAR_WORDS.has(next)) return true;
+      if (NOT_AN_AGE.has(next)) continue;
+      let before = i - 1;
+      while (before > at && FILLERS.has(words[before] ?? '')) before -= 1;
+      const markerNear = before >= afterLabel && before - afterLabel <= MARKER_REACH;
+      if (markerNear && AGE_MARKERS.has(words[before] ?? '') && plausible(who.value, claimed)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function plausible(label: string, years: number): boolean {
+  const band = isSpeaker(label) ? undefined : roleBand(label);
+  const range = band === undefined ? ([1, 110] as const) : PLAUSIBLE[band];
+  return range !== undefined && years >= range[0] && years <= range[1];
+}
+
 function ageOf(
   text: string,
   draft: ReaderOutput['members'][number],
@@ -71,6 +193,13 @@ function ageOf(
     // The quote must carry a year word next to the number; months or weeks read as under one.
     const supported = ageYearsFromQuote(years.value, years.quote);
     if (supported !== undefined) return ageBandOfYears(supported);
+    // The quote may be only the number ("72"): the text around it then has to say it is an age.
+    if (
+      valueSupportedByQuote(years.value, years.quote) &&
+      statedAgeFor(text, draft.label, years.value)
+    ) {
+      return ageBandOfYears(years.value);
+    }
   }
   const word = draft.ageWord;
   if (word && quoteInText(text, word.quote) && valueSupportedByQuote(word.value, word.quote)) {

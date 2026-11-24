@@ -15,6 +15,9 @@ import {
   firstTerm,
   hasTerm,
   mentionsAny,
+  quoteInTextAsWords,
+  sameWord,
+  wordsOf,
 } from '@/core/reader/terms';
 import { normalizeText, quoteInText, valueSupportedByQuote } from '@/core/text';
 import { LEXICON_ENTRIES, termsForValue } from '@/core/text/lexicon';
@@ -59,6 +62,23 @@ function quotesOf(draft: RoutineDraft): string[] {
     draft.km?.quote,
     draft.days?.quote,
   ].filter((q): q is string => q !== undefined);
+}
+
+/**
+ * The kind's quote is the activity word as the family wrote it, in any form: "walk" for "walks",
+ * "jogging" for "jog". Only the routine kind is read this way; every other quote stays strict.
+ */
+function kindQuoteInText(text: string, q: Quoted<unknown>): boolean {
+  return inText(text, q) || quoteInTextAsWords(text, q.quote);
+}
+
+function kindSupported(kind: RoutineKind, quote: string): boolean {
+  const words = wordsOf(quote);
+  return (
+    valueSupportedByQuote(kind, quote) ||
+    mentionsAny(quote, termsForValue(kind)) ||
+    termsForValue(kind).some((term) => words.some((word) => sameWord(term, word)))
+  );
 }
 
 function kindFromLexicon(quote: string): RoutineKind | undefined {
@@ -167,8 +187,8 @@ export function readRoutines(
     if (routines.length >= 8) break;
     const quotes = quotesOf(draft);
     const mode = modeOf(text, draft);
-    const kindQuoted = inText(text, draft.kind);
-    const claimed = kindQuoted && valueSupportedByQuote(draft.kind.value, draft.kind.quote);
+    const kindQuoted = kindQuoteInText(text, draft.kind);
+    const claimed = kindQuoted && kindSupported(draft.kind.value, draft.kind.quote);
     const fromWords = kindQuoted ? kindFromLexicon(draft.kind.quote) : undefined;
     // "I drive to Gurugram at 8:30" names no activity, but a trip by a verified mode is a commute.
     const byMode = !claimed && fromWords === undefined && mode !== undefined;

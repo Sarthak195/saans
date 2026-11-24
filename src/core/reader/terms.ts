@@ -7,7 +7,7 @@ import { normalizeText } from '@/core/text';
 
 const WORD = String.raw`[\p{L}\p{M}\p{N}]`;
 // Inflections people write: "candles", "smoking", "walked".
-const ENDINGS = '(?:s|es|ing|ning|ting|ping|ed)?';
+const ENDINGS = '(?:s|es|ing|ning|ting|ping|ging|ming|bing|ding|ed|ned|ted|ped|ged)?';
 
 export function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
@@ -89,7 +89,23 @@ const DAY_NAMES: Record<Weekday, readonly string[]> = {
 export const WEEK_ORDER: readonly Weekday[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 export const WEEKDAY_NAMES = DAY_NAMES;
 export const DAY_GROUPS: readonly { terms: readonly string[]; days: readonly Weekday[] }[] = [
-  { terms: ['every day', 'everyday', 'daily', 'roz', 'rozana', 'रोज'], days: WEEK_ORDER },
+  {
+    terms: [
+      'every day',
+      'everyday',
+      'daily',
+      'roz',
+      'rozana',
+      'रोज',
+      'every morning',
+      'every evening',
+      'every night',
+      'each morning',
+      'each evening',
+      'each day',
+    ],
+    days: WEEK_ORDER,
+  },
   {
     terms: ['weekdays', 'weekday', 'school days', 'working days', 'schooldays'],
     days: ['mon', 'tue', 'wed', 'thu', 'fri'],
@@ -196,4 +212,60 @@ export const ROLE_TERMS: readonly { band: AgeBand; terms: readonly string[] }[] 
 
 export function roleBand(label: string): AgeBand | undefined {
   return ROLE_TERMS.find((role) => mentionsAny(label, role.terms))?.band;
+}
+
+// Endings a verb takes in plain writing ("walks", "walked", "jogging", "cycled").
+const VERB_ENDINGS = new Set(['s', 'es', 'ed', 'd', 'ing']);
+const DOUBLED_ENDINGS = new Set(['ing', 'ed']);
+const IRREGULAR: Readonly<Record<string, readonly string[]>> = {
+  run: ['ran'],
+  go: ['goes', 'going', 'went', 'gone'],
+};
+
+function inflectsFrom(base: string, word: string): boolean {
+  if (word === base) return true;
+  if (IRREGULAR[base]?.includes(word) === true) return true;
+  if (base.length < 3) return false;
+  if (word.startsWith(base)) {
+    const rest = word.slice(base.length);
+    if (VERB_ENDINGS.has(rest)) return true;
+    // "jogging", "jogged": the last letter doubles.
+    const last = base.at(-1) ?? '';
+    return rest.startsWith(last) && DOUBLED_ENDINGS.has(rest.slice(1));
+  }
+  // "cycle" gives "cycling" and "cycled".
+  return (
+    base.endsWith('e') &&
+    word.startsWith(base.slice(0, -1)) &&
+    DOUBLED_ENDINGS.has(word.slice(base.length - 1))
+  );
+}
+
+/** True when two words are the same verb or noun in different forms: walk and walks, run and ran. */
+export function sameWord(a: string, b: string): boolean {
+  return inflectsFrom(a, b) || inflectsFrom(b, a);
+}
+
+/** Words of a phrase as plain tokens, with punctuation gone and digits split from letters. */
+export function wordsOf(s: string): string[] {
+  const key = normalizeText(s)
+    .replace(/(\d)(\p{L})/gu, '$1 $2')
+    .replace(/(?<!\d)[.:]|[.:](?!\d)/g, ' ')
+    .trim();
+  return key === '' ? [] : key.split(/\s+/u);
+}
+
+/**
+ * True when the quote is in the text word for word, allowing each word to be another form of the
+ * same word ("walk" in "my father walks"). Only for words the reader looks up in its own lists;
+ * a stated value is still checked with the strict matcher in the text module.
+ */
+export function quoteInTextAsWords(text: string, quote: string): boolean {
+  const wanted = wordsOf(quote);
+  if (wanted.length === 0) return false;
+  const source = wordsOf(text);
+  for (let at = 0; at + wanted.length <= source.length; at += 1) {
+    if (wanted.every((word, i) => sameWord(word, source[at + i] ?? ''))) return true;
+  }
+  return false;
 }

@@ -167,6 +167,30 @@ describe('the keyword reader', () => {
     ).toEqual(['infant']);
   });
 
+  it('reads a stated age next to a person word, with the walk', () => {
+    const draft = read('My father is 72 and walks at 6 am in Lajpat Nagar');
+    expect(draft.members.map((m) => [m.label, m.ageBand])).toEqual([['Father', 'older']]);
+    expect(draft.routines.map((r) => [r.kind, r.start])).toEqual([['walk', '06:00']]);
+    expect(draft.notes.join(' ')).not.toContain('Assumed an adult');
+  });
+
+  it('reads a walk written as "walks" and never takes a statement for a question', () => {
+    const draft = read('My dadi walks every morning at 7 in Lajpat Nagar');
+    expect(draft.members.map((m) => m.ageBand)).toEqual(['older']);
+    expect(draft.routines.map((r) => [r.kind, r.start, r.days.length])).toEqual([
+      ['walk', '07:00', 7],
+    ]);
+    expect(draft.question).toBeUndefined();
+    expect(draft.target).toBeUndefined();
+  });
+
+  it('does not take a time, a distance or a count for an age', () => {
+    const ages = (text: string) => read(text).members.map((m) => m.ageBand);
+    expect(ages('My father walks at 6 am.')).toEqual(['adult']);
+    expect(ages('My father walks 5 km at 6 am.')).toEqual(['adult']);
+    expect(ages('My father is 6 km from the park and walks at 6 am.')).toEqual(['adult']);
+  });
+
   it('keeps the injected number out', () => {
     const draft = read(INJECTION_TEXT);
     expect(JSON.stringify(draft)).not.toMatch(/\b20\b/);
