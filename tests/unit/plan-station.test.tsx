@@ -124,6 +124,8 @@ describe('a nearby monitor that reads worse than the model', () => {
     const tomorrow = planFor({ station: station() }, { day: 'tomorrow' });
     expect(tomorrow.air.precaution).toBeUndefined();
     expect(decide(tomorrow)).toEqual(decide(planFor({}, { day: 'tomorrow' })));
+    // The reading still describes the air now, so tomorrow's page shows it beside today's AQI.
+    expect(tomorrow.air.station?.pm25).toBe(station().pm25);
   });
 
   it('does not cover hours that fall on the next day', () => {
