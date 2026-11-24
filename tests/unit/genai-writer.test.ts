@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { briefingFacts } from '@/core/briefing';
+import { DECISION_HI, briefingFacts } from '@/core/briefing';
 import type { GenaiDeps, ModelCall, ModelRequest } from '@/server/genai/model';
 import { briefingWithDeps } from '@/server/genai/writer';
 
@@ -55,6 +55,20 @@ describe('the recorded briefing', () => {
     expect(JSON.parse(seen[0]?.input ?? '{}')).toMatchObject({ lang: 'hi' });
     // A Hindi briefing is written from the structure of the plan, not its English sentences.
     expect(seen[0]?.input).not.toContain('Keep hard exercise');
+  });
+
+  it('is given Hindi words for the decisions and the day, and writes without English words', async () => {
+    const seen: ModelRequest[] = [];
+    const written = await briefing(depsWith(replay('briefing-hi', seen)), 'hi');
+    const sent = seen[0]?.input ?? '';
+    expect(sent).toContain(DECISION_HI.indoors);
+    expect(sent).toContain('शनिवार, 21 नवंबर');
+    expect(sent).not.toMatch(/"decision":"(?:keep|lighten|move|indoors|essential)"/);
+    expect(sent).not.toMatch(/Very Poor|Moderately polluted|Sat 21 Nov/);
+    // What the model wrote, before the family's labels go in, is Hindi but for the placeholders.
+    const raw = loadFixture('briefing-hi').reply.replace(/routine_\d+/g, '');
+    expect(raw).not.toMatch(/[A-Za-z]/);
+    expect(written.text).not.toMatch(/\b(?:keep|lighten|move|indoors|essential)\b/i);
   });
 
   it('keeps names and health words out of the facts', () => {

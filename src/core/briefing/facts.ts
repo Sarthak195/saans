@@ -1,6 +1,6 @@
 import { BAND_LABEL } from '@/core/aqi';
 import type { Band } from '@/core/aqi';
-import type { Decision } from '@/core/decision';
+import { ACTIVITY_HI, BAND_HI, DECISION_HI, dayHindi } from '@/core/briefing/hindi';
 import type {
   Alternative,
   CommunityPlan,
@@ -29,7 +29,8 @@ export interface RoutineFacts {
   ref: string;
   member: string;
   activity: string;
-  decision: Decision;
+  /** The decision as a code, or as a Hindi phrase when the briefing is in Hindi. */
+  decision: string;
   at: string;
   minutes: number;
   onThisDay: boolean;
@@ -66,28 +67,35 @@ export interface NoticeFacts {
   weeklyEffect?: string;
 }
 
-function windowOf(w: Window | null): WindowFacts | null {
-  return w === null ? null : { from: w.start, to: w.end, pm25: w.pm25, level: BAND_LABEL[w.level] };
+// Level names: English by default, CPCB's Hindi names for a Hindi briefing.
+function labelOf(band: Band, hindi: boolean): string {
+  return hindi ? BAND_HI[band] : BAND_LABEL[band];
 }
 
-function levelOf(band: Band | null): string | undefined {
-  return band === null ? undefined : BAND_LABEL[band];
+function windowOf(w: Window | null, hindi = false): WindowFacts | null {
+  return w === null
+    ? null
+    : { from: w.start, to: w.end, pm25: w.pm25, level: labelOf(w.level, hindi) };
 }
 
-function aqiOf(plan: Plan): { value: number; level: string } | null {
+function levelOf(band: Band | null, hindi: boolean): string | undefined {
+  return band === null ? undefined : labelOf(band, hindi);
+}
+
+function aqiOf(plan: Plan, hindi = false): { value: number; level: string } | null {
   return plan.air.aqi.kind === 'ok'
-    ? { value: plan.air.aqi.aqi, level: BAND_LABEL[plan.air.aqi.band] }
+    ? { value: plan.air.aqi.aqi, level: labelOf(plan.air.aqi.band, hindi) }
     : null;
 }
 
-function routineFacts(r: RoutineAdvice, prose: boolean): RoutineFacts {
-  const window = windowOf(r.window ?? null);
-  const level = levelOf(r.level);
+function routineFacts(r: RoutineAdvice, prose: boolean, hindi: boolean): RoutineFacts {
+  const window = windowOf(r.window ?? null, hindi);
+  const level = levelOf(r.level, hindi);
   return {
     ref: r.ref,
     member: r.memberRef,
-    activity: r.kind.replace('_', ' '),
-    decision: r.decision,
+    activity: hindi ? ACTIVITY_HI[r.kind] : r.kind.replace('_', ' '),
+    decision: hindi ? DECISION_HI[r.decision] : r.decision,
     at: r.start,
     minutes: r.minutes,
     onThisDay: r.scheduled,
@@ -102,23 +110,26 @@ function routineFacts(r: RoutineAdvice, prose: boolean): RoutineFacts {
 /**
  * The facts for a briefing. With `prose` the plan's own English sentences go along, for the model
  * to put in its own words; without it only the structure goes (decisions, times, numbers), which
- * is what a Hindi briefing needs, because a model asked to translate prose tends to copy it.
+ * is what a Hindi briefing needs, because a model asked to translate prose tends to copy it. With
+ * `hindi` the decisions, level names, activities and the day come as Hindi words from the code, so
+ * the model has nothing in English to carry over.
  */
 export function briefingFacts(
   input: { plan: Plan; home: HomeAdvice[]; alternatives: Alternative[] },
   prose = true,
+  hindi = false,
 ): BriefingFacts {
   const { plan } = input;
   const answer = plan.answer;
   return {
-    day: plan.day.label,
+    day: hindi ? dayHindi(plan.day) : plan.day.label,
     severe: plan.severe,
-    aqi: aqiOf(plan),
-    cleanestWindow: windowOf(plan.glance.best),
-    worstWindow: windowOf(plan.glance.worst),
+    aqi: aqiOf(plan, hindi),
+    cleanestWindow: windowOf(plan.glance.best, hindi),
+    worstWindow: windowOf(plan.glance.worst, hindi),
     ...(prose ? { topAction: plan.glance.topAction } : {}),
     members: plan.members.map((m) => ({ ref: m.memberRef, sensitivity: m.sensitivity })),
-    routines: plan.routines.map((r) => routineFacts(r, prose)),
+    routines: plan.routines.map((r) => routineFacts(r, prose, hindi)),
     ...(answer === undefined
       ? {}
       : {
