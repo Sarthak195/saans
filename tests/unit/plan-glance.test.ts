@@ -296,7 +296,6 @@ describe('the top action and the routine decisions', () => {
 });
 
 describe('the top action never contradicts the routine decisions', () => {
-
   function contradictions(home: Household, p: Plan): string[] {
     const found: string[] = [];
     const text = p.glance.topAction;
@@ -307,13 +306,13 @@ describe('the top action never contradicts the routine decisions', () => {
       const hard = source?.intensity !== 'light' || r.kind === 'sport' || r.kind === 'outdoor_play';
       return hard && r.decision !== 'indoors';
     });
-    if (text.startsWith("Keep hard exercise and outdoor play indoors") && hardStays)
+    if (text.startsWith('Keep hard exercise and outdoor play indoors') && hardStays)
       found.push('indoors line with a hard routine that stays');
     if (text.includes('go ahead as planned') && [...decisions].some((d) => d !== 'keep'))
       found.push('go-ahead line with a changed routine');
-    if (text.startsWith("Bring the routines marked indoors") && !decisions.has('indoors'))
+    if (text.startsWith('Bring the routines marked indoors') && !decisions.has('indoors'))
       found.push('indoors line with no routine indoors');
-    if (text.startsWith("Move the routines marked") && !decisions.has('move'))
+    if (text.startsWith('Move the routines marked') && !decisions.has('move'))
       found.push('move line with no routine moved');
     return found;
   }
