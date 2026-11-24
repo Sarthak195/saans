@@ -25,6 +25,7 @@ import { readWithDeps } from '@/server/genai/reader';
 import { briefingWithDeps, noticeWithDeps } from '@/server/genai/writer';
 
 import {
+  FATHER_TEXT,
   FIXTURE_DIR,
   INJECTION_TEXT,
   QUESTION_TEXT,
@@ -127,6 +128,12 @@ function cases(
       prompt: READER_PROMPT_VERSION,
       input: { text: 'injection' },
       run: (call) => readWithDeps({ text: INJECTION_TEXT }, deps(call)),
+    },
+    {
+      name: 'reader-father',
+      prompt: READER_PROMPT_VERSION,
+      input: { text: 'father' },
+      run: (call) => readWithDeps({ text: FATHER_TEXT }, deps(call)),
     },
     {
       name: 'briefing-en',

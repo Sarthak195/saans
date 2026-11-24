@@ -5,7 +5,14 @@ import type { ModelCall, ModelRequest } from '@/server/genai/model';
 import { readWithDeps } from '@/server/genai/reader';
 import type { ReaderResult } from '@/server/genai/types';
 
-import { INJECTION_TEXT, depsWith, loadFixture, replay, sampleText } from '../helpers/genai';
+import {
+  FATHER_TEXT,
+  INJECTION_TEXT,
+  depsWith,
+  loadFixture,
+  replay,
+  sampleText,
+} from '../helpers/genai';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -76,6 +83,22 @@ describe('reading the recorded replies', () => {
     expect(result.household.lang).toBe('en');
     for (const pair of quotedPairs(JSON.parse(loadFixture('reader-s2').reply))) {
       expect(quoteInText(text, pair.quote)).toBe(true);
+    }
+  });
+
+  it('keeps a stated age and a walk the text writes as "walks"', async () => {
+    const result = household(
+      await readWithDeps({ text: FATHER_TEXT }, depsWith(replay('reader-father'))),
+    );
+    expect(result.household.members).toEqual([
+      expect.objectContaining({ label: 'Father', ageBand: 'older' }),
+    ]);
+    expect(result.household.routines).toEqual([
+      expect.objectContaining({ kind: 'walk', start: '06:00' }),
+    ]);
+    expect(result.notes.join(' ')).not.toContain('Assumed an adult');
+    for (const pair of quotedPairs(JSON.parse(loadFixture('reader-father').reply))) {
+      expect(typeof pair.quote).toBe('string');
     }
   });
 
