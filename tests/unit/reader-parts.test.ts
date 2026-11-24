@@ -74,6 +74,11 @@ describe('durations and days', () => {
     ['on weekends', ['sat', 'sun']],
     ['Saturdays and Sundays', ['sat', 'sun']],
     ['every day', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']],
+    ['every morning', ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']],
+    ['every morning on weekdays', ['mon', 'tue', 'wed', 'thu', 'fri']],
+    ['every evening Mon to Fri', ['mon', 'tue', 'wed', 'thu', 'fri']],
+    ['walks every evening on weekends', ['sat', 'sun']],
+    ['each morning Sat and Sun', ['sat', 'sun']],
     ['Sat to Mon', ['mon', 'sat', 'sun']],
     ['tomorrow', []],
   ])('reads the days in %s', (quote, expected) => {

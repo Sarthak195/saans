@@ -156,7 +156,9 @@ function dayOf(word: string): Weekday | undefined {
 export function daysIn(quote: string): Weekday[] {
   // A hyphen between two day names is a range ("Mon-Fri"), which normalising would turn into a list.
   const text = normalizeText(quote.replace(DASH_BETWEEN, ' to '));
-  const group = DAY_GROUPS.find((g) => mentionsAny(text, g.terms));
+  // The first group is "every day"; it only applies when nothing narrower is named.
+  const [daily, ...narrower] = DAY_GROUPS;
+  const group = narrower.find((g) => mentionsAny(text, g.terms));
   const names = text.split(' ').map(dayOf);
   const tokens = text.split(' ');
   const days = new Set<Weekday>(group?.days ?? []);
@@ -169,5 +171,7 @@ export function daysIn(quote: string): Weekday[] {
         : undefined;
     for (const d of end === undefined ? [day] : daysBetween(day, end)) days.add(d);
   });
+  if (days.size === 0 && daily !== undefined && mentionsAny(text, daily.terms))
+    return [...daily.days];
   return WEEK_ORDER.filter((day) => days.has(day));
 }
