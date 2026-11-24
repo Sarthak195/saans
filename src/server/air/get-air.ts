@@ -1,7 +1,7 @@
 import 'server-only';
 
 import type { AirSeries } from '@/core/air/types';
-import { fetchAirSeries, type FetchAirOptions } from '@/server/air/open-meteo';
+import { fetchAirSeries, isInIndia, type FetchAirOptions } from '@/server/air/open-meteo';
 import { fetchStation } from '@/server/air/openaq';
 import { fetchRecordedSeries, recordedIdForPoint } from '@/server/air/recorded';
 import { getEnv } from '@/server/env';
@@ -10,6 +10,11 @@ import { AppError } from '@/server/errors';
 export interface GetAirOptions extends FetchAirOptions {
   /** The OpenAQ key, injectable for tests; by default it comes from the environment. */
   openAqKey?: string;
+  /**
+   * Also look for a nearby monitoring station. Only today's plan reads it, so every other caller
+   * leaves it off and no OpenAQ request is made for data that would be thrown away.
+   */
+  station?: boolean;
 }
 
 /** The key if the environment is set up and has one. A broken environment is reported elsewhere. */
@@ -33,10 +38,13 @@ export async function getAirSeries(
   lon: number,
   opts: GetAirOptions = {},
 ): Promise<AirSeries> {
-  const { openAqKey, ...airOpts } = opts;
+  const { openAqKey, station: wantStation = false, ...airOpts } = opts;
   // Started first so both requests run together; fetchStation never rejects, so a failed
-  // series leaves nothing unhandled behind it.
-  const station = fetchStation(lat, lon, openAqKey ?? envOpenAqKey(), airOpts);
+  // series leaves nothing unhandled behind it. A point outside India is refused below, so it asks nothing.
+  const station =
+    wantStation && isInIndia(lat, lon)
+      ? fetchStation(lat, lon, openAqKey ?? envOpenAqKey(), airOpts)
+      : Promise.resolve(undefined);
   try {
     const series = await fetchAirSeries(lat, lon, airOpts);
     const reading = await station;

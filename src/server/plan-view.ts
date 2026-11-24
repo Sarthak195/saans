@@ -15,7 +15,7 @@ import type {
   Plan,
   QuestionTarget,
 } from '@/core/plan/types';
-import { istParts } from '@/core/time';
+import { defaultPlanDay, istParts, planDays } from '@/core/time';
 import type { PlanDay } from '@/core/time';
 import type { Household } from '@/core/types';
 import { getAirSeries } from '@/server/air/get-air';
@@ -75,10 +75,17 @@ async function seriesFor(
   household: Household,
   air: AirMode,
   now: Date,
+  planDay: PlanDay['relative'] | undefined,
 ): Promise<{ series: AirSeries; unavailable?: AppErrorKind }> {
   if (air === 'smog-day') return { series: await fetchRecordedSeries(SMOG_DAY_ID) };
   try {
-    return { series: await getAirSeries(household.place.lat, household.place.lon) };
+    // A nearby monitor only changes today's advice, so no other day asks for one.
+    const today =
+      (planDays(now).find((d) => d.relative === planDay) ?? defaultPlanDay(now)).relative ===
+      'today';
+    return {
+      series: await getAirSeries(household.place.lat, household.place.lon, { station: today }),
+    };
   } catch (error) {
     if (!(error instanceof AppError) || error.kind === 'outside_india') throw error;
     const series: AirSeries = {
@@ -108,7 +115,7 @@ export async function loadPlanView(input: PlanViewInput): Promise<PlanView> {
   const mode = input.air ?? 'live';
   const household: Household =
     mode === 'smog-day' ? { ...input.household, place: { ...DELHI } } : input.household;
-  const { series, unavailable } = await seriesFor(household, mode, input.now);
+  const { series, unavailable } = await seriesFor(household, mode, input.now, input.day);
 
   const now =
     series.source === 'recorded' && series.recordedOn !== undefined

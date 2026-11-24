@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { unstable_cache } from 'next/cache';
 import { z } from 'zod';
 
 import type { StationReading } from '@/core/air/types';
@@ -11,7 +12,13 @@ import { istIso, roundCoord } from '@/server/air/open-meteo-shape';
 
 const BASE = 'https://api.openaq.org/v3';
 const TIMEOUT_MS = 2000;
-const SEARCH_RADIUS_M = 15_000;
+/** A monitor farther than this from the household's own point is a different part of the city. */
+export const MAX_STATION_KM = 10;
+// The search is centred on the point rounded to 0.1 degree, which can sit about 8 km from the true
+// point, so the search reaches that much past the cap and nothing inside the cap is missed.
+const SEARCH_RADIUS_M = 18_000;
+/** After a failed lookup (a rate limit, a timeout) the same place is not asked again for this long. */
+const FAILURE_PAUSE_SECONDS = 60;
 // Results come back unsorted and cut at the limit, so a small limit can drop the nearest one.
 const SEARCH_LIMIT = 100;
 const LOCATIONS_REVALIDATE_SECONDS = 3 * 60 * 60;
@@ -59,7 +66,24 @@ export interface StationOptions {
   /** The clock, injectable so a test can fix the time. */
   now?: () => Date;
   signal?: AbortSignal;
+  /** Remembers the outcome of a lookup for a short time; injectable so a test can see it. */
+  remember?: Remember;
 }
+
+export type Remember = <T>(key: string[], produce: () => Promise<T>) => Promise<T>;
+
+/**
+ * The framework's data cache for one minute, so a failed lookup is not repeated on every page
+ * view, and one lookup stands in for the several views of a place within the minute. Outside the
+ * framework (a script, a test) it is not there, and the lookup simply runs; `produce` never throws.
+ */
+const rememberBriefly: Remember = async (key, produce) => {
+  try {
+    return await unstable_cache(produce, key, { revalidate: FAILURE_PAUSE_SECONDS })();
+  } catch {
+    return produce();
+  }
+};
 
 function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
   const rad = (degrees: number): number => (degrees * Math.PI) / 180;
@@ -105,7 +129,7 @@ export function chooseLocation(
     if (sensorIds(location, 'pm25').length === 0) continue;
     if (!location.datetimeLast || !isFresh(location.datetimeLast.utc, now)) continue;
     const distanceKm = kmFrom(lat, lon, location);
-    if (distanceKm === null) continue;
+    if (distanceKm === null || distanceKm > MAX_STATION_KM) continue;
     if (best === null || distanceKm < best.distanceKm) best = { location, distanceKm };
   }
   return best;
@@ -174,18 +198,12 @@ async function getJson(
   return (await response.json()) as unknown;
 }
 
-/**
- * The nearest recent station reading for a point, or undefined. With no key it makes no call.
- * Any failure (timeout, 401, 429, odd shape) also gives undefined, because the station is a
- * bonus on top of the model data and never a reason for a slower or broken page.
- */
-export async function fetchStation(
+async function lookUp(
   lat: number,
   lon: number,
-  apiKey: string | undefined,
-  opts: StationOptions = {},
-): Promise<StationReading | undefined> {
-  if (!apiKey) return undefined;
+  apiKey: string,
+  opts: StationOptions,
+): Promise<StationReading | null> {
   try {
     const timeout = AbortSignal.timeout(TIMEOUT_MS);
     const signal = opts.signal ? AbortSignal.any([opts.signal, timeout]) : timeout;
@@ -195,7 +213,7 @@ export async function fetchStation(
       await getJson(locationsUrl(lat, lon), apiKey, LOCATIONS_REVALIDATE_SECONDS, signal),
     );
     const chosen = chooseLocation(locations.results, lat, lon, now);
-    if (chosen === null) return undefined;
+    if (chosen === null) return null;
 
     const latest = latestBodySchema.parse(
       await getJson(
@@ -205,8 +223,27 @@ export async function fetchStation(
         signal,
       ),
     );
-    return toStation(chosen.location, chosen.distanceKm, latest.results, now) ?? undefined;
+    return toStation(chosen.location, chosen.distanceKm, latest.results, now);
   } catch {
-    return undefined;
+    return null;
   }
+}
+
+/**
+ * The nearest recent station reading for a point, or undefined. With no key it makes no call.
+ * Any failure (timeout, 401, 429, odd shape) also gives undefined, because the station is a
+ * bonus on top of the model data and never a reason for a slower or broken page. The outcome,
+ * a failure included, is remembered for a minute per place, so a rate limit is not hit again by
+ * every page view.
+ */
+export async function fetchStation(
+  lat: number,
+  lon: number,
+  apiKey: string | undefined,
+  opts: StationOptions = {},
+): Promise<StationReading | undefined> {
+  if (!apiKey) return undefined;
+  const key = ['saans-openaq-station', locationsUrl(lat, lon)];
+  const found = await (opts.remember ?? rememberBriefly)(key, () => lookUp(lat, lon, apiKey, opts));
+  return found ?? undefined;
 }

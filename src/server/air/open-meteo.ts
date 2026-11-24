@@ -69,18 +69,22 @@ async function getJson(url: string, signal: AbortSignal | undefined): Promise<un
   throw failure;
 }
 
+export function isInIndia(lat: number, lon: number): boolean {
+  return (
+    lat >= INDIA_BOUNDS.minLat &&
+    lat <= INDIA_BOUNDS.maxLat &&
+    lon >= INDIA_BOUNDS.minLon &&
+    lon <= INDIA_BOUNDS.maxLon
+  );
+}
+
 /** The hourly air series for a point, from Open-Meteo (CAMS). Coordinates are rounded to 0.1 degree. */
 export async function fetchAirSeries(
   lat: number,
   lon: number,
   opts: FetchAirOptions = {},
 ): Promise<AirSeries> {
-  const inIndia =
-    lat >= INDIA_BOUNDS.minLat &&
-    lat <= INDIA_BOUNDS.maxLat &&
-    lon >= INDIA_BOUNDS.minLon &&
-    lon <= INDIA_BOUNDS.maxLon;
-  if (!inIndia) throw new AppError('outside_india', 'The point is outside India');
+  if (!isInIndia(lat, lon)) throw new AppError('outside_india', 'The point is outside India');
 
   const body = airBodySchema.safeParse(await getJson(airUrl(lat, lon), opts.signal));
   if (!body.success) {

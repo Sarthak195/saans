@@ -259,6 +259,19 @@ describe('chooseLocation', () => {
     expect(chooseLocation(bare, POINT.lat, POINT.lon, NOW)?.distanceKm).toBe(5.537);
   });
 
+  it('drops a monitor farther than the cap from the exact point', () => {
+    const far = LOCATIONS.filter((l) => l.id === 17).map((l) => ({
+      ...l,
+      coordinates: { latitude: POINT.lat + 0.2, longitude: POINT.lon },
+    }));
+    expect(chooseLocation(far, POINT.lat, POINT.lon, NOW)).toBeNull();
+    const near = LOCATIONS.filter((l) => l.id === 17).map((l) => ({
+      ...l,
+      coordinates: { latitude: POINT.lat + 0.08, longitude: POINT.lon },
+    }));
+    expect(chooseLocation(near, POINT.lat, POINT.lon, NOW)?.distanceKm).toBeLessThan(10);
+  });
+
   it('gives nothing for a station that lists no last reading', () => {
     const unknown = LOCATIONS.filter((l) => l.id === 15);
     expect(unknown[0]?.datetimeLast).toBeNull();
@@ -266,14 +279,60 @@ describe('chooseLocation', () => {
   });
 });
 
+describe('remembering a failed lookup', () => {
+  const memory = () => {
+    const kept = new Map<string, Promise<unknown>>();
+    const remember = <T>(key: string[], produce: () => Promise<T>): Promise<T> => {
+      const id = key.join('|');
+      const hit = kept.get(id);
+      if (hit) return hit as Promise<T>;
+      const made = produce();
+      kept.set(id, made);
+      return made;
+    };
+    return remember;
+  };
+
+  it('asks OpenAQ once for a place that answered 429, however often it is viewed', async () => {
+    const stub = stubFetch({ locations: new Response('', { status: 429 }) });
+    const remember = memory();
+    for (let view = 0; view < 3; view += 1) {
+      expect(await fetchStation(POINT.lat, POINT.lon, KEY, { now, remember })).toBeUndefined();
+    }
+    expect(stub.urls()).toHaveLength(1);
+  });
+
+  it('keeps a separate memory for each place', async () => {
+    const stub = stubFetch({ locations: new Response('', { status: 429 }) });
+    const remember = memory();
+    await fetchStation(POINT.lat, POINT.lon, KEY, { now, remember });
+    await fetchStation(19.1, 72.9, KEY, { now, remember });
+    expect(stub.urls()).toHaveLength(2);
+  });
+});
+
 describe('getAirSeries with a station', () => {
+  it('asks OpenAQ nothing unless the caller wants the station', async () => {
+    const stub = stubFetch();
+    const series = await getAirSeries(POINT.lat, POINT.lon, { now, openAqKey: KEY });
+    expect(series.station).toBeUndefined();
+    expect(stub.urls().every((u) => u.includes('open-meteo'))).toBe(true);
+  });
+
+  it('asks OpenAQ nothing for a point outside India', async () => {
+    const stub = stubFetch();
+    await getAirSeries(51.5, -0.1, { now, openAqKey: KEY, station: true }).catch(() => undefined);
+    expect(stub.urls().some((u) => u.includes('openaq'))).toBe(false);
+  });
+
   it('attaches the station to a live series, fetching both at the same time', async () => {
     const stub = stubFetch();
-    const pending = getAirSeries(POINT.lat, POINT.lon, { now, openAqKey: KEY });
-    // Both requests are out before either has answered.
-    expect(stub.urls()).toHaveLength(2);
+    const pending = getAirSeries(POINT.lat, POINT.lon, { now, openAqKey: KEY, station: true });
+    // The station lookup starts without waiting for the model data.
+    await vi.waitFor(() => {
+      expect(stub.urls().some((u) => u.includes('api.openaq.org'))).toBe(true);
+    });
     expect(stub.urls().some((u) => u.includes('open-meteo'))).toBe(true);
-    expect(stub.urls().some((u) => u.includes('api.openaq.org'))).toBe(true);
     const series = await pending;
     expect(series.source).toBe('open-meteo-cams');
     expect(series.station?.name).toBe('R K Puram, Delhi - DPCC');
@@ -281,21 +340,21 @@ describe('getAirSeries with a station', () => {
 
   it('leaves the series as it was when the station call fails', async () => {
     stubFetch({ locations: new Response('', { status: 401 }) });
-    const series = await getAirSeries(POINT.lat, POINT.lon, { now, openAqKey: KEY });
+    const series = await getAirSeries(POINT.lat, POINT.lon, { now, openAqKey: KEY, station: true });
     expect(series.source).toBe('open-meteo-cams');
     expect(series.station).toBeUndefined();
   });
 
   it('never puts a station on a recorded series', async () => {
     stubFetch({ air: new Response('', { status: 503 }) });
-    const series = await getAirSeries(19.13, 72.85, { now, openAqKey: KEY });
+    const series = await getAirSeries(19.13, 72.85, { now, openAqKey: KEY, station: true });
     expect(series.source).toBe('recorded');
     expect(series.station).toBeUndefined();
   });
 
   it('asks for no station without a key', async () => {
     const stub = stubFetch();
-    const series = await getAirSeries(POINT.lat, POINT.lon, { now });
+    const series = await getAirSeries(POINT.lat, POINT.lon, { now, station: true });
     expect(series.station).toBeUndefined();
     expect(stub.urls().every((u) => u.includes('open-meteo'))).toBe(true);
   });
