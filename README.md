@@ -208,11 +208,11 @@ All taken on 2026-11-24 (IST), with the commands shown.
 
 | What                         | Result                                                                                                                   | Command                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
-| Tests                        | 1,479 tests in 68 files, all passing                                                                                     | `npx vitest run`        |
-| Coverage, all of `src`       | 96.59% of lines (95.08% statements, 89.2% branches, 96.61% functions)                                                    | `npm run coverage`      |
+| Tests                        | 1,482 tests in 68 files, all passing                                                                                     | `npx vitest run`        |
+| Coverage, all of `src`       | 96.59% of lines (95.09% statements, 89.22% branches, 96.61% functions)                                                   | `npm run coverage`      |
 | Coverage thresholds enforced | 80% lines overall, 90% lines under `src/core` (the run passes)                                                           | `vitest.config.mts`     |
 | Tracked files                | 313 files, 1.56 MB (`npm run check:repo`)                                                                                | `git ls-files \| wc -l` |
-| Lines                        | 14,054 in `src` (without `src/data`), 4,301 in `src/data`, 12,774 in `tests` (without fixtures), 385 in `tests/fixtures` | `npm run check:repo`    |
+| Lines                        | 14,093 in `src` (without `src/data`), 4,301 in `src/data`, 12,809 in `tests` (without fixtures), 385 in `tests/fixtures` | `npm run check:repo`    |
 | Data rows                    | 28 decision-grid rows, 25 indoor rows, 18 community rows, 7 trip rules, 9 transit cities, 41 listed places, 6 samples    | the command below       |
 
 ```
