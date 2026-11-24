@@ -6,6 +6,7 @@ import {
   CPCB_URL,
   DISCLAIMER_LINE,
   GEONAMES_URL,
+  OPENAQ_URL,
   OPEN_METEO_URL,
 } from '@/components/copy';
 
@@ -49,6 +50,15 @@ export default function AboutPage(): ReactElement {
               the CPCB air quality site
             </a>
             .
+          </li>
+          <li>
+            Measured nearby: the latest PM2.5 and PM10 from the nearest CPCB or state board monitor
+            within 10 km that reported in the last 4 hours, through{' '}
+            <a href={OPENAQ_URL} rel="noopener noreferrer">
+              OpenAQ
+            </a>
+            . It usually arrives 2 to 3 hours late and is shown beside the model number, never mixed
+            into it.
           </li>
           <li>
             Place names:{' '}

@@ -18,6 +18,7 @@ export const CPCB_URL = 'https://airquality.cpcb.gov.in';
 export const SAMEER_URL = 'https://play.google.com/store/apps/details?id=com.cpcb';
 export const OPEN_METEO_URL = 'https://open-meteo.com/';
 export const GEONAMES_URL = 'https://www.geonames.org/';
+export const OPENAQ_URL = 'https://openaq.org/';
 
 /** One short line per action, shown in a status region after a redirect. Keys are fixed, never user text. */
 export const STATUS_LINES = {

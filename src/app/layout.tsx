@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { connection } from 'next/server';
 import type { ReactElement, ReactNode } from 'react';
 
-import { DISCLAIMER_LINE, GEONAMES_URL, OPEN_METEO_URL } from '@/components/copy';
+import { DISCLAIMER_LINE, GEONAMES_URL, OPEN_METEO_URL, OPENAQ_URL } from '@/components/copy';
 
 import './globals.css';
 import './components.css';
@@ -50,7 +50,11 @@ export default async function RootLayout({
               <a href={OPEN_METEO_URL} rel="noopener noreferrer">
                 Open-Meteo.com
               </a>{' '}
-              (CC BY 4.0), CAMS; place names:{' '}
+              (CC BY 4.0), CAMS; nearby monitor readings:{' '}
+              <a href={OPENAQ_URL} rel="noopener noreferrer">
+                OpenAQ
+              </a>{' '}
+              (CPCB and state boards); place names:{' '}
               <a href={GEONAMES_URL} rel="noopener noreferrer">
                 GeoNames
               </a>
