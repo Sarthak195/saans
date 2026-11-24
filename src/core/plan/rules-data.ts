@@ -96,6 +96,7 @@ const rulesSchema = z.strictObject({
         outcome: z.exactOptional(z.array(z.enum(OUTCOMES))),
         poorDay: z.exactOptional(z.array(z.boolean())),
         hasBest: z.exactOptional(z.array(z.boolean())),
+        activeStays: z.exactOptional(z.array(z.boolean())),
       }),
       then: z.string().min(1),
       source: sourceKey,
@@ -135,6 +136,8 @@ interface TopFacts extends Record<string, FactValue> {
   outcome: Outcome;
   poorDay: boolean;
   hasBest: boolean;
+  /** A hard exercise or outdoor play routine on the day is not brought indoors. */
+  activeStays: boolean;
 }
 
 export const GRID: readonly Rule<GridFacts, GridOutcome>[] = data.grid.map((row) => ({

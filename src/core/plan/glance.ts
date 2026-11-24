@@ -114,13 +114,15 @@ function topActionFor(args: {
   outcome: Outcome;
   dayBand: Band | null;
   best: Window | null;
+  activeStays: boolean;
 }): string {
-  const { day, severe, outcome, dayBand, best } = args;
+  const { day, severe, outcome, dayBand, best, activeStays } = args;
   const rule = firstMatch(TOP_ACTIONS, {
     severe,
     outcome,
     poorDay: atLeast(dayBand, 'poor'),
     hasBest: best !== null,
+    activeStays,
   });
   if (!rule) throw new Error('No top-action rule matched');
   return fillTemplate(rule.then, {
@@ -136,6 +138,8 @@ export function buildGlance(args: {
   severe: boolean;
   outcome: Outcome;
   dayBand: Band | null;
+  /** A hard exercise or outdoor play routine is kept, lightened or moved rather than brought indoors. */
+  activeStays: boolean;
 }): Glance {
   const { best, worst } = bestAndWorst(args.pm, args.day);
   return {

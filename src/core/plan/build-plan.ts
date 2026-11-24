@@ -41,6 +41,22 @@ export interface PlanInput {
   question?: QuestionTarget | undefined;
 }
 
+/**
+ * A scheduled hard exercise or outdoor play routine the plan does not bring indoors: the top
+ * action may not tell the family to keep such routines indoors while the routine lines say otherwise.
+ */
+function activeStays(household: Household, evaluated: Evaluated[]): boolean {
+  return evaluated.some((e) => {
+    const routine = household.routines.find((r) => r.id === e.advice.routineId);
+    const active =
+      routine !== undefined &&
+      (routine.intensity !== 'light' ||
+        routine.kind === 'sport' ||
+        routine.kind === 'outdoor_play');
+    return active && e.advice.scheduled && e.advice.decision !== 'indoors';
+  });
+}
+
 function strongest(evaluated: Evaluated[]): Outcome {
   const seen = new Set(evaluated.filter((e) => e.usual !== null).map((e) => e.advice.decision));
   return OUTCOME_ORDER.find((outcome) => seen.has(outcome)) ?? 'none';
@@ -76,7 +92,14 @@ export function buildPlan(input: PlanInput): Plan {
   });
 
   const severe = (aqi.kind === 'ok' && aqi.aqi >= VERY_POOR_AQI) || hasSevereBlock(pm, day);
-  const glance = buildGlance({ day, pm, severe, outcome: strongest(evaluated), dayBand });
+  const glance = buildGlance({
+    day,
+    pm,
+    severe,
+    outcome: strongest(evaluated),
+    dayBand,
+    activeStays: activeStays(household, evaluated),
+  });
 
   const air: AirSummary = {
     aqi,

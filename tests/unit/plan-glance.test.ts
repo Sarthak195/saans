@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildPlan } from '@/core/plan/build-plan';
+import { SAMPLES } from '@/core/profile/samples';
+import { RECORDED_IDS, fetchRecordedSeries } from '@/server/air/recorded';
 import type { Plan } from '@/core/plan/types';
-import type { Routine } from '@/core/types';
+import type { Household, Routine } from '@/core/types';
 import { at, flatSeries, household, member, routine, seriesOf } from '../helpers/plan';
 
 function byHour(values: Record<number, number>, rest: number) {
@@ -256,5 +258,113 @@ describe('member totals', () => {
       percentLess: 0,
       memberRef: 'member_3',
     });
+  });
+});
+
+describe('the top action and the routine decisions', () => {
+  // Very Poor in the morning, only Moderately polluted from midday: the son's 17:00 cricket is
+  // lightened, not brought indoors.
+  const MORNING_SMOG = byHour({ 6: 200, 7: 200, 8: 200, 9: 200, 10: 200 }, 80);
+  const cricket = routine({
+    id: 'cricket',
+    memberId: 'm3',
+    kind: 'sport',
+    start: '17:00',
+    intensity: 'vigorous',
+    flexHours: 0,
+  });
+
+  it('does not say hard exercise stays indoors while the plan only lightens the cricket', () => {
+    const { glance, routines, severe } = plan(MORNING_SMOG, [cricket]);
+    expect(severe).toBe(true);
+    expect(routines[0]?.decision).toBe('lighten');
+    expect(glance.topAction).not.toMatch(/^Keep hard exercise and outdoor play indoors/);
+    expect(glance.topAction).toContain('the times the plan below picks for it');
+  });
+
+  it('keeps the plain indoors line when every hard routine is brought indoors', () => {
+    const { glance, routines } = plan(flatSeries(200), [cricket]);
+    expect(routines[0]?.decision).toBe('indoors');
+    expect(glance.topAction).toMatch(/^Keep hard exercise and outdoor play indoors today\./);
+  });
+
+  it('keeps the plain indoors line on a severe day with no hard routine to contradict it', () => {
+    const walk = routine({ id: 'walk', memberId: 'm2', kind: 'walk', intensity: 'light' });
+    const { glance } = plan(flatSeries(200), [walk]);
+    expect(glance.topAction).toMatch(/^Keep hard exercise and outdoor play indoors today\./);
+  });
+});
+
+describe('the top action never contradicts the routine decisions', () => {
+
+  function contradictions(home: Household, p: Plan): string[] {
+    const found: string[] = [];
+    const text = p.glance.topAction;
+    const scheduled = p.routines.filter((r) => r.scheduled);
+    const decisions = new Set(scheduled.map((r) => r.decision));
+    const hardStays = scheduled.some((r) => {
+      const source = home.routines.find((x) => x.id === r.routineId);
+      const hard = source?.intensity !== 'light' || r.kind === 'sport' || r.kind === 'outdoor_play';
+      return hard && r.decision !== 'indoors';
+    });
+    if (text.startsWith("Keep hard exercise and outdoor play indoors") && hardStays)
+      found.push('indoors line with a hard routine that stays');
+    if (text.includes('go ahead as planned') && [...decisions].some((d) => d !== 'keep'))
+      found.push('go-ahead line with a changed routine');
+    if (text.startsWith("Bring the routines marked indoors") && !decisions.has('indoors'))
+      found.push('indoors line with no routine indoors');
+    if (text.startsWith("Move the routines marked") && !decisions.has('move'))
+      found.push('move line with no routine moved');
+    return found;
+  }
+
+  it('holds for every sample on every recorded day, time and plan day', async () => {
+    const days = ['today', 'tomorrow', 'day_after'] as const;
+    let checked = 0;
+    for (const id of RECORDED_IDS) {
+      const series = await fetchRecordedSeries(id);
+      const date = series.recordedOn ?? '2026-11-21';
+      for (const sample of SAMPLES) {
+        for (const time of ['06:00', '09:30', '13:00', '16:30']) {
+          for (const day of days) {
+            const p = buildPlan({
+              household: sample.household,
+              series,
+              now: at(date, time),
+              day,
+            });
+            expect(
+              contradictions(sample.household, p),
+              `${sample.id} ${id} ${time} ${day}`,
+            ).toEqual([]);
+            checked += 1;
+          }
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(200);
+  });
+
+  it('holds on days with a Very Poor spell and a cleaner rest of the day', () => {
+    const home = household(
+      [member('m1', 'adult'), member('m2', 'older'), member('m3', 'child')],
+      [
+        routine({ id: 'a', memberId: 'm3', kind: 'sport', start: '17:00', intensity: 'vigorous' }),
+        routine({ id: 'b', memberId: 'm1', kind: 'sport', start: '06:30', intensity: 'moderate' }),
+        routine({ id: 'c', memberId: 'm2', kind: 'walk', start: '07:00', intensity: 'light' }),
+      ],
+    );
+    const shapes = [
+      byHour({ 6: 200, 7: 200, 8: 200, 9: 200 }, 80),
+      byHour({ 18: 200, 19: 200, 20: 200, 21: 200 }, 40),
+      byHour({ 6: 200, 7: 200, 8: 200, 17: 200, 18: 200, 19: 200 }, 70),
+      flatSeries(200),
+    ];
+    for (const series of shapes) {
+      for (const day of ['today', 'tomorrow'] as const) {
+        const p = buildPlan({ household: home, series, now: SATURDAY, day });
+        expect(contradictions(home, p)).toEqual([]);
+      }
+    }
   });
 });

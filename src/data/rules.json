@@ -625,6 +625,15 @@
   ],
   "topActions": [
     {
+      "id": "top-severe-scoped",
+      "when": {
+        "severe": [true],
+        "activeStays": [true]
+      },
+      "then": "Some hours {when} are very polluted. Do hard exercise and outdoor play only at the times the plan below picks for it, shorter and gentler where it says so, and indoors otherwise. If an adult has to make a trip, consider a well-fitted N95 or N99 mask; it may help on a short trip.",
+      "source": "mohfw-reschedule"
+    },
+    {
       "id": "top-severe",
       "when": {
         "severe": [true]
