@@ -121,6 +121,38 @@ const NOT_AN_AGE = new Set([
   'kids',
   'people',
   'members',
+  'kg',
+  'kgs',
+  'g',
+  'cm',
+  'mm',
+  'm',
+  'meter',
+  'meters',
+  'metre',
+  'metres',
+  'feet',
+  'foot',
+  'floor',
+  'floors',
+  'degree',
+  'degrees',
+  'c',
+  'f',
+  'outside',
+  'inside',
+  'here',
+  'there',
+  'away',
+  'tall',
+  'long',
+  'high',
+  'wide',
+  'rupees',
+  'rs',
+  'steps',
+  'points',
+  'ppm',
 ]);
 // "is 72", "aged 72", "umar 72": the word that says the number that follows is how old someone is.
 const AGE_MARKERS = new Set([
@@ -144,8 +176,9 @@ const PLAUSIBLE: Record<AgeBand, readonly [number, number] | undefined> = {
   adult: [16, 110],
   older: [40, 110],
 };
-// "father also is 72": the marker may sit a word or two after the label, and a filler may follow it.
-const MARKER_REACH = 2;
+// "father is 72", "father who is 72": the marker sits at most one word after the label, so a number
+// in a later part of the sentence ("mother thinks it is 65 outside") is not taken as her age.
+const MARKER_REACH = 1;
 const FILLERS = new Set(['about', 'around', 'nearly', 'almost', 'just', 'only', 'abhi']);
 const CLAUSE_END = /(?:[.;!?\n।]+(?=\s|$))|\s+(?:and|aur|but|lekin|while)\s+/giu;
 

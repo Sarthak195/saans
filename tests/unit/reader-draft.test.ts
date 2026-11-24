@@ -340,6 +340,10 @@ describe('what the model reads correctly but the checks used to drop', () => {
       ['my father is 6 am regular', 'father', 6, '6', 'adult'],
       ['my father has 3 kids', 'father', 3, '3', 'adult'],
       ['my father says the AQI is 90', 'father', 90, '90', 'adult'],
+      // A temperature, a weight and a floor are not ages either.
+      ['my mother thinks it is 65 outside', 'mother', 65, '65', 'adult'],
+      ['my father weighs 70 kg and my father is 70 kg', 'father', 70, '70', 'adult'],
+      ['my son is 72 floors up', 'son', 72, '72', 'child'],
       // The number belongs to someone else in the text.
       ['my father is 72 and my son is 8', 'son', 72, '72', 'child'],
       // Months are a baby, not an age in years.
