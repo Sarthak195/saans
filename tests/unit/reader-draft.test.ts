@@ -261,6 +261,10 @@ describe('what the model reads correctly but the checks used to drop', () => {
       'Can my dadi walk today?',
       'should my dadi walk today',
       'kya dadi sair kar sakti hain',
+      'Is my dadi safe to walk at 5 pm',
+      'Do I need a mask for my dadi',
+      'Is dadi ok to walk now',
+      'Safe for my dadi to walk today',
     ]) {
       expect(readDraft(said, output(said)).question, said).toBe(said);
     }

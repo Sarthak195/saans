@@ -64,8 +64,34 @@ const QUESTION_WORDS = [
   'क्यों',
 ];
 
+// A question can open with one of these and carry no question mark: "Is my son safe to play".
+const QUESTION_OPENERS = new Set([
+  'is',
+  'are',
+  'am',
+  'do',
+  'does',
+  'did',
+  'was',
+  'were',
+  'have',
+  'has',
+  'any',
+  'safe',
+  'ok',
+  'okay',
+]);
+
 function asksSomething(question: string): boolean {
-  return /[?？]/u.test(question) || mentionsAny(question, QUESTION_WORDS);
+  const first =
+    question
+      .trim()
+      .split(/\s+/u)[0]
+      ?.toLowerCase()
+      .replace(/[^\p{L}]/gu, '') ?? '';
+  return (
+    /[?？]/u.test(question) || QUESTION_OPENERS.has(first) || mentionsAny(question, QUESTION_WORDS)
+  );
 }
 
 function placeQueryOf(text: string, output: ReaderOutput): string | undefined {
