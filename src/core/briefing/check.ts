@@ -98,6 +98,9 @@ export function memberGuards(plan: Plan): PolarityRef[] {
   });
 }
 
+// A summary for a family that asked nothing must not answer a question it made up.
+const MENTIONS_QUESTION = /\b(you|they) (asked|wanted to know)\b|\byour question\b|पूछ/iu;
+
 /**
  * Decides whether written text may be shown. Every number must be one the plan computed (an hour
  * or minute only when written as a time), every
@@ -116,6 +119,8 @@ export function checkWritten(
     clockOnly?: readonly number[];
     /** Place name and labels: numbers inside them are fine, but only as part of the exact string. */
     names?: readonly string[];
+    /** False when the family asked nothing, so the text may not say they did. */
+    asked?: boolean;
   },
 ): CheckResult {
   const reasons: string[] = [];
@@ -144,5 +149,6 @@ export function checkWritten(
   const guarded = checkPolarity(text, options.memberGuards ?? []);
   if (guarded.reassuringAboutNonKeep.length > 0) reasons.push('reassurance about a member');
   if (options.noReassurance === true && reassuresAnywhere(text)) reasons.push('reassurance');
+  if (options.asked === false && MENTIONS_QUESTION.test(text)) reasons.push('invented question');
   return { ok: reasons.length === 0, reasons };
 }

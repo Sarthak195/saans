@@ -199,6 +199,22 @@ describe('checkWritten: links and reassurance', () => {
     expect(why(base)).toEqual([]);
   });
 
+  it('refuses a text that answers a question the family never asked', () => {
+    const check = (text: string, asked: boolean) =>
+      checkWritten(text, { lang: 'en', allowedNumbers, refs, asked }).reasons;
+    const made = `${base} You asked if routine_1 can go ahead.`;
+    expect(check(made, false)).toContain('invented question');
+    expect(check(made, true)).not.toContain('invented question');
+    expect(check(`${base} Your question was about routine_1.`, false)).toContain(
+      'invented question',
+    );
+    expect(check(base, false)).not.toContain('invented question');
+    const hindi = 'आज हवा ख़राब है। routine_1 के बारे में पूछने पर, घर के अंदर करें।';
+    expect(
+      checkWritten(hindi, { lang: 'hi', allowedNumbers, refs: [], asked: false }).reasons,
+    ).toContain('invented question');
+  });
+
   it('rejects anything that reads as a link or an address', () => {
     for (const extra of [
       'See https://example.org now.',

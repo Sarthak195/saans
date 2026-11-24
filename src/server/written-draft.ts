@@ -104,6 +104,7 @@ function stillHolds(written: WrittenText, target: WrittenFor): boolean {
     // Routine names were swapped in after the first check, so only the number and tone checks apply.
     refs: [],
     noReassurance: !family || changes,
+    asked: family && plan.answer !== undefined,
   }).ok;
 }
 
