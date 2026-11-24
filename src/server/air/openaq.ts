@@ -21,6 +21,8 @@ const SEARCH_RADIUS_M = 18_000;
 const FAILURE_PAUSE_SECONDS = 60;
 // Results come back unsorted and cut at the limit, so a small limit can drop the nearest one.
 const SEARCH_LIMIT = 100;
+// How many of the nearest stations are read, so one with a stopped PM2.5 sensor does not hide the rest.
+const CANDIDATES = 3;
 const LOCATIONS_REVALIDATE_SECONDS = 3 * 60 * 60;
 const LATEST_REVALIDATE_SECONDS = 15 * 60;
 /** CPCB data trails the clock by two to three hours, so a reading a little under four hours old still counts. */
@@ -114,25 +116,25 @@ function kmFrom(lat: number, lon: number, location: OpenAqLocation): number | nu
 }
 
 /**
- * The nearest fixed monitoring station that reported recently and measures PM2.5, or null.
- * Many listed stations stopped years ago, and results arrive in no particular order.
+ * Fixed monitoring stations that reported recently and measure PM2.5, nearest first. Many listed
+ * stations stopped years ago, and results arrive in no particular order.
  */
-export function chooseLocation(
+export function rankLocations(
   locations: readonly OpenAqLocation[],
   lat: number,
   lon: number,
   now: Date,
-): { location: OpenAqLocation; distanceKm: number } | null {
-  let best: { location: OpenAqLocation; distanceKm: number } | null = null;
+): { location: OpenAqLocation; distanceKm: number }[] {
+  const ranked: { location: OpenAqLocation; distanceKm: number }[] = [];
   for (const location of locations) {
     if (location.isMonitor !== true || location.isMobile === true) continue;
     if (sensorIds(location, 'pm25').length === 0) continue;
     if (!location.datetimeLast || !isFresh(location.datetimeLast.utc, now)) continue;
     const distanceKm = kmFrom(lat, lon, location);
     if (distanceKm === null || distanceKm > MAX_STATION_KM) continue;
-    if (best === null || distanceKm < best.distanceKm) best = { location, distanceKm };
+    ranked.push({ location, distanceKm });
   }
-  return best;
+  return ranked.sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
 interface Pick {
@@ -212,18 +214,27 @@ async function lookUp(
     const locations = locationsBodySchema.parse(
       await getJson(locationsUrl(lat, lon), apiKey, LOCATIONS_REVALIDATE_SECONDS, signal),
     );
-    const chosen = chooseLocation(locations.results, lat, lon, now);
-    if (chosen === null) return null;
-
-    const latest = latestBodySchema.parse(
-      await getJson(
-        `${BASE}/locations/${String(chosen.location.id)}/latest`,
-        apiKey,
-        LATEST_REVALIDATE_SECONDS,
-        signal,
-      ),
+    // A station can report recently while its PM2.5 sensor has stopped, so the nearest few are
+    // read together and the nearest one with a fresh PM2.5 value wins.
+    const candidates = rankLocations(locations.results, lat, lon, now).slice(0, CANDIDATES);
+    const readings = await Promise.all(
+      candidates.map(async ({ location, distanceKm }) => {
+        try {
+          const latest = latestBodySchema.parse(
+            await getJson(
+              `${BASE}/locations/${String(location.id)}/latest`,
+              apiKey,
+              LATEST_REVALIDATE_SECONDS,
+              signal,
+            ),
+          );
+          return toStation(location, distanceKm, latest.results, now);
+        } catch {
+          return null;
+        }
+      }),
     );
-    return toStation(chosen.location, chosen.distanceKm, latest.results, now);
+    return readings.find((reading) => reading !== null) ?? null;
   } catch {
     return null;
   }

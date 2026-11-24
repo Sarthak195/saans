@@ -2,10 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { getAirSeries } from '@/server/air/get-air';
 import {
-  chooseLocation,
   fetchStation,
   isFresh,
   locationsUrl,
+  rankLocations,
   type OpenAqLatest,
   type OpenAqLocation,
 } from '@/server/air/openaq';
@@ -22,6 +22,8 @@ const POINT = fixture.point;
 // 19:55 on the Indian clock, two and a half hours after the newest reading.
 const NOW = new Date('2026-11-24T14:25:00Z');
 const now = (): Date => NOW;
+const chooseLocation = (...args: Parameters<typeof rankLocations>) =>
+  rankLocations(...args)[0] ?? null;
 
 const RK_PURAM_PM25 = 12234787;
 const RK_PURAM_PM10 = 12234786;
@@ -79,8 +81,29 @@ describe('fetchStation', () => {
       pm10: 69,
       measuredAt: '2026-11-24T17:45:00+05:30',
     });
-    expect(stub.urls()).toHaveLength(2);
+    // The search, then the latest list of each of the nearest recent stations, nearest first.
+    expect(stub.urls()).toHaveLength(3);
     expect(stub.urls()[1]).toBe('https://api.openaq.org/v3/locations/17/latest');
+  });
+
+  it('moves to the next station when the nearest one has no fresh PM2.5', async () => {
+    const answer = vi.fn((input: string | URL | Request) => {
+      const url = urlOf(input);
+      if (url.includes('/locations/17/')) return Promise.resolve(jsonResponse(withLatest([])));
+      if (url.includes('/locations/')) {
+        // Another station, reporting the same live values under its own sensor ids.
+        const other = LOCATIONS.find((l) => url.includes(`/locations/${String(l.id)}/`));
+        const ids = other?.sensors.filter((s) => s.parameter.name === 'pm25').map((s) => s.id);
+        const live = LATEST.find((r) => r.sensorsId === RK_PURAM_PM25);
+        const results = live && ids?.[0] !== undefined ? [{ ...live, sensorsId: ids[0] }] : [];
+        return Promise.resolve(jsonResponse(withLatest(results)));
+      }
+      return Promise.resolve(jsonResponse(fixture.locations));
+    });
+    vi.stubGlobal('fetch', answer);
+    const result = await station(KEY);
+    expect(result?.name).not.toBe('R K Puram, Delhi - DPCC');
+    expect(result?.pm25).toBe(28);
   });
 
   it('puts the key in a header only, and a point rounded to 0.1 degree in the address', async () => {
