@@ -70,14 +70,17 @@ computed. What fails a check is dropped, and the family sees a labelled fallback
 - Gemini does: words the plan. It is sent a facts object with placeholders only (`member_1`,
   `routine_2`), no names, ages or health conditions beyond the plan's sensitivity word, plus the
   rounded numbers, decisions, windows and impact sentences. For Hindi it is sent the structure
-  without the English sentences, because a model asked to translate prose tends to copy it.
+  without the English sentences, because a model asked to translate prose tends to copy it, and
+  code supplies the Hindi words for each decision, the air level and the day, which the model
+  copies as given.
 - Code does: checks the text, then puts the family's labels in place of the placeholders. The
   checked text is cached for 30 minutes (framework cache, best effort) under a hash of the facts,
   language and audience; the cache holds the text before names go in.
 - Checks: every number is one the plan computed (ASCII and Devanagari digits, number words);
   every routine the plan changes is named; no sentence naming a changed routine reassures; no
   placeholder the plan never gave; the right script for the language, and no English sentence in a
-  Hindi text; no markup; dashes become words. After names go in, a leftover placeholder falls back
+  Hindi text; no markup; dashes become words; no mention of a question when the family asked
+  none. After names go in, a leftover placeholder falls back
   to the template.
 - Failure: any failed check or error sends the request to the fallback model once; then a template
   built in code from the plan, labelled with the reason. A Hindi request that falls back gets the

@@ -52,7 +52,7 @@ export default function AboutPage(): ReactElement {
             .
           </li>
           <li>
-            Measured nearby: the latest PM2.5 and PM10 from the nearest CPCB or state board monitor
+            Measured nearby: the latest PM2.5 and PM10 from the nearest monitor in the CPCB network
             within 10 km that reported in the last 4 hours, through{' '}
             <a href={OPENAQ_URL} rel="noopener noreferrer">
               OpenAQ

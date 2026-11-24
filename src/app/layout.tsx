@@ -54,7 +54,7 @@ export default async function RootLayout({
               <a href={OPENAQ_URL} rel="noopener noreferrer">
                 OpenAQ
               </a>{' '}
-              (CPCB and state boards); place names:{' '}
+              (CPCB network monitors); place names:{' '}
               <a href={GEONAMES_URL} rel="noopener noreferrer">
                 GeoNames
               </a>
