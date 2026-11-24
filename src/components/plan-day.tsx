@@ -61,11 +61,25 @@ export function GlanceSection({ glance }: { readonly glance: Glance }): ReactEle
   );
 }
 
-/** `scoped` when the plan lets some hard exercise or outdoor play go ahead at chosen hours. */
-export function SevereBanner({ scoped }: { readonly scoped: boolean }): ReactElement {
+/**
+ * `scoped` when the plan lets some hard exercise or outdoor play go ahead at chosen hours;
+ * `hoursOnly` when the day's AQI is below Very Poor and only some hours are, so the title does
+ * not contradict the band shown above it.
+ */
+export function SevereBanner({
+  scoped,
+  hoursOnly,
+}: {
+  readonly scoped: boolean;
+  readonly hoursOnly: boolean;
+}): ReactElement {
   return (
     <section aria-labelledby="severe-title" className="severe">
-      <h2 id="severe-title">Very bad air: three things to do</h2>
+      <h2 id="severe-title">
+        {hoursOnly
+          ? 'Some hours are very polluted: three things to do'
+          : 'Very bad air: three things to do'}
+      </h2>
       <ol>
         <li>
           {scoped

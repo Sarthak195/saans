@@ -79,7 +79,15 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
             />
           </section>
           <GlanceSection glance={plan.glance} />
-          {plan.severe ? <SevereBanner scoped={plan.glance.activeStays} /> : null}
+          {plan.severe ? (
+            <SevereBanner
+              scoped={plan.glance.activeStays}
+              hoursOnly={
+                plan.air.aqi.kind !== 'ok' ||
+                (plan.air.aqi.band !== 'very_poor' && plan.air.aqi.band !== 'severe')
+              }
+            />
+          ) : null}
         </>
       )}
       <Timeline
