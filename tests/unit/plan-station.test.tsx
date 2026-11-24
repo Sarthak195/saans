@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
@@ -8,6 +9,7 @@ import { buildPlan } from '@/core/plan/build-plan';
 import { planFacts } from '@/core/plan/facts';
 import type { Plan } from '@/core/plan/types';
 
+import { violationsIn } from '../helpers/axe';
 import { at, household, member, routine, seriesOf } from '../helpers/plan';
 
 // A Saturday afternoon: the model says Good air, then the play routines are judged.
@@ -159,5 +161,11 @@ describe('showing the monitor reading', () => {
     expect(html).toContain('uses the worse level');
     const calm = renderToStaticMarkup(<PlanHeader plan={planFor()} ctx={ctx} smogDay={false} />);
     expect(calm).not.toContain('reads worse');
+  });
+
+  it('has no accessibility problems with the reading or the note', async () => {
+    const careful = planFor({ station: station() });
+    expect(await violationsIn(<AirSection air={careful.air} />)).toEqual([]);
+    expect(await violationsIn(<PlanHeader plan={careful} ctx={ctx} smogDay={false} />)).toEqual([]);
   });
 });
