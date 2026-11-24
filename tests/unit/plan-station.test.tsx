@@ -67,9 +67,24 @@ describe('a nearby monitor that reads worse than the model', () => {
     const careful = planFor({ station: station({ pm25: 200 }) });
     expect(careful.air.aqi).toEqual(plain.air.aqi);
     expect(careful.air.hourly).toEqual(plain.air.hourly);
-    expect(careful.glance.best).toEqual(plain.glance.best);
     expect(careful.glance.worst).toEqual(plain.glance.worst);
     expect(careful.severe).toBe(plain.severe);
+  });
+
+  it('does not offer the hours the monitor reads worse as the cleanest window', () => {
+    // The model is cleanest from 14:00 to 17:00, where the monitor says the air is worse.
+    const series = (extra: Partial<AirSeries>) =>
+      seriesOf((_, hour) => (hour >= 14 && hour < 17 ? 20 : 60), extra);
+    const build = (extra: Partial<AirSeries>) =>
+      buildPlan({
+        household: household([member('c', 'child')], []),
+        series: series(extra),
+        now: NOW,
+      });
+    expect(build({}).glance.best?.start).toBe('14:00');
+    const careful = build({ station: station({ pm25: 120 }) });
+    expect(careful.glance.best?.start).not.toBe('14:00');
+    expect(careful.glance.topAction).not.toContain('14:00');
   });
 
   it('keeps the monitor numbers out of what a written text may state', () => {

@@ -142,8 +142,12 @@ export function buildGlance(args: {
   activeStays: boolean;
   /** The hours airing is judged on, when they differ from the model because a nearby monitor reads worse. */
   airingPm?: PmIndex | undefined;
+  /** The hours the cleanest window is picked from: the ones the routines were decided on. */
+  advicePm?: PmIndex | undefined;
 }): Glance {
-  const { best, worst } = bestAndWorst(args.pm, args.day);
+  const { worst } = bestAndWorst(args.pm, args.day);
+  // The cleanest window is advice about when to go out, so it avoids hours a monitor reads worse.
+  const { best } = bestAndWorst(args.advicePm ?? args.pm, args.day);
   return {
     best,
     worst,

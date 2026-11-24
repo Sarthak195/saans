@@ -104,6 +104,7 @@ export function buildPlan(input: PlanInput): Plan {
     dayBand,
     activeStays: activeStays(household, evaluated),
     airingPm: station.pm,
+    advicePm: station.pm,
   });
 
   const air: AirSummary = {
