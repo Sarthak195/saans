@@ -204,16 +204,16 @@ Generate a key with `openssl rand -base64 32`. `npm run verify` runs typecheck, 
 
 ## Measurements
 
-All taken on 2026-11-22 (IST) from a fresh `npm ci`, with the commands shown.
+All taken on 2026-11-24 (IST), with the commands shown.
 
-| What                         | Result                                                                                                                  | Command                 |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| Tests                        | 1,368 tests in 66 files, all passing                                                                                    | `npx vitest run`        |
-| Coverage, all of `src`       | 96.17% of lines (94.75% statements, 88.91% branches, 96.41% functions)                                                  | `npm run coverage`      |
-| Coverage thresholds enforced | 80% lines overall, 90% lines under `src/core` (the run passes)                                                          | `vitest.config.mts`     |
-| Tracked files                | 306 files, 1.46 MB (`npm run check:repo`)                                                                               | `git ls-files \| wc -l` |
-| Lines                        | 13,183 in `src` (without `src/data`), 4,279 in `src/data`, 11,708 in `tests` (without fixtures), 15 in `tests/fixtures` | `npm run check:repo`    |
-| Data rows                    | 28 decision-grid rows, 25 indoor rows, 18 community rows, 7 trip rules, 9 transit cities, 41 listed places, 6 samples   | the command below       |
+| What                         | Result                                                                                                                   | Command                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
+| Tests                        | 1,479 tests in 68 files, all passing                                                                                     | `npx vitest run`        |
+| Coverage, all of `src`       | 96.59% of lines (95.08% statements, 89.2% branches, 96.61% functions)                                                    | `npm run coverage`      |
+| Coverage thresholds enforced | 80% lines overall, 90% lines under `src/core` (the run passes)                                                           | `vitest.config.mts`     |
+| Tracked files                | 313 files, 1.56 MB (`npm run check:repo`)                                                                                | `git ls-files \| wc -l` |
+| Lines                        | 14,054 in `src` (without `src/data`), 4,301 in `src/data`, 12,774 in `tests` (without fixtures), 385 in `tests/fixtures` | `npm run check:repo`    |
+| Data rows                    | 28 decision-grid rows, 25 indoor rows, 18 community rows, 7 trip rules, 9 transit cities, 41 listed places, 6 samples    | the command below       |
 
 ```
 node -e "const d=n=>require('./src/data/'+n+'.json');console.log(d('rules').grid.length,d('indoor').rows.length,d('community').rows.length,d('transit').rules.length,Object.keys(d('transit').cities).length,d('places').length,d('samples').length)"
