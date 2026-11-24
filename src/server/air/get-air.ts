@@ -2,21 +2,45 @@ import 'server-only';
 
 import type { AirSeries } from '@/core/air/types';
 import { fetchAirSeries, type FetchAirOptions } from '@/server/air/open-meteo';
+import { fetchStation } from '@/server/air/openaq';
 import { fetchRecordedSeries, recordedIdForPoint } from '@/server/air/recorded';
+import { getEnv } from '@/server/env';
 import { AppError } from '@/server/errors';
+
+export interface GetAirOptions extends FetchAirOptions {
+  /** The OpenAQ key, injectable for tests; by default it comes from the environment. */
+  openAqKey?: string;
+}
+
+/** The key if the environment is set up and has one. A broken environment is reported elsewhere. */
+function envOpenAqKey(): string | undefined {
+  try {
+    return getEnv().OPENAQ_API_KEY;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Air data for a point: live if Open-Meteo answers; otherwise, for the sample places only, the
  * dated recording (its `source` says 'recorded' so the page can label it); otherwise an error
  * the caller turns into a plain message. A point outside India is refused, not papered over.
+ * A live series also carries the nearest recent monitoring-station reading when one is found;
+ * it is fetched alongside the model data, and its absence changes nothing else.
  */
 export async function getAirSeries(
   lat: number,
   lon: number,
-  opts: FetchAirOptions = {},
+  opts: GetAirOptions = {},
 ): Promise<AirSeries> {
+  const { openAqKey, ...airOpts } = opts;
+  // Started first so both requests run together; fetchStation never rejects, so a failed
+  // series leaves nothing unhandled behind it.
+  const station = fetchStation(lat, lon, openAqKey ?? envOpenAqKey(), airOpts);
   try {
-    return await fetchAirSeries(lat, lon, opts);
+    const series = await fetchAirSeries(lat, lon, airOpts);
+    const reading = await station;
+    return reading ? { ...series, station: reading } : series;
   } catch (error) {
     if (error instanceof AppError && error.kind === 'outside_india') throw error;
     const recorded = recordedIdForPoint(lat, lon);

@@ -1,0 +1,369 @@
+{
+ "note": "Trimmed from real OpenAQ v3 replies on 2026-11-24 for a point near Lajpat Nagar, Delhi: pm25 and pm10 sensors only, readings for location 17 only.",
+ "point": {
+  "lat": 28.5677,
+  "lon": 77.243
+ },
+ "locations": {
+  "results": [
+   {
+    "id": 15,
+    "name": "IGI Airport",
+    "distance": 14633.18061183,
+    "coordinates": {
+     "latitude": 28.56,
+     "longitude": 77.094
+    },
+    "provider": {
+     "name": "CPCB"
+    },
+    "isMobile": false,
+    "isMonitor": true,
+    "datetimeLast": null,
+    "sensors": [
+     {
+      "id": 26,
+      "parameter": {
+       "name": "pm10",
+       "units": "µg/m³"
+      }
+     },
+     {
+      "id": 30,
+      "parameter": {
+       "name": "pm25",
+       "units": "µg/m³"
+      }
+     }
+    ]
+   },
+   {
+    "id": 17,
+    "name": "R K Puram, Delhi - DPCC",
+    "distance": 5536.65025031,
+    "coordinates": {
+     "latitude": 28.563262,
+     "longitude": 77.186937
+    },
+    "provider": {
+     "name": "CPCB"
+    },
+    "isMobile": false,
+    "isMonitor": true,
+    "datetimeLast": {
+     "utc": "2026-11-24T12:15:00Z",
+     "local": "2026-11-24T17:45:00+05:30"
+    },
+    "sensors": [
+     {
+      "id": 399,
+      "parameter": {
+       "name": "pm10",
+       "units": "µg/m³"
+      }
+     },
+     {
+      "id": 12234786,
+      "parameter": {
+       "name": "pm10",
+       "units": "µg/m³"
+      }
+     },
+     {
+      "id": 35,
+      "parameter": {
+       "name": "pm25",
+       "units": "µg/m³"
+      }
+     },
+     {
+      "id": 12234787,
+      "parameter": {
+       "name": "pm25",
+       "units": "µg/m³"
+      }
+     }
+    ]
+   },
+   {
+    "id": 103,
+    "name": "Income Tax Office, Delhi - CPCB",
+    "distance": 6212.98287126,
+    "coordinates": {
+     "latitude": 28.623499999999996,
+     "longitude": 77.2494
+    },
+    "provider": {
+     "name": "CPCB"
+    },
+    "isMobile": false,
+    "isMonitor": true,
+    "datetimeLast": {
+     "utc": "2018-02-22T03:45:00Z",
+     "local": "2018-02-22T09:15:00+05:30"
+    },
+    "sensors": [
+     {
+      "id": 13862,
+      "parameter": {
+       "name": "pm10",
+       "units": "µg/m³"
+      }
+     },
+     {
+      "id": 13861,
+      "parameter": {
+       "name": "pm25",
+       "units": "µg/m³"
+      }
+     }
+    ]
+   },
+   {
+    "id": 236,
+    "name": "Mandir Marg, Delhi - DPCC",
+    "distance": 8466.45682982,
+    "coordinates": {
+     "latitude": 28.6341,
+     "longitude": 77.2005
+    },
+    "provider": {
+     "name": "CPCB"
+    },
+    "isMobile": false,
+    "isMonitor": true,
+    "datetimeLast": {
+     "utc": "2018-02-21T21:15:00Z",
+     "local": "2018-02-22T02:45:00+05:30"
+    },
+    "sensors": [
+     {
+      "id": 391,
+      "parameter": {
+       "name": "pm10",
+       "units": "µg/m³"
+      }
+     },
+     {
+      "id": 388,
+      "parameter": {
+       "name": "pm25",
+       "units": "µg/m³"
+      }
+     }
+    ]
+   },
+   {
+    "id": 2597,
+    "name": "US Diplomatic Post: New Delhi",
+    "distance": 6284.71605809,
+    "coordinates": {
+     "latitude": 28.598096,
+     "longitude": 77.189066
+    },
+    "provider": {
+     "name": "StateAir NewDelhi"
+    },
+    "isMobile": false,
+    "isMonitor": true,
+    "datetimeLast": {
+     "utc": "2016-11-09T16:30:00Z",
+     "local": "2016-11-09T22:00:00+05:30"
+    },
+    "sensors": [
+     {
+      "id": 5398,
+      "parameter": {
+       "name": "pm25",
+       "units": "µg/m³"
+      }
+     }
+    ]
+   },
+   {
+    "id": 5598,
+    "name": "Sector - 125, Noida, UP - UPPCB",
+    "distance": 8214.43430344,
+    "coordinates": {
+     "latitude": 28.5447608,
+     "longitude": 77.3231257
+    },
+    "provider": {
+     "name": "CPCB"
+    },
+    "isMobile": false,
+    "isMonitor": true,
+    "datetimeLast": {
+     "utc": "2026-11-24T12:15:00Z",
+     "local": "2026-11-24T17:45:00+05:30"
+    },
+    "sensors": [
+     {
+      "id": 12235186,
+      "parameter": {
+       "name": "pm10",
+       "units": "µg/m³"
+      }
+     },
+     {
+      "id": 12235187,
+      "parameter": {
+       "name": "pm25",
+       "units": "µg/m³"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "latest": {
+  "17": {
+   "results": [
+    {
+     "sensorsId": 12234783,
+     "value": 2.6,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 12234785,
+     "value": 16.6,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 12234787,
+     "value": 28,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 12234784,
+     "value": 86.1,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 12234786,
+     "value": 69,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 12234782,
+     "value": 1.61,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 12234790,
+     "value": 23.6,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 12234788,
+     "value": 69,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 12234789,
+     "value": 6.4,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 14340715,
+     "value": 0.3,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 14340714,
+     "value": 173,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 14340713,
+     "value": 0.0479,
+     "datetime": {
+      "utc": "2026-11-24T12:15:00Z",
+      "local": "2026-11-24T17:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 399,
+     "value": 339,
+     "datetime": {
+      "utc": "2018-02-21T21:15:00Z",
+      "local": "2018-02-22T02:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 35,
+     "value": 201,
+     "datetime": {
+      "utc": "2018-02-21T21:15:00Z",
+      "local": "2018-02-22T02:45:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 394,
+     "value": 95.33,
+     "datetime": {
+      "utc": "2018-01-24T09:30:00Z",
+      "local": "2018-01-24T15:00:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 36,
+     "value": 77.6,
+     "datetime": {
+      "utc": "2018-02-21T20:45:00Z",
+      "local": "2018-02-22T02:15:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 392,
+     "value": 4300,
+     "datetime": {
+      "utc": "2018-02-21T20:45:00Z",
+      "local": "2018-02-22T02:15:00+05:30"
+     }
+    },
+    {
+     "sensorsId": 393,
+     "value": 56.9,
+     "datetime": {
+      "utc": "2018-02-21T21:15:00Z",
+      "local": "2018-02-22T02:45:00+05:30"
+     }
+    }
+   ]
+  }
+ }
+}
