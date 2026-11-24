@@ -1,11 +1,14 @@
 import type { ReactElement } from 'react';
 
+import type { StationReading } from '@/core/air/types';
 import { healthStatement } from '@/core/aqi';
+import { oneDecimal } from '@/core/format';
 import type { AirSummary } from '@/core/plan/types';
+import { istParts } from '@/core/time';
 
 import { BandBadge } from './band';
 import { CPCB_URL, SAMEER_URL, SMOG_DAY_LABEL } from './copy';
-import { clockOf, coordinate, dateLabel } from './format';
+import { clockOf, coordinate, dateLabel, whole } from './format';
 
 const GAS_NAME: Record<string, string> = {
   no2: 'Nitrogen dioxide',
@@ -22,6 +25,30 @@ function SourceLine({ air }: { readonly air: AirSummary }): ReactElement {
       Open-Meteo, CAMS global model, grid point {grid}; data hour {clockOf(air.dataHour)} IST;
       fetched {clockOf(air.fetchedAt)} IST
     </p>
+  );
+}
+
+/** The nearby monitor's latest reading, in words, beside the model number and never part of it. */
+function StationLine({ station }: { readonly station: StationReading }): ReactElement | null {
+  const readings = [
+    station.pm25 === null ? null : `PM2.5 ${whole(station.pm25)}`,
+    station.pm10 === null ? null : `PM10 ${whole(station.pm10)}`,
+  ].filter((r) => r !== null);
+  const measured = new Date(station.measuredAt);
+  if (readings.length === 0 || Number.isNaN(measured.getTime())) return null;
+  const when = istParts(measured);
+  const clock = `${String(when.hour).padStart(2, '0')}:${String(when.minute).padStart(2, '0')}`;
+  return (
+    <>
+      <p>
+        Measured nearby: {readings.join(', ')} at {station.name} (via OpenAQ),{' '}
+        {String(oneDecimal(station.distanceKm))} km away, at {clock} IST
+      </p>
+      <p className="small">
+        This is a reading from a street monitor, shown beside the model number. It does not change
+        the AQI above.
+      </p>
+    </>
   );
 }
 
@@ -125,6 +152,7 @@ export function AirSection({
         </p>
       )}
       {unavailable ? null : <SourceLine air={air} />}
+      {unavailable || air.station === undefined ? null : <StationLine station={air.station} />}
       <details>
         <summary>Why this can differ from the Sameer app</summary>
         <p>

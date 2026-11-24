@@ -140,12 +140,14 @@ export function buildGlance(args: {
   dayBand: Band | null;
   /** A hard exercise or outdoor play routine is kept, lightened or moved rather than brought indoors. */
   activeStays: boolean;
+  /** The hours airing is judged on, when they differ from the model because a nearby monitor reads worse. */
+  airingPm?: PmIndex | undefined;
 }): Glance {
   const { best, worst } = bestAndWorst(args.pm, args.day);
   return {
     best,
     worst,
-    airing: airingAdvice(args.pm, args.day, args.dayBand),
+    airing: airingAdvice(args.airingPm ?? args.pm, args.day, args.dayBand),
     topAction: topActionFor({ ...args, best }),
   };
 }

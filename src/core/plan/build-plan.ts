@@ -10,6 +10,7 @@ import { hourOfDay } from '@/core/plan/clock';
 import { buildGlance, hasSevereBlock, planDayBand } from '@/core/plan/glance';
 import { summariseMembers } from '@/core/plan/members';
 import { atLeast, pmIndex } from '@/core/plan/pm25';
+import { stationDecision } from '@/core/plan/station';
 import type { Outcome } from '@/core/plan/rules-data';
 import type { AirSummary, Plan, QuestionTarget } from '@/core/plan/types';
 import { defaultPlanDay, istParts, planDays } from '@/core/time';
@@ -72,11 +73,14 @@ export function buildPlan(input: PlanInput): Plan {
   const days = planDays(now);
   const day = days.find((d) => d.relative === input.day) ?? defaultPlanDay(now);
   const pm = pmIndex(series);
+  // Routine decisions read the hours with any monitor-driven worse level; the day's level, the
+  // strip and the best and worst hours stay the model's own numbers.
+  const station = stationDecision({ series, pm, day, now });
   const aqi = aqiToday(series, parts.hourStamp);
   const dayBand = planDayBand(series, pm, day);
   const contextFor = (forDay: PlanDay) => ({
     day: forDay,
-    pm,
+    pm: station.pm,
     poorDay: atLeast(forDay === day ? dayBand : planDayBand(series, pm, forDay), 'poor'),
     // Today's earlier hours are gone, so no window is offered before now.
     notBefore: forDay.relative === 'today' ? parts.hour * 60 + parts.minute : 0,
@@ -99,6 +103,7 @@ export function buildPlan(input: PlanInput): Plan {
     outcome: strongest(evaluated),
     dayBand,
     activeStays: activeStays(household, evaluated),
+    airingPm: station.pm,
   });
 
   const air: AirSummary = {
@@ -110,6 +115,10 @@ export function buildPlan(input: PlanInput): Plan {
     fetchedAt: series.fetchedAt,
     ...(series.recordedOn === undefined ? {} : { recordedOn: series.recordedOn }),
     ...(series.stale === undefined ? {} : { staleSince: series.stale.lastGoodAt }),
+    ...(series.station === undefined || series.source !== 'open-meteo-cams'
+      ? {}
+      : { station: series.station }),
+    ...(station.precaution === undefined ? {} : { precaution: station.precaution }),
     hourly: Array.from({ length: STRIP_HOURS }, (_, i) => {
       const hour = hourOfDay(day, STRIP_FROM + i);
       const value = pm.get(hour);

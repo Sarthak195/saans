@@ -1,4 +1,4 @@
-import type { AirSeries, HourStamp } from '@/core/air/types';
+import type { AirSeries, HourStamp, StationReading } from '@/core/air/types';
 import type { AqiToday, Band } from '@/core/aqi';
 import type { Decision } from '@/core/decision';
 import type { SourceRef } from '@/core/source';
@@ -99,6 +99,15 @@ export interface QuestionAnswer {
   shiftedToNextDay: boolean;
 }
 
+/** The nearby monitor reads a worse level than the model for the same hour, so today's next few hours use the worse one. */
+export interface StationPrecaution {
+  stationLevel: Band;
+  modelLevel: Band;
+  /** The first and last hours covered, as hour stamps on the plan day. */
+  fromHour: HourStamp;
+  toHour: HourStamp;
+}
+
 export interface AirSummary {
   aqi: AqiToday;
   dataHour: HourStamp;
@@ -108,6 +117,9 @@ export interface AirSummary {
   fetchedAt: string;
   recordedOn?: string;
   staleSince?: string;
+  /** The nearby monitor's latest reading, shown beside the model value and never part of the AQI. */
+  station?: StationReading;
+  precaution?: StationPrecaution;
   /** The plan day's hours from 06:00 to 22:00. */
   hourly: { hour: HourStamp; pm25: number | null; level: Band | null }[];
 }

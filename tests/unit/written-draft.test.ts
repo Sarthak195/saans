@@ -215,3 +215,24 @@ describe('what the writer really produces still opens on its own page', () => {
     expect(openWritten(sealWritten(written, target), target)).toEqual(written);
   });
 });
+
+describe('written text is bound to the decisions of the plan', () => {
+  it('is refused when the same page now carries different decisions', async () => {
+    const target = await writtenFor(sample.household, TOKEN);
+    const token = sealedFor(target);
+    expect(openWritten(token, target)?.text).toBe(SUMMARY);
+    const { plan } = target.view;
+    const changed = {
+      ...target,
+      view: {
+        ...target.view,
+        plan: {
+          ...plan,
+          routines: plan.routines.map((r) => ({ ...r, decision: 'indoors' as const })),
+        },
+      },
+    };
+    expect(plan.routines.some((r) => r.decision !== 'indoors')).toBe(true);
+    expect(openWritten(token, changed)).toBeUndefined();
+  });
+});

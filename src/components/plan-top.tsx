@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react';
 
+import { BAND_LABEL } from '@/core/aqi';
 import type { Plan, QuestionAnswer } from '@/core/plan/types';
 import type { WrittenText } from '@/server/genai';
 
@@ -25,6 +26,14 @@ export function PlanHeader({
       <p className="place-line">
         {plan.place.name}, {plan.place.admin1}
       </p>
+      {plan.air.precaution === undefined ? null : (
+        <p className="notice">
+          A monitor near you reads worse than the forecast for the same hour:{' '}
+          {BAND_LABEL[plan.air.precaution.stationLevel]} at the monitor,{' '}
+          {BAND_LABEL[plan.air.precaution.modelLevel]} in the forecast. For the next few hours,
+          today&apos;s advice uses the worse level.
+        </p>
+      )}
       {smogDay ? null : (
         <nav aria-label="Plan day">
           <ul className="day-links">

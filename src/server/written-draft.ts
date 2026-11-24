@@ -29,8 +29,16 @@ export interface WrittenFor {
 
 function bindingOf(target: WrittenFor): string {
   const { token, view, lang, audience } = target;
+  const { plan } = view;
+  // The decisions are part of the binding: a reading from a nearby monitor can change what the plan
+  // tells a family to do, and text written for other decisions must never show beside these.
+  const decisions = [
+    plan.severe,
+    plan.glance.airing.kind,
+    plan.routines.map((r) => [r.routineId, r.decision, r.level]),
+  ];
   return createHash('sha256')
-    .update(JSON.stringify([token, view.plan.day.date, view.mode, lang, audience]))
+    .update(JSON.stringify([token, plan.day.date, view.mode, lang, audience, decisions]))
     .digest('base64url');
 }
 
