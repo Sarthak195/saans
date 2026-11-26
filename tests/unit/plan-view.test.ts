@@ -26,6 +26,20 @@ describe('loadPlanView with live air data', () => {
     expect(view.facts.length).toBeGreaterThan(0);
   });
 
+  it('trims the live series around the page clock, not the server clock', async () => {
+    // Months after the recorded body: a series trimmed around the real clock would have no hours
+    // left and fall back to the recording.
+    vi.useFakeTimers({ toFake: ['Date'], now: new Date('2027-06-01T12:00:00+05:30') });
+    try {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(airBody())));
+      const view = await loadPlanView({ household: sample('s1').household, now: EVENING });
+      expect(view.plan.air.source).toBe('open-meteo-cams');
+      expect(view.plan.day.date).toBe('2026-11-22');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('honours the requested day', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(airBody())));
     const view = await loadPlanView({

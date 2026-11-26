@@ -99,9 +99,13 @@ async function seriesFor(
   if (air === 'smog-day') return { series: await fetchRecordedSeries(SMOG_DAY_ID) };
   try {
     // A nearby monitor describes the air now, so every plan day shows it; only today's advice
-    // uses it.
+    // uses it. The series is trimmed around the page's own clock, so the hours kept are the
+    // hours the plan reads, whatever the time of the request.
     return {
-      series: await getAirSeries(household.place.lat, household.place.lon, { station: true }),
+      series: await getAirSeries(household.place.lat, household.place.lon, {
+        station: true,
+        now: () => now,
+      }),
     };
   } catch (error) {
     // A bug, or a place outside India, is not hidden behind an empty plan.

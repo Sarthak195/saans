@@ -28,7 +28,7 @@ export type LiveStrip =
  */
 export async function loadLiveStrip(now: Date): Promise<LiveStrip> {
   try {
-    const series = await getAirSeries(DELHI.lat, DELHI.lon);
+    const series = await getAirSeries(DELHI.lat, DELHI.lon, { now: () => now });
     // A recording can stand in when the live service fails. It is read on its own date, so the
     // clock is moved onto that date (keeping the real time of day) before the hour is looked up.
     const recorded = series.source === 'recorded' && series.recordedOn !== undefined;
