@@ -3,11 +3,6 @@
 // that works with a mouse can still be unreachable by Tab, and only a browser shows that.
 import { expect, test } from '@playwright/test';
 
-test.skip(
-  ({ browserName }) => browserName !== 'chromium',
-  'focus order is checked in Chromium only',
-);
-
 test('the first Tab on the home page focuses the skip link', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle');

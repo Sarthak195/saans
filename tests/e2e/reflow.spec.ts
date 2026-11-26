@@ -5,8 +5,6 @@ import { expect, test } from '@playwright/test';
 
 import { PAGES } from './pages';
 
-test.skip(({ browserName }) => browserName !== 'chromium', 'layout is checked in Chromium only');
-
 test.use({ viewport: { width: 320, height: 800 } });
 
 for (const entry of PAGES) {

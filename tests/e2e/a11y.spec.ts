@@ -18,8 +18,6 @@ const SCHEMES = ['light', 'dark'] as const;
 // 1280 is a laptop; 320 is the narrowest width WCAG 1.4.10 (reflow) asks a page to work at.
 const WIDTHS = [1280, 320] as const;
 
-test.skip(({ browserName }) => browserName !== 'chromium', 'axe runs in Chromium only');
-
 for (const entry of PAGES) {
   for (const scheme of SCHEMES) {
     for (const width of WIDTHS) {

@@ -25,7 +25,9 @@ export default defineConfig({
   use: { baseURL: `http://localhost:${PORT}`, trace: 'retain-on-failure' },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    // Firefox runs the place paths, where browsers differ (the location prompt and its answer).
+    // Accessibility, reflow and focus order are checked once, in Chromium.
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] }, testMatch: /places\.spec\.ts$/ },
   ],
   webServer: {
     command: `npx next start -p ${PORT}`,

@@ -25,6 +25,16 @@ async function submitEmptyHousehold(page: Page): Promise<void> {
   await page.locator('#error-summary').waitFor();
 }
 
+/** Sends Change place with nothing typed, which reopens the disclosure with the reason. */
+async function submitEmptyChangePlace(page: Page): Promise<void> {
+  await openChangePlace(page);
+  await page
+    .locator('details.change-place')
+    .getByRole('button', { name: 'Plan for this place' })
+    .click();
+  await page.locator('#place-change-error').waitFor();
+}
+
 const SAMPLES = ['s1', 's2', 's3', 's4', 's5', 's6'] as const;
 
 /**
@@ -43,5 +53,10 @@ export const PAGES: readonly PageCase[] = [
     name: 'sample plan s1 with change place open',
     path: '/plan/sample/s1',
     prepare: openChangePlace,
+  },
+  {
+    name: 'sample plan s1 after an empty change of place',
+    path: '/plan/sample/s1',
+    prepare: submitEmptyChangePlace,
   },
 ];

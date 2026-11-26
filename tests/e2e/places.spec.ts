@@ -110,3 +110,26 @@ test.describe('changing the place of a plan', () => {
     await expect(page.locator('.place-line')).toHaveText(/^Mumbai/);
   });
 });
+
+test.describe('a change of place with nothing given', () => {
+  test('reopens the box with the reason beside it, tied to it for screen readers', async ({
+    page,
+  }) => {
+    await page.goto('/plan/sample/s1');
+    await page.waitForLoadState('networkidle');
+    await page.locator('details.change-place > summary').click();
+    await page
+      .locator('details.change-place')
+      .getByRole('button', { name: 'Plan for this place' })
+      .click();
+
+    await expect(page).toHaveURL(/#place-change$/);
+    await expect(page.locator('details.change-place')).toHaveAttribute('open', '');
+    const box = page.locator('#place-change');
+    await expect(box).toHaveAttribute('aria-invalid', 'true');
+    await expect(box).toHaveAttribute('aria-describedby', 'place-change-error');
+    await expect(page.locator('#place-change-error')).toHaveText(
+      'Type a place in India, or use your location.',
+    );
+  });
+});
