@@ -171,3 +171,34 @@ describe('showing the monitor reading', () => {
     expect(await violationsIn(<PlanHeader plan={careful} ctx={ctx} smogDay={false} />)).toEqual([]);
   });
 });
+
+describe('the Change place panel when a place could not be used', () => {
+  const ctx = { base: '/plan/x', actionBase: '/plan/x', formToken: 't', keep: {} };
+  const PROBLEM = 'Type a place in India, or use your location.';
+
+  it('opens with the reason beside the box, tied to it for screen readers', () => {
+    const html = renderToStaticMarkup(
+      <PlanHeader plan={planFor()} ctx={ctx} smogDay={false} placeProblem={PROBLEM} />,
+    );
+    expect(html).toMatch(/<details class="change-place" open="">/);
+    expect(html).toContain(`<p id="place-change-error" class="field-error">${PROBLEM}</p>`);
+    expect(html).toMatch(
+      /<input id="place-change"[^>]*aria-invalid="true"[^>]*aria-describedby="place-change-error"/,
+    );
+  });
+
+  it('stays closed, with no error marks, when nothing went wrong', () => {
+    const html = renderToStaticMarkup(<PlanHeader plan={planFor()} ctx={ctx} smogDay={false} />);
+    expect(html).toContain('<details class="change-place">');
+    expect(html).not.toContain('aria-invalid');
+    expect(html).not.toContain('place-change-error');
+  });
+
+  it('has no accessibility problems with the panel open and the reason shown', async () => {
+    expect(
+      await violationsIn(
+        <PlanHeader plan={planFor()} ctx={ctx} smogDay={false} placeProblem={PROBLEM} />,
+      ),
+    ).toEqual([]);
+  });
+});

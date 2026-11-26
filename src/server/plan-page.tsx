@@ -6,7 +6,7 @@ import 'server-only';
 import type { ReactElement, ReactNode } from 'react';
 
 import { ErrorNotice, AlertNotice } from '@/components/notice';
-import { noteLine, statusLine } from '@/components/copy';
+import { noteLine, placeNoteLine, statusLine } from '@/components/copy';
 import { PlanBody } from '@/components/plan-body';
 import type { RoutineAdvice } from '@/core/plan/types';
 import type { PlanDay } from '@/core/time';
@@ -141,6 +141,7 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
           keep: { air, lang: q.lang },
         }}
         status={joinStatus(statusLine(q.status), noteLine(q.note))}
+        placeProblem={placeNoteLine(q.note)}
         before={before}
         communityHref={props.communityHref}
         editHref={`/household?from=${props.token}`}

@@ -213,6 +213,29 @@ describe('POST /plan/[token]/place', () => {
     expect(noteLine('placeNotFound')).toContain('Nothing in India matched');
   });
 
+  it('lands on the place box, which the plan shows open with the reason beside it', async () => {
+    const location = locationOf(await placePost(formPost('/plan/x/place', {}), context(TOKEN)));
+    expect(location.endsWith('#place-change')).toBe(true);
+    expect(query(location).get('note')).toBe('placeMissing');
+
+    const page = await SamplePage({
+      params: Promise.resolve({ id: 's1' }),
+      searchParams: Promise.resolve({ note: 'placeMissing' }),
+    });
+    const html = renderToStaticMarkup(page);
+    expect(html).toContain('<details class="change-place" open="">');
+    expect(html).toContain('<p id="place-change-error" class="field-error">Type a place in India');
+    expect(html).toMatch(/<input id="place-change"[^>]*aria-invalid="true"/);
+    // Any other note leaves the panel closed.
+    const other = renderToStaticMarkup(
+      await SamplePage({
+        params: Promise.resolve({ id: 's1' }),
+        searchParams: Promise.resolve({ note: 'keywords' }),
+      }),
+    );
+    expect(other).toContain('<details class="change-place">');
+  });
+
   it('moves the plan to the device location, named after the nearest listed place', async () => {
     const location = locationOf(
       await placePost(formPost('/plan/x/place', { lat: '19.1', lon: '72.9' }), context(TOKEN)),

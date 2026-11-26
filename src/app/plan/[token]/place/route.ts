@@ -1,7 +1,7 @@
 // Plans the same household somewhere else: from typed text, a pick from a list, or the device
 // location. The family, routines and home stay as they were; only the place changes.
 import { withQuery } from '@/components/links';
-import type { NoteKey } from '@/components/copy';
+import type { PlaceNoteKey } from '@/components/copy';
 import { keepFromForm, placeOfForm, planPath, toPlace } from '@/server/edits';
 import type { GivenPlace } from '@/server/geo/geocode';
 import { handleForm, readGuardedForm, seeOther } from '@/server/http';
@@ -13,7 +13,7 @@ interface Context {
 }
 
 // A link carries only a fixed key for the line to show, never words a family or a server wrote.
-const PROBLEM_NOTE: Record<Exclude<GivenPlace['kind'], 'one' | 'many'>, NoteKey> = {
+const PROBLEM_NOTE: Record<Exclude<GivenPlace['kind'], 'one' | 'many'>, PlaceNoteKey> = {
   none: 'placeNotFound',
   outside_india: 'placeOutside',
   unreachable: 'placeLookup',
@@ -54,7 +54,10 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
       case 'outside_india':
       case 'unreachable':
       case 'not_given':
-        return seeOther(planPath(token, { ...keep, note: PROBLEM_NOTE[given.kind] }, 'plan-title'));
+        // Lands on the place box, which the page shows open with the reason beside it.
+        return seeOther(
+          planPath(token, { ...keep, note: PROBLEM_NOTE[given.kind] }, 'place-change'),
+        );
     }
   });
 }

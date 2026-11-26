@@ -31,6 +31,8 @@ export interface PlanBodyProps {
   ctx: PlanContext;
   /** A fixed line announced after an action. */
   status?: string | undefined;
+  /** Why a place given on this page could not be used; shown beside the Change place box. */
+  placeProblem?: string | undefined;
   /** The routine as it was before a what-if. */
   before?: RoutineAdvice | undefined;
   /** Link to the community notice page for this household. */
@@ -65,7 +67,7 @@ export function PlanBody(props: PlanBodyProps): ReactElement {
   // only when the day's AQI is below Very Poor, so it does not contradict the band shown above.
   return (
     <>
-      <PlanHeader plan={plan} ctx={ctx} smogDay={smogDay} />
+      <PlanHeader plan={plan} ctx={ctx} smogDay={smogDay} placeProblem={props.placeProblem} />
       <StatusLine text={status} />
       <JumpBar
         hasAnswer={plan.answer !== undefined}

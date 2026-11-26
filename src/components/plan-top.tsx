@@ -14,16 +14,20 @@ import { LocationButton } from './location-button';
 
 /**
  * The page heading with the place, a notice when a nearby monitor reads worse than the forecast,
- * links to the other days, and a form to plan for another place.
+ * links to the other days, and a form to plan for another place. When a place the family gave
+ * could not be used, the form opens with the reason beside its box, as a form field error would.
  */
 export function PlanHeader({
   plan,
   ctx,
   smogDay,
+  placeProblem,
 }: {
   readonly plan: Plan;
   readonly ctx: PlanContext;
   readonly smogDay: boolean;
+  /** Why the place given on this page could not be used, if it could not. */
+  readonly placeProblem?: string | undefined;
 }): ReactElement {
   // The day links are left out on the recorded smog day, which is one fixed day. The change-place
   // form posts to the place route of this plan and carries the form token.
@@ -64,18 +68,25 @@ export function PlanHeader({
           </ul>
         </nav>
       )}
-      <details className="change-place">
+      <details className="change-place" open={placeProblem !== undefined}>
         <summary>Not right? Change place</summary>
         <form method="post" action={`${ctx.actionBase}/place`}>
           <input type="hidden" name="formToken" value={ctx.formToken} />
           <div className="field">
             <label htmlFor="place-change">Place in India</label>
+            {placeProblem === undefined ? null : (
+              <p id="place-change-error" className="field-error">
+                {placeProblem}
+              </p>
+            )}
             <input
               id="place-change"
               name="place"
               type="text"
               autoComplete="address-level2"
               maxLength={80}
+              aria-invalid={placeProblem === undefined ? undefined : true}
+              aria-describedby={placeProblem === undefined ? undefined : 'place-change-error'}
             />
           </div>
           <p className="actions">

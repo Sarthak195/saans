@@ -82,3 +82,19 @@ export function noteLine(key: string | undefined): string | undefined {
     ? NOTE_LINES[key as NoteKey]
     : undefined;
 }
+
+/** The notes that say why a place could not be used. The plan shows them at the place box too. */
+export const PLACE_NOTE_KEYS = [
+  'placeNotFound',
+  'placeOutside',
+  'placeLookup',
+  'placeMissing',
+] as const satisfies readonly NoteKey[];
+
+/** One of the place notes. */
+export type PlaceNoteKey = (typeof PLACE_NOTE_KEYS)[number];
+
+/** The line for a place note, or undefined for any other key. */
+export function placeNoteLine(key: string | undefined): string | undefined {
+  return PLACE_NOTE_KEYS.some((k) => k === key) ? noteLine(key) : undefined;
+}
