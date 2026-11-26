@@ -96,4 +96,49 @@ describe('LocationButton', () => {
     expect(fields()).toEqual({});
     expect(host.querySelector('[role="status"]')?.textContent).toContain('Type your place');
   });
+
+  it('says what to do when the browser never answers, and not when it answers in time', () => {
+    vi.useFakeTimers();
+    try {
+      // A permission prompt closed without a choice: neither callback ever runs.
+      let answer: PositionCallback | undefined;
+      stubLocation((ok) => {
+        answer = ok;
+      });
+      act(() => {
+        root.render(<LocationButton />);
+      });
+      const button = host.querySelector('button');
+      if (button === null) throw new Error('no button');
+      const status = (): string => host.querySelector('[role="status"]')?.textContent ?? '';
+
+      act(() => {
+        button.click();
+      });
+      act(() => {
+        vi.advanceTimersByTime(11_000);
+      });
+      expect(status()).toBe('Finding your location.');
+      act(() => {
+        vi.advanceTimersByTime(1_000);
+      });
+      expect(status()).toContain('Allow location for this site');
+
+      // A later answer still works, and a second request that is answered shows no hint.
+      act(() => {
+        answer?.({ coords: { latitude: 28.61, longitude: 77.21 } } as GeolocationPosition);
+      });
+      expect(status()).toContain('Using your location');
+      act(() => {
+        button.click();
+      });
+      act(() => {
+        answer?.({ coords: { latitude: 28.61, longitude: 77.21 } } as GeolocationPosition);
+        vi.advanceTimersByTime(20_000);
+      });
+      expect(status()).toContain('Using your location');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

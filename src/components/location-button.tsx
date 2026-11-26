@@ -14,6 +14,12 @@ export interface Coords {
 const USING =
   'Using your location, rounded to about 11 km. If you type a place, that is used instead.';
 
+// Shown when the browser has not answered at all after NO_ANSWER_MS, usually because its
+// permission prompt is still open or was closed without a choice.
+const NO_ANSWER =
+  'No location yet. Allow location for this site in your browser, or type your place instead.';
+const NO_ANSWER_MS = 12_000;
+
 // The button needs script and a browser that can locate. These three functions let React ask
 // for that once on the client, while the server render keeps the button hidden.
 function noSubscription(): () => void {
@@ -51,8 +57,14 @@ export function LocationButton({
   // Asks the browser once. Success sets the coordinates; an error clears them.
   function locate(): void {
     setMessage('Finding your location.');
+    // The timeout below does not run while the browser's permission prompt is open, and Firefox
+    // never answers a prompt that was closed without a choice, so after a while say what to do.
+    const hint = window.setTimeout(() => {
+      setMessage(NO_ANSWER);
+    }, NO_ANSWER_MS);
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        window.clearTimeout(hint);
         // Rounded here in the browser, before anything is sent.
         setCoords({
           lat: round1(position.coords.latitude),
@@ -61,6 +73,7 @@ export function LocationButton({
         setMessage(USING);
       },
       () => {
+        window.clearTimeout(hint);
         // Denied, unavailable or timed out: the family can still type a place, so say that.
         setCoords(undefined);
         setMessage('We could not get your location. Type your place instead.');
