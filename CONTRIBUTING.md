@@ -45,7 +45,14 @@ Two kinds of recording exist and neither is ever edited by hand. A hand-edited r
 
 `npm run verify` runs the type check, lint, format check, tests and the repository checks (no private paths tracked, no em-dashes or en-dashes in tracked text, size report). `npm run check:repo` reads `git ls-files`, so stage new files before running it. `npm run coverage` enforces the coverage thresholds, and `npm run build` makes the production build. Tests run offline: any unmocked network call fails. The OpenAQ tests read `tests/fixtures/openaq.json`, which is trimmed from real replies (its `note` says how); the app only calls OpenAQ when `OPENAQ_API_KEY` is set.
 
-Formatting is Prettier (`npm run format`). Comments are brief and say why, not what.
+Formatting is Prettier (`npm run format`).
+
+## Comments
+
+- Every source file opens with a short header: what the file is for, which layer it belongs to, and the rule that layer follows (a pure core, a stateless server).
+- Every exported function, component, type and constant has a doc comment that says what it is for and why it behaves as it does, with its units (minutes, IST hours, micrograms per cubic metre) and what it returns when nothing matches.
+- Inside a function, comment the steps that are not obvious: a threshold or other number and where it comes from, a regular expression with an example of what it matches, an order that matters, a fallback, a guard. Do not narrate the code.
+- A comment must be true of the code. A change of behaviour changes its comments in the same commit.
 
 ## Commits
 
