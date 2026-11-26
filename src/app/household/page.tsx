@@ -46,8 +46,8 @@ export default async function HouseholdPage({
         Describe your family
       </h1>
       <p>
-        Fill in what you know. Saans stores nothing: the details travel inside the link to your
-        plan.
+        Fill in what you know. Saans keeps no copy: the details travel, encrypted, inside the link
+        to your plan.
       </p>
       <HouseholdForm
         state={{ values: opened.values, errors: opened.draft?.errors ?? [] }}

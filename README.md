@@ -169,7 +169,13 @@ Each of these is labelled in the app as a Saans rule, not as an authority's figu
 
 ## Privacy and security
 
-Nothing about a family is stored on the server. A household travels inside its link, encrypted, so anyone with the link can see the plan, and pages carry a warning to that effect. The family's own text is sent to Google's Gemini API only when the family submits it. Every call sends `store: false`. Written text is bound to the link, day, air mode, language and audience it was made for. Forms are protected by an origin check and a signed token. Every response carries a per-request Content-Security-Policy and the other headers in [SECURITY.md](SECURITY.md), which also states the accepted risk of shared free-tier quotas.
+Saans keeps no copy of a family's details on the server. A household travels inside its link, encrypted, so anyone with the link can see the plan, and pages carry a warning to that effect. Those links would otherwise sit in the platform's request log, so the live service keeps none (the command is at the end of this section). The family's own text is sent to Google's Gemini API only when the family submits it. Every call sends `store: false`. Written text is bound to the link, day, air mode, language and audience it was made for. Forms are protected by an origin check and a signed token. Every response carries a per-request Content-Security-Policy and the other headers in [SECURITY.md](SECURITY.md), which also states the accepted risk of shared free-tier quotas.
+
+On Cloud Run the request log is kept out with one exclusion on the project's default log sink:
+
+```
+gcloud logging sinks update _Default --add-exclusion='name=saans-request-urls,filter=resource.type="cloud_run_revision" AND resource.labels.service_name="saans" AND LOG_ID("run.googleapis.com/requests")'
+```
 
 ## Accessibility
 

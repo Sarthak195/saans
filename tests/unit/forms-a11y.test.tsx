@@ -37,7 +37,7 @@ describe('home page components', () => {
     const askHtml = renderToStaticMarkup(ask);
     expect(askHtml).toContain('maxLength="1500"');
     expect(askHtml).toContain('Make my plan');
-    expect(askHtml).toContain('Saans stores nothing.');
+    expect(askHtml).toContain('Saans keeps no copy of it.');
   });
 
   it('says what the live strip shows, in the agreed words', () => {

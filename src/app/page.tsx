@@ -38,7 +38,8 @@ export default async function HomePage({
       </h1>
       <p>
         Saans turns today&apos;s air quality into a plan for your family&apos;s school runs, evening
-        play and walks. Nothing about your family is stored.
+        play and walks. Saans keeps no copy of your family&apos;s details: they travel, encrypted,
+        inside the link to your plan.
       </p>
       <LiveStripView strip={strip} />
       <SampleList samples={SAMPLES} />

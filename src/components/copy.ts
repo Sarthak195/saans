@@ -7,7 +7,7 @@ export const DISCLAIMER_LINE =
   'General public-health guidance, not medical advice. See a doctor for breathlessness, chest pain or a cough that will not settle.';
 
 export const PRIVACY_LINE =
-  "Your text is sent to Google's Gemini API to read it. On the free tier Google may use it to improve its products. Avoid names and exact addresses. Saans stores nothing.";
+  "Your text is sent to Google's Gemini API to read it. On the free tier Google may use it to improve its products. Avoid names and exact addresses. Saans keeps no copy of it.";
 
 export const SHARE_WARNING = "This link contains your family's profile.";
 

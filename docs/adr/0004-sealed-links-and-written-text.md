@@ -21,6 +21,7 @@ Saans keeps nothing about a family on the server, yet a plan page needs the fami
 ## Consequences
 
 - The link is the profile. Anyone who has it can read the plan, and the pages say "This link contains your family's profile." Plan pages at sealed addresses are `noindex`, and every page response is `Cache-Control: private, no-store`.
+- A log of request addresses would hold every family's sealed details, so the live service keeps none: a log exclusion drops Cloud Run's request entries for it (the command is in the README).
 - Nothing can be revoked. Rotating `SEAL_KEY` invalidates every link ever shared.
 - A household that does not fit in 2,000 characters is refused, not shortened.
 - Changing a household's shape (the zod schema) can make old links invalid, which shows the friendly page.

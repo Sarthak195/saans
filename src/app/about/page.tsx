@@ -74,11 +74,11 @@ export default function AboutPage(): ReactElement {
       <section aria-labelledby="privacy-title" className="section">
         <h2 id="privacy-title">Privacy</h2>
         <p>
-          Saans stores nothing. Your family&apos;s details travel inside the link to your plan, in a
-          form only Saans can read, so anyone you give the link to can see the plan. When you write
-          about your family in your own words, the text is sent to Google&apos;s Gemini API to read
-          it. On the free tier Google may use it to improve its products, so avoid names and exact
-          addresses.
+          Saans keeps no copy of your family&apos;s details. They travel inside the link to your
+          plan, encrypted so that only Saans can read them, so anyone you give the link to can see
+          the plan. The server keeps no log of the links it is asked for. When you write about your
+          family in your own words, the text is sent to Google&apos;s Gemini API to read it. On the
+          free tier Google may use it to improve its products, so avoid names and exact addresses.
         </p>
       </section>
 
