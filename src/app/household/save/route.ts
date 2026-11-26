@@ -42,9 +42,7 @@ function placeOrError(given: GivenPlace): { place: Place } | { error: FormError 
 export function POST(request: Request): Promise<Response> {
   // A failure that stops the form being taken shows a message page with a link to /household.
   return handleForm(async () => {
-    // Same-site, size-capped and token-checked before anything is read.
     const form = await readGuardedForm(request, new Date());
-    // Every text field the family filled in, so a form sent back shows what they entered.
     const values = collectValues(form);
     const located = placeOrError(await placeOfForm(form));
     // The rest of the form is checked even when the place failed, so all mistakes come back

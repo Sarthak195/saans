@@ -13,7 +13,6 @@ interface Context {
 /** Moves one routine to another time or mode and opens the plan again, showing before and after. */
 export function POST(request: Request, { params }: Context): Promise<Response> {
   return handleForm(async () => {
-    // The guard checks the origin, the body size and the form token before anything else runs.
     const form = await readGuardedForm(request, new Date());
     const { token } = await params;
     const household = openHousehold(token);

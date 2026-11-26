@@ -23,7 +23,6 @@ const PROBLEM_NOTE: Record<Exclude<GivenPlace['kind'], 'one' | 'many'>, NoteKey>
 /** Plans the same household somewhere else, or says why the place could not be used. */
 export function POST(request: Request, { params }: Context): Promise<Response> {
   return handleForm(async () => {
-    // Same-site, size-capped and token-checked before the plan link is opened.
     const form = await readGuardedForm(request, new Date());
     const { token } = await params;
     // An old, forged or damaged link throws here and is shown as a plain error page.

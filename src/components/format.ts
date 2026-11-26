@@ -1,10 +1,9 @@
+// Wording for the codes the plan uses, and small text formatters for the page components. Written
+// for a parent, not for a developer. UI layer: pure string work, no clock and no environment.
 import type { Band } from '@/core/aqi';
 import type { Decision } from '@/core/decision';
 import type { DaySlot } from '@/core/plan/types';
 import type { Mode, RoutineKind, Weekday } from '@/core/types';
-
-// Wording for the codes the plan uses, and small text formatters for the page components. Written
-// for a parent, not for a developer. UI layer: pure string work, no clock and no environment.
 
 /** The words for each decision on a routine, shown beside its drawing. */
 export const DECISION_WORD: Record<Decision, string> = {

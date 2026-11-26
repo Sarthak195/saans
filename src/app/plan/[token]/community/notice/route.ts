@@ -18,7 +18,6 @@ interface Context {
 /** Writes the community notice with Gemini, only because the visitor pressed the button, and hands it back sealed. */
 export function POST(request: Request, { params }: Context): Promise<Response> {
   return handleForm(async () => {
-    // The guard checks the origin, the body size and the form token before anything else runs.
     const form = await readGuardedForm(request, new Date());
     const { token } = await params;
     const household = openHousehold(token);

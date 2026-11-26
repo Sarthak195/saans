@@ -23,7 +23,6 @@ interface Context {
  */
 export function POST(request: Request, { params }: Context): Promise<Response> {
   return handleForm(async () => {
-    // The form must come from this site and carry a form token we issued lately.
     const form = await readGuardedForm(request, new Date());
     const { token } = await params;
     const household = openHousehold(token);

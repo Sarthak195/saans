@@ -49,8 +49,8 @@ Formatting is Prettier (`npm run format`).
 
 ## Comments
 
-- Every source file opens with a short header: what the file is for, which layer it belongs to, and the rule that layer follows (a pure core, a stateless server).
-- Every exported function, component, type and constant has a doc comment that says what it is for and why it behaves as it does, with its units (minutes, IST hours, micrograms per cubic metre) and what it returns when nothing matches.
+- Every file in `src` and `scripts` opens with a short header: what the file is for, which layer it belongs to, and the rule that layer follows (a pure core, a stateless server).
+- Every function, component, type and constant a file exports and declares has a doc comment that says what it is for and why it behaves as it does, with its units (minutes, IST hours, micrograms per cubic metre) and what it returns when nothing matches. A re-export keeps its doc at the declaration.
 - Inside a function, comment the steps that are not obvious: a threshold or other number and where it comes from, a regular expression with an example of what it matches, an order that matters, a fallback, a guard. Do not narrate the code.
 - A comment must be true of the code. A change of behaviour changes its comments in the same commit.
 

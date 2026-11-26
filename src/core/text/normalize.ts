@@ -1,9 +1,8 @@
 // Brings text to one comparable form. Layer: core (pure). Used before any quote, number or
 // phrase is compared, so the same rules apply to model output and to what a user typed.
 
-// Indian grouping ("1,50,000") and western grouping ("1,500") both end in a three-digit group.
-// Matches a digit group with commas, such as 1,50,000 or 1,500. The look-arounds stop it from
-// matching in the middle of a longer run of digits.
+// A number written with group commas, Indian (1,50,000) or western (1,500): both end in a
+// three-digit group. The look-arounds stop it matching inside a longer run of digits.
 const GROUPED_NUMBER = /(?<!\d)\d{1,3}(?:,\d{2})*,\d{3}(?!\d)/g;
 
 /**
