@@ -8,7 +8,7 @@ import type { WrittenText } from '@/server/genai';
 
 import { BandBadge } from './band';
 import { bandClass } from './format';
-import { withQuery } from './links';
+import { withQuery } from '@/core/format';
 import type { PlanContext } from './links';
 import { LocationButton } from './location-button';
 

@@ -3,7 +3,7 @@
 // layer: nothing is stored, and a changed household is always a new value for the caller to seal.
 import 'server-only';
 
-import { withQuery } from '@/components/links';
+import { withQuery } from '@/core/format';
 import { COMMUNITY_KINDS, MODES } from '@/core/profile/schema';
 import type { CommunityKind, Household, Mode, Place } from '@/core/types';
 import { field } from '@/server/http';

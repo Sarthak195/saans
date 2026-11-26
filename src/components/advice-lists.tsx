@@ -7,7 +7,7 @@ import type { TransitOption } from '@/core/alternatives';
 import type { Alternative, GrapNote, HomeAdvice } from '@/core/plan/types';
 
 import { ReasonLine, SourceLink } from './source-link';
-import { withQuery } from './links';
+import { withQuery } from '@/core/format';
 import type { PlanContext } from './links';
 import { SHARE_WARNING } from './copy';
 

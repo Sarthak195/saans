@@ -1,6 +1,6 @@
 // Plans the same household somewhere else: from typed text, a pick from a list, or the device
 // location. The family, routines and home stay as they were; only the place changes.
-import { withQuery } from '@/components/links';
+import { withQuery } from '@/core/format';
 import type { PlaceNoteKey } from '@/components/copy';
 import { keepFromForm, placeOfForm, planPath } from '@/server/edits';
 import { toPlace, type GivenPlace } from '@/server/geo/geocode';

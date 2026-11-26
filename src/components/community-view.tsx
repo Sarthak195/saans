@@ -10,7 +10,7 @@ import type { WrittenText } from '@/server/genai';
 
 import { CopyButton } from './copy-button';
 import { SMOG_DAY_LABEL } from './copy';
-import { withQuery } from './links';
+import { withQuery } from '@/core/format';
 import { ReasonLine } from './source-link';
 
 // The label for each kind of community, in the order the audience links are listed.

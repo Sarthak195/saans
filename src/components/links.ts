@@ -1,21 +1,5 @@
-// Helpers for the addresses a plan page links to. UI layer: pure string work, no environment.
-
-/**
- * A path with a query made of the values that are set; unset ones are left out. Empty strings
- * count as unset. With no values left, the path is returned unchanged, without a '?'.
- */
-export function withQuery(
-  path: string,
-  params: Readonly<Record<string, string | undefined>>,
-): string {
-  // URLSearchParams escapes each name and value, so a value cannot add a parameter of its own.
-  const query = new URLSearchParams();
-  for (const [name, value] of Object.entries(params)) {
-    if (value !== undefined && value !== '') query.set(name, value);
-  }
-  const text = query.toString();
-  return text === '' ? path : `${path}?${text}`;
-}
+// The context a plan page hands to its parts: where it sits and how its forms reach back to it.
+// UI layer: a type only.
 
 /** Where a plan page sits and how its forms and links reach back to it. */
 export interface PlanContext {

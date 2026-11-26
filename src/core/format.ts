@@ -1,7 +1,6 @@
+// How numbers, clock times and page addresses are written. Plan, advice and pages all use these,
+// so the same reading never prints two ways. Core layer: pure string and number work.
 import { pm25Level } from '@/core/aqi';
-
-// How numbers and clock times are shown to people. Plan and advice both use these, so the same
-// reading never prints two ways.
 
 /** The nearest 5, with no band check: for shares and totals. A PM2.5 shown beside its band uses displayPm25. */
 export function roundToFive(n: number): number {
@@ -61,4 +60,21 @@ export function fillTemplate(text: string, vars: Vars): string {
     if (value === undefined) throw new Error(`No value for {${name}} in: ${text}`);
     return String(value);
   });
+}
+
+/**
+ * A path with a query made of the values that are set; unset ones are left out. Empty strings
+ * count as unset. With no values left, the path is returned unchanged, without a '?'.
+ */
+export function withQuery(
+  path: string,
+  params: Readonly<Record<string, string | undefined>>,
+): string {
+  // URLSearchParams escapes each name and value, so a value cannot add a parameter of its own.
+  const query = new URLSearchParams();
+  for (const [name, value] of Object.entries(params)) {
+    if (value !== undefined && value !== '') query.set(name, value);
+  }
+  const text = query.toString();
+  return text === '' ? path : `${path}?${text}`;
 }

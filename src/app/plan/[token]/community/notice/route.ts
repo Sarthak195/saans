@@ -8,7 +8,7 @@ import { loadPlanView } from '@/server/plan-view';
 import { airOf } from '@/server/query';
 import { openHousehold } from '@/server/seal';
 import { sealWritten } from '@/server/written-draft';
-import { withQuery } from '@/components/links';
+import { withQuery } from '@/core/format';
 
 /** The sealed household token from the address. */
 interface Context {
