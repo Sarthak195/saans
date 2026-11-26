@@ -10,12 +10,14 @@ import {
   findStaticPlace,
   foldName,
   INDIA_BOUNDS,
+  isInIndia,
   listedPlacesIn,
   nearestStaticPlace,
+  toPlace,
   type PlaceMatch,
 } from '@/server/geo/places';
 
-export { INDIA_BOUNDS, nearestStaticPlace, type PlaceMatch };
+export { INDIA_BOUNDS, isInIndia, nearestStaticPlace, toPlace, type PlaceMatch };
 
 /** One place, several places that share a name (the family picks), or nothing found. */
 export type Resolution =
@@ -55,16 +57,6 @@ const resultSchema = z.object({
 // A geocoder reply is an object whose `results` list may be absent when nothing matched.
 const bodySchema = z.object({ results: z.array(z.unknown()).optional() });
 
-/** True when the point is inside the rough box around India (degrees of latitude, longitude). */
-function inIndia(lat: number, lon: number): boolean {
-  return (
-    lat >= INDIA_BOUNDS.minLat &&
-    lat <= INDIA_BOUNDS.maxLat &&
-    lon >= INDIA_BOUNDS.minLon &&
-    lon <= INDIA_BOUNDS.maxLon
-  );
-}
-
 /** Rounds to two decimals, about a kilometre. */
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
@@ -90,7 +82,7 @@ function populatedPlaces(body: unknown): PlaceMatch[] {
     const keep =
       POPULATED_PLACE.test(r.feature_code) &&
       (r.country_code === undefined || r.country_code === 'IN') &&
-      inIndia(r.latitude, r.longitude);
+      isInIndia(r.latitude, r.longitude);
     if (!keep) continue;
     places.push({
       name: r.name,
@@ -265,7 +257,7 @@ export async function placeFromInput(input: PlaceInput): Promise<GivenPlace> {
   const lat = Number(input.lat);
   const lon = Number(input.lon);
   // NaN fails every comparison, so text that is not a number reads as outside India.
-  if (!inIndia(lat, lon)) return { kind: 'outside_india' };
+  if (!isInIndia(lat, lon)) return { kind: 'outside_india' };
   return {
     kind: 'one',
     // A listed place near the fix names it; otherwise the coordinates are kept as they came.

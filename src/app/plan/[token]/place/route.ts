@@ -2,8 +2,8 @@
 // location. The family, routines and home stay as they were; only the place changes.
 import { withQuery } from '@/components/links';
 import type { PlaceNoteKey } from '@/components/copy';
-import { keepFromForm, placeOfForm, planPath, toPlace } from '@/server/edits';
-import type { GivenPlace } from '@/server/geo/geocode';
+import { keepFromForm, placeOfForm, planPath } from '@/server/edits';
+import { toPlace, type GivenPlace } from '@/server/geo/geocode';
 import { handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { openHousehold, sealDraft, sealHousehold } from '@/server/seal';
 

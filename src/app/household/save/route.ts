@@ -1,8 +1,8 @@
 // Takes the household form. A complete form becomes a plan; a form with mistakes comes back with
 // every value kept (the rounded device location too) and one reason per field to fix.
 import type { Place } from '@/core/types';
-import { draftPath, placeOfForm, placeProblem, planPath, toPlace } from '@/server/edits';
-import type { GivenPlace } from '@/server/geo/geocode';
+import { draftPath, placeOfForm, placeProblem, planPath } from '@/server/edits';
+import { toPlace, type GivenPlace } from '@/server/geo/geocode';
 import { handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { collectValues, parseHouseholdForm } from '@/server/household-form';
 import type { FormError } from '@/server/household-form';

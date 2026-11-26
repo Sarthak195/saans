@@ -1,9 +1,9 @@
 // The front door: a family's own words, and optionally a place or a device location, become a
 // plan. Anything still missing sends them to the household form with what they gave so far.
 import { MAX_TEXT } from '@/core/profile/schema';
-import { draftPath, placeOfForm, placeProblem, planPath, toPlace } from '@/server/edits';
+import { draftPath, placeOfForm, placeProblem, planPath } from '@/server/edits';
 import { readHousehold } from '@/server/genai';
-import type { GivenPlace } from '@/server/geo/geocode';
+import { toPlace, type GivenPlace } from '@/server/geo/geocode';
 import { valuesOfPlace } from '@/server/household-values';
 import type { FormValues } from '@/server/household-form';
 import { ASK_MAX_BYTES, field, handleForm, readGuardedForm, seeOther } from '@/server/http';

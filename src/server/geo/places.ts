@@ -4,8 +4,10 @@
 import { z } from 'zod';
 
 import placesData from '@/data/places.json';
+import { oneDecimal } from '@/core/format';
 import { INDIA_LAT, INDIA_LON } from '@/core/profile/schema';
 import { sourceRefSchema } from '@/core/source';
+import type { Place } from '@/core/types';
 
 /**
  * The box around India, in degrees of latitude and longitude, shared with the household schema.
@@ -144,4 +146,30 @@ export function nearestStaticPlace(lat: number, lon: number): PlaceMatch | null 
     if (km <= limit && (best === undefined || km < best.km)) best = { place, km };
   }
   return best ? toMatch(best.place) : null;
+}
+
+/**
+ * True when the point lies inside the latitude and longitude box the app serves (INDIA_BOUNDS).
+ * The box is a rectangle, so it is wider than India's actual border.
+ */
+export function isInIndia(lat: number, lon: number): boolean {
+  return (
+    lat >= INDIA_BOUNDS.minLat &&
+    lat <= INDIA_BOUNDS.maxLat &&
+    lon >= INDIA_BOUNDS.minLon &&
+    lon <= INDIA_BOUNDS.maxLon
+  );
+}
+
+/**
+ * A place as a household keeps it: name, state and position rounded to one decimal degree (about
+ * 11 km). The source of the match is not kept.
+ */
+export function toPlace(match: Pick<PlaceMatch, 'name' | 'admin1' | 'lat' | 'lon'>): Place {
+  return {
+    name: match.name,
+    admin1: match.admin1,
+    lat: oneDecimal(match.lat),
+    lon: oneDecimal(match.lon),
+  };
 }

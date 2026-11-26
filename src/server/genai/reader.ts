@@ -18,7 +18,7 @@ import { climb, isOutage } from '@/server/genai/ladder';
 import type { GenaiDeps } from '@/server/genai/model';
 import { READER_SYSTEM } from '@/server/genai/prompts/reader';
 import type { ReaderResult } from '@/server/genai/types';
-import { resolvePlace, type PlaceMatch } from '@/server/geo/geocode';
+import { resolvePlace, toPlace, type PlaceMatch } from '@/server/geo/geocode';
 import { STATIC_PLACES } from '@/server/geo/places';
 
 // The shape the model is asked to reply in, built from the same schema that checks the reply.
@@ -35,16 +35,6 @@ const NO_MEMBER = 'We could not find who is in your family from that text. Add t
 const NO_PLACE = 'Tell us which city or area you live in, in the form.';
 const PLACE_LOOKUP = 'We could not look up that place right now. Choose it in the form.';
 const PLACE_NONE = 'We could not find that place in India. Check the spelling in the form.';
-
-/** One decimal, the precision a household keeps for a place. */
-function round1(value: number): number {
-  return Math.round(value * 10) / 10;
-}
-
-/** A place match as a household keeps it: position rounded to one decimal degree. */
-function toPlace(match: PlaceMatch): Place {
-  return { name: match.name, admin1: match.admin1, lat: round1(match.lat), lon: round1(match.lon) };
-}
 
 /**
  * Asks the AI reader to read the text. The reader model is tried first and then the fallback, and

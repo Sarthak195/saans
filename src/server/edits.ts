@@ -7,7 +7,7 @@ import { withQuery } from '@/components/links';
 import { COMMUNITY_KINDS, MODES } from '@/core/profile/schema';
 import type { CommunityKind, Household, Mode, Place } from '@/core/types';
 import { field } from '@/server/http';
-import { placeFromInput, type GivenPlace, type PlaceMatch } from '@/server/geo/geocode';
+import { placeFromInput, type GivenPlace } from '@/server/geo/geocode';
 import { AppError, userMessage } from '@/server/errors';
 import { openDraft, sealDraft } from '@/server/seal';
 import type { Draft } from '@/server/seal';
@@ -26,24 +26,6 @@ export function validClock(value: string): boolean {
 /** The travel mode the text names, or undefined when it is not one of the known modes. */
 export function modeOf(value: string): Mode | undefined {
   return MODES.find((m) => m === value);
-}
-
-/** One decimal, the precision a household keeps for a place. */
-function round1(value: number): number {
-  return Math.round(value * 10) / 10;
-}
-
-/**
- * A place as a household keeps it: name, state and position rounded to one decimal degree. The
- * source of the match is not kept.
- */
-export function toPlace(match: Pick<PlaceMatch, 'name' | 'admin1' | 'lat' | 'lon'>): Place {
-  return {
-    name: match.name,
-    admin1: match.admin1,
-    lat: round1(match.lat),
-    lon: round1(match.lon),
-  };
 }
 
 /**

@@ -6,7 +6,7 @@ import 'server-only';
 import type { AirSeries } from '@/core/air/types';
 import { airBodySchema, airUrl, istIso, toAirSeries } from '@/server/air/open-meteo-shape';
 import { AppError } from '@/server/errors';
-import { INDIA_BOUNDS } from '@/server/geo/places';
+import { isInIndia } from '@/server/geo/places';
 
 export { fetchRecordedSeries } from '@/server/air/recorded';
 
@@ -81,19 +81,6 @@ async function getJson(url: string, signal: AbortSignal | undefined): Promise<un
     if (!outcome.retry) break;
   }
   throw failure;
-}
-
-/**
- * True when the point lies inside the latitude and longitude box the app serves. The box is a
- * rectangle, so it is wider than India's actual border.
- */
-export function isInIndia(lat: number, lon: number): boolean {
-  return (
-    lat >= INDIA_BOUNDS.minLat &&
-    lat <= INDIA_BOUNDS.maxLat &&
-    lon >= INDIA_BOUNDS.minLon &&
-    lon <= INDIA_BOUNDS.maxLon
-  );
 }
 
 /**

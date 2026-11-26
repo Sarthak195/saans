@@ -3,10 +3,11 @@
 import 'server-only';
 
 import type { AirSeries } from '@/core/air/types';
-import { fetchAirSeries, isInIndia, type FetchAirOptions } from '@/server/air/open-meteo';
+import { fetchAirSeries, type FetchAirOptions } from '@/server/air/open-meteo';
 import { fetchStation } from '@/server/air/openaq';
 import { fetchRecordedSeries, recordedIdForPoint } from '@/server/air/recorded';
 import { getEnv } from '@/server/env';
+import { isInIndia } from '@/server/geo/places';
 import { AppError } from '@/server/errors';
 
 /** The options for getAirSeries: those of the live fetch, plus the station key and switch. */
