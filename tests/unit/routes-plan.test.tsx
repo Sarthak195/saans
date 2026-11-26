@@ -175,10 +175,12 @@ describe('POST /plan/[token]/place', () => {
       placeLat: '28.6',
       placeLon: '77.2',
     };
-    // The old four fields mean nothing now: with no list the text is read as a place name.
+    // The old four fields mean nothing now: with no list, no typed place and no device
+    // location, the plan stays as it was and the family is asked for a place.
     replyWith({ results: [] });
     const ignored = locationOf(await placePost(formPost('/plan/x/place', forged), context(TOKEN)));
-    expect(query(ignored).get('note')).toBe('placeNotFound');
+    expect(tokenOf(ignored)).toBe(TOKEN);
+    expect(query(ignored).get('note')).toBe('placeMissing');
 
     const chosen = locationOf(
       await placePost(
@@ -209,6 +211,55 @@ describe('POST /plan/[token]/place', () => {
     expect(tokenOf(location)).toBe(TOKEN);
     expect(query(location).get('note')).toBe('placeNotFound');
     expect(noteLine('placeNotFound')).toContain('Nothing in India matched');
+  });
+
+  it('moves the plan to the device location, named after the nearest listed place', async () => {
+    const location = locationOf(
+      await placePost(formPost('/plan/x/place', { lat: '19.1', lon: '72.9' }), context(TOKEN)),
+    );
+    expect(query(location).get('status')).toBe('place');
+    const moved = openHousehold(tokenOf(location));
+    expect(moved.place).toMatchObject({ name: 'Mumbai', admin1: 'Maharashtra' });
+    expect(moved.members).toEqual(sample.household.members);
+  });
+
+  it('keeps an unnamed device location as "Your location" with its rounded coordinates', async () => {
+    const location = locationOf(
+      await placePost(formPost('/plan/x/place', { lat: '12.3', lon: '76.6' }), context(TOKEN)),
+    );
+    expect(openHousehold(tokenOf(location)).place).toEqual({
+      name: 'Your location',
+      admin1: 'India',
+      lat: 12.3,
+      lon: 76.6,
+    });
+  });
+
+  it('lets a typed place win over the device location', async () => {
+    const location = locationOf(
+      await placePost(
+        formPost('/plan/x/place', { place: 'Pune', lat: '19.1', lon: '72.9' }),
+        context(TOKEN),
+      ),
+    );
+    expect(openHousehold(tokenOf(location)).place.name).toBe('Pune');
+  });
+
+  it('keeps the plan and says why for a location outside India or a place search that is down', async () => {
+    const outside = locationOf(
+      await placePost(formPost('/plan/x/place', { lat: '51.5', lon: '-0.1' }), context(TOKEN)),
+    );
+    expect(tokenOf(outside)).toBe(TOKEN);
+    expect(query(outside).get('note')).toBe('placeOutside');
+    expect(noteLine('placeOutside')).toContain('India only');
+
+    // The default stub answers 503, so a name that is not listed cannot be looked up.
+    const down = locationOf(
+      await placePost(formPost('/plan/x/place', { place: 'Mysuru' }), context(TOKEN)),
+    );
+    expect(tokenOf(down)).toBe(TOKEN);
+    expect(query(down).get('note')).toBe('placeLookup');
+    expect(noteLine('placeLookup')).toContain('could not look up');
   });
 });
 

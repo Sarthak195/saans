@@ -4,6 +4,14 @@ import { CheckGroup, ErrorSummary, SelectField, TextField } from './form-fields'
 import type { FormState } from '@/server/household-form';
 import { COOKING, HABITS, HEATING, PURIFIER_UNITS } from './form-options';
 import { MemberRow, RoutineRow, rows } from './household-rows';
+import { LocationButton, type Coords } from './location-button';
+
+/** A device location carried from an earlier page (or a form sent back with mistakes), if any. */
+function coordsOf(values: FormState['values']): Coords | undefined {
+  return values.lat === undefined || values.lon === undefined
+    ? undefined
+    : { lat: values.lat, lon: values.lon };
+}
 
 const MEMBER_ROWS = 6;
 const ROUTINE_ROWS = 8;
@@ -85,6 +93,9 @@ export function HouseholdForm({
             autoComplete="address-level2"
             maxLength={80}
           />
+          <p className="actions">
+            <LocationButton initial={coordsOf(state.values)} />
+          </p>
           <SelectField
             state={state}
             name="lang"

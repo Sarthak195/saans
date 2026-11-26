@@ -60,7 +60,10 @@ function toMatch(place: (typeof STATIC_PLACES)[number]): PlaceMatch {
   };
 }
 
-/** Exact match on a listed name or alias. "Lajpat Nagar, Delhi" also matches on the part before the comma. */
+/**
+ * Exact match on a listed name or alias. "Lajpat Nagar, Delhi" also matches on the part before the
+ * comma. A listed place wins over the geocoder, because its position is checked by hand.
+ */
 export function findStaticPlace(query: string): PlaceMatch | undefined {
   const keys = [query, query.split(',')[0] ?? ''].map(foldName).filter((key) => key !== '');
   for (const key of keys) {
@@ -70,6 +73,35 @@ export function findStaticPlace(query: string): PlaceMatch | undefined {
   return undefined;
 }
 
+/**
+ * The listed places named anywhere in a typed place, in the order they appear, for an address the
+ * geocoder does not know ("Noida Sector 62" names Noida). Names match as whole words, and a name
+ * inside a longer one ("Delhi" inside "New Delhi") does not count, so each spot gives one place.
+ */
+export function listedPlacesIn(text: string): PlaceMatch[] {
+  // Folding turns punctuation into single spaces, so padding with spaces makes " name " a
+  // whole-word test that also works at the start and the end of the text.
+  const folded = ` ${foldName(text)} `;
+  const spans: { place: (typeof STATIC_PLACES)[number]; from: number; to: number }[] = [];
+  for (const place of STATIC_PLACES) {
+    for (const name of [place.name, ...place.aliases]) {
+      const key = foldName(name);
+      const at = key === '' ? -1 : folded.indexOf(` ${key} `);
+      if (at !== -1) spans.push({ place, from: at + 1, to: at + 1 + key.length });
+    }
+  }
+  // Longest names claim their words first, so "New Delhi" wins over the "Delhi" inside it.
+  spans.sort((a, b) => b.to - b.from - (a.to - a.from));
+  const kept: typeof spans = [];
+  for (const span of spans) {
+    if (!kept.some((k) => span.from < k.to && k.from < span.to)) kept.push(span);
+  }
+  kept.sort((a, b) => a.from - b.from);
+  // A place written twice, or by its name and an alias, is still one place.
+  return [...new Set(kept.map((k) => k.place))].map(toMatch);
+}
+
+/** Great-circle distance in km between two points, by the haversine formula. */
 function distanceKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
   const rad = Math.PI / 180;
   const dLat = (bLat - aLat) * rad;

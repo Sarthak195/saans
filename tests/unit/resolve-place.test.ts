@@ -93,6 +93,65 @@ describe('resolvePlace', () => {
   });
 });
 
+describe('resolvePlace with a state, a larger place or an address', () => {
+  it('looks a name up alone and keeps the one in the state written after the comma', async () => {
+    const mock = replyWith(recorded('rampur'));
+    expect(await resolvePlace('Rampur, Odisha')).toEqual({
+      kind: 'one',
+      place: { name: 'Rāmpur', admin1: 'Odisha', lat: 21.07, lon: 84.34, source: 'geocoder' },
+    });
+    // More rows than a plain search, so a state further down the list is still found.
+    expect((mock.mock.calls[0] as [string])[0]).toContain('?name=Rampur&count=20&');
+  });
+
+  it('plans for the larger place after the comma when the first part is not found', async () => {
+    replyWith(recorded('sector-62'));
+    expect(await resolvePlace('Sector 62, Noida')).toMatchObject({
+      kind: 'one',
+      place: { name: 'Noida', source: 'static' },
+    });
+    // "Name, state" for a place the geocoder knows, in a state it is not in, falls back the same way.
+    replyWith(recorded('rampur'));
+    expect(await resolvePlace('Rampur, Delhi')).toMatchObject({
+      kind: 'one',
+      place: { name: 'Delhi', source: 'static' },
+    });
+  });
+
+  it('reads a listed place named inside an address the geocoder does not know', async () => {
+    replyWith(recorded('sector-62'));
+    expect(await resolvePlace('Noida Sector 62')).toMatchObject({
+      kind: 'one',
+      place: { name: 'Noida' },
+    });
+    expect(await resolvePlace('Gurgaon Sector 56')).toMatchObject({
+      kind: 'one',
+      place: { name: 'Gurugram' },
+    });
+    // "Delhi" inside "New Delhi" is not a second place.
+    expect(await resolvePlace('New Delhi Block C')).toMatchObject({
+      kind: 'one',
+      place: { name: 'New Delhi' },
+    });
+  });
+
+  it('asks the family to choose when an address names two listed places', async () => {
+    replyWith(recorded('sector-62'));
+    const result = await resolvePlace('Between Noida and Gurgaon');
+    expect(result.kind).toBe('many');
+    if (result.kind !== 'many') return;
+    expect(result.options.map((o) => o.name)).toEqual(['Noida', 'Gurugram']);
+  });
+
+  it('finds nothing when no part names a place, and reads a trailing comma as no comma', async () => {
+    replyWith(recorded('sector-62'));
+    expect(await resolvePlace('Qwerty, Kerala')).toEqual({ kind: 'none' });
+    const mock = replyWith(recorded('mysuru'));
+    expect(await resolvePlace('Mysuru,')).toMatchObject({ kind: 'one', place: { name: 'Mysuru' } });
+    expect((mock.mock.calls[0] as [string])[0]).toContain('?name=Mysuru&count=5&');
+  });
+});
+
 describe('exports', () => {
   it('re-exports the list helpers next to resolvePlace', () => {
     expect(geo.INDIA_BOUNDS.minLat).toBe(6);

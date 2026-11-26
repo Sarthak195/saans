@@ -52,6 +52,10 @@ export const NOTE_LINES = {
   noAir: 'There is no air data to write about right now, so try again in a while.',
   placeNotFound:
     'Nothing in India matched what you typed. Check the spelling, or type the name of the nearest city.',
+  placeOutside: 'Saans gives guidance for places in India only. Type a place in India.',
+  placeLookup:
+    'We could not look up that place just now. Try again in a minute, or type the nearest city.',
+  placeMissing: 'Type a place in India, or use your location.',
 } as const;
 
 export type NoteKey = keyof typeof NOTE_LINES;

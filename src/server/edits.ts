@@ -4,8 +4,8 @@ import { withQuery } from '@/components/links';
 import { COMMUNITY_KINDS, MODES } from '@/core/profile/schema';
 import type { CommunityKind, Household, Mode, Place } from '@/core/types';
 import { field } from '@/server/http';
-import type { PlaceMatch } from '@/server/geo/geocode';
-import { AppError } from '@/server/errors';
+import { placeFromInput, type GivenPlace, type PlaceMatch } from '@/server/geo/geocode';
+import { AppError, userMessage } from '@/server/errors';
 import { openDraft, sealDraft } from '@/server/seal';
 import type { Draft } from '@/server/seal';
 
@@ -45,6 +45,42 @@ export function pickedPlace(form: FormData): Place | undefined {
   const place = /^\d$/.test(index) ? openDraft(draft).options[Number(index)] : undefined;
   if (place === undefined) throw new AppError('token_invalid', 'no such place in the list');
   return place;
+}
+
+/**
+ * Where a form says the family is: a pick from a list we sealed, else the typed place, else the
+ * rounded device location. The household form, the front door and the change of place all read
+ * the place this way, so each accepts the same answers and says the same thing about a problem.
+ */
+export async function placeOfForm(form: FormData): Promise<GivenPlace> {
+  const picked = pickedPlace(form);
+  if (picked !== undefined) return { kind: 'one', place: { ...picked, source: 'geocoder' } };
+  return placeFromInput({
+    typed: field(form, 'place', 80),
+    lat: field(form, 'lat', 12),
+    lon: field(form, 'lon', 12),
+  });
+}
+
+/** Said when the place search is down: a listed city still works, because it needs no search. */
+const PLACE_UNREACHABLE =
+  'We could not look up that place just now. Try again in a minute, or type the nearest city.';
+
+/** The line a family reads when the place they gave cannot be used, or none when it can. */
+export function placeProblem(given: GivenPlace): string | undefined {
+  switch (given.kind) {
+    case 'none':
+    case 'outside_india': {
+      const message = userMessage(given.kind === 'none' ? 'geocode_none' : 'outside_india');
+      return `${message.body} ${message.nextAction}`;
+    }
+    case 'unreachable':
+      return PLACE_UNREACHABLE;
+    case 'one':
+    case 'many':
+    case 'not_given':
+      return undefined;
+  }
 }
 
 /** The day and air choices a form carried along, checked, as query values for the next page. */

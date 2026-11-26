@@ -40,7 +40,7 @@ function fields(): Record<string, string> {
 }
 
 describe('LocationButton', () => {
-  it('writes the rounded coordinates into hidden form fields and never into the address', () => {
+  it('writes the rounded coordinates into hidden form fields, not into the page address', () => {
     const before = window.location.href;
     stubLocation((ok) => {
       ok({ coords: { latitude: 28.6139, longitude: 77.209 } } as GeolocationPosition);
@@ -59,6 +59,26 @@ describe('LocationButton', () => {
     expect(fields()).toEqual({ lat: '28.6', lon: '77.2' });
     expect(host.querySelector('[role="status"]')?.textContent).toContain('rounded to about 11 km');
     expect(window.location.href).toBe(before);
+  });
+
+  it('sends a location given on an earlier page, and replaces it rather than adding a second', () => {
+    stubLocation((ok) => {
+      ok({ coords: { latitude: 19.07, longitude: 72.88 } } as GeolocationPosition);
+    });
+    act(() => {
+      root.render(<LocationButton initial={{ lat: '12.3', lon: '76.6' }} />);
+    });
+    expect(fields()).toEqual({ lat: '12.3', lon: '76.6' });
+    expect(host.querySelector('[role="status"]')?.textContent).toContain('Using your location');
+
+    const button = host.querySelector('button');
+    if (button === null) throw new Error('no button');
+    act(() => {
+      button.click();
+    });
+    // One pair only: the server would read two values of one field as a single joined value.
+    expect([...new FormData(host).keys()]).toEqual(['lat', 'lon']);
+    expect(fields()).toEqual({ lat: '19.1', lon: '72.9' });
   });
 
   it('leaves the fields out and says so when the device will not share a location', () => {

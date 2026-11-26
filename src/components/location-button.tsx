@@ -1,7 +1,20 @@
 'use client';
+// "Use my location": asks the browser for a position, rounds it, and puts it in hidden fields of
+// the form around the button. Used on the front door, the household form and the change of place.
 
 import { useState, useSyncExternalStore, type ReactElement } from 'react';
 
+/** A device location as the form sends it: degrees rounded to one decimal, as text. */
+export interface Coords {
+  lat: string;
+  lon: string;
+}
+
+const USING =
+  'Using your location, rounded to about 11 km. If you type a place, that is used instead.';
+
+// The button needs script and a browser that can locate. These three functions let React ask
+// for that once on the client, while the server render keeps the button hidden.
 function noSubscription(): () => void {
   return () => undefined;
 }
@@ -18,14 +31,19 @@ function round1(value: number): string {
 }
 
 /**
- * Fills in the place from the device. It needs script, so it stays hidden until the page has
- * loaded. The rounded coordinates go into hidden fields of the form around it, so they travel in
- * the POST body and never in an address that browsers and servers keep.
+ * Fills in the place from the device. The rounded coordinates go into hidden fields of the form
+ * around it, so they travel in the body of the form post, never as plain values in an address.
+ * `initial` is a location the family already gave on an earlier page; it is sent again unless
+ * they ask for a new one, and pressing the button replaces it rather than adding a second pair.
  */
-export function LocationButton(): ReactElement {
+export function LocationButton({
+  initial,
+}: {
+  readonly initial?: Coords | undefined;
+} = {}): ReactElement {
   const ready = useSyncExternalStore(noSubscription, canLocate, cannotLocateOnServer);
-  const [message, setMessage] = useState('');
-  const [coords, setCoords] = useState<{ lat: string; lon: string } | undefined>(undefined);
+  const [message, setMessage] = useState(initial === undefined ? '' : USING);
+  const [coords, setCoords] = useState<Coords | undefined>(initial);
 
   function locate(): void {
     setMessage('Finding your location.');
@@ -35,14 +53,14 @@ export function LocationButton(): ReactElement {
           lat: round1(position.coords.latitude),
           lon: round1(position.coords.longitude),
         });
-        setMessage(
-          'Using your location, rounded to about 11 km. A place you type below is used instead.',
-        );
+        setMessage(USING);
       },
       () => {
+        // Denied, unavailable or timed out: the family can still type a place, so say that.
         setCoords(undefined);
         setMessage('We could not get your location. Type your place instead.');
       },
+      // A fix up to ten minutes old is close enough at 11 km, and saves a slow new reading.
       { timeout: 10_000, maximumAge: 600_000 },
     );
   }

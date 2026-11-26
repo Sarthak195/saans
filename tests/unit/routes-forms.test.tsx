@@ -8,9 +8,11 @@ import PlanTokenPage from '@/app/plan/[token]/page';
 import { sampleById } from '@/core/profile/samples';
 import { readHousehold } from '@/server/genai';
 import { issueFormToken } from '@/server/guards';
+import { valuesOfHousehold } from '@/server/household-values';
 import { openDraft, openHousehold, sealDraft } from '@/server/seal';
 
 import { ORIGIN, formPost, locationOf, stubKeys } from '../helpers/form';
+import { recorded, replyWith } from '../helpers/geocode';
 
 vi.mock('@/server/genai', () => ({
   readHousehold: vi.fn(),
@@ -265,11 +267,124 @@ describe('POST /ask', () => {
     const outside = locationOf(
       await askPost(formPost('/ask', { text: 'Hello', lat: '51.5', lon: '-0.1' })),
     );
-    const reason = openDraft(new URL(outside, ORIGIN).searchParams.get('draft') ?? '').reason;
-    expect(reason).toContain('Saans covers India');
+    const draft = openDraft(new URL(outside, ORIGIN).searchParams.get('draft') ?? '');
+    expect(draft.reason).toContain('places in India only');
+    // A location the app cannot use is not carried on, so the form does not offer it again.
+    expect(draft.values).toEqual({});
 
     vi.mocked(readHousehold).mockResolvedValue({ kind: 'form', reason: 'x', text: 'Hello' });
     await askPost(formPost('/ask', { text: 'Hello', lat: '28.6', lon: '77.2' }));
     expect(vi.mocked(readHousehold).mock.calls.at(-1)?.[0].place?.name).toBeDefined();
+  });
+});
+
+describe('the place a family gives is kept until the plan is made', () => {
+  const draftParam = (location: string): string =>
+    new URL(location, ORIGIN).searchParams.get('draft') ?? '';
+  const tokenOf = (location: string): string => pathOf(location).replace('/plan/', '');
+  const withoutPlace = FAMILY.filter(([name]) => name !== 'place');
+
+  it('keeps a device location when the text box is empty, and the form sends it back', async () => {
+    vi.mocked(readHousehold).mockClear();
+    const location = locationOf(
+      await askPost(formPost('/ask', { text: '', lat: '12.3', lon: '76.6' })),
+    );
+    expect(pathOf(location)).toBe('/household');
+    expect(readHousehold).not.toHaveBeenCalled();
+    const draft = openDraft(draftParam(location));
+    expect(draft.reason).toContain('Add who is in your family');
+    expect(draft.values).toEqual({ lat: '12.3', lon: '76.6' });
+
+    const page = await HouseholdPage({
+      searchParams: Promise.resolve({ draft: draftParam(location) }),
+    });
+    const html = renderToStaticMarkup(page);
+    expect(html).toContain('<input type="hidden" name="lat" value="12.3"/>');
+    expect(html).toContain('<input type="hidden" name="lon" value="76.6"/>');
+    expect(html).toContain('Using your location');
+
+    const saved = locationOf(
+      await savePost(
+        formPost('/household/save', [...withoutPlace, ['lat', '12.3'], ['lon', '76.6']]),
+      ),
+    );
+    expect(openHousehold(tokenOf(saved)).place).toEqual({
+      name: 'Your location',
+      admin1: 'India',
+      lat: 12.3,
+      lon: 76.6,
+    });
+  });
+
+  it('carries a named place on as "name, state", whether it was typed or came from the device', async () => {
+    const typed = locationOf(await askPost(formPost('/ask', { text: '', place: 'bombay' })));
+    expect(openDraft(draftParam(typed)).values).toEqual({ place: 'Mumbai, Maharashtra' });
+    const device = locationOf(
+      await askPost(formPost('/ask', { text: '', lat: '19.1', lon: '72.9' })),
+    );
+    expect(openDraft(draftParam(device)).values).toEqual({ place: 'Mumbai, Maharashtra' });
+  });
+
+  it('keeps the place the family gave when their text cannot be read', async () => {
+    vi.mocked(readHousehold).mockResolvedValue({ kind: 'form', reason: 'x', text: 'Some words' });
+    const location = locationOf(
+      await askPost(formPost('/ask', { text: 'Some words', place: 'Pune' })),
+    );
+    expect(openDraft(draftParam(location)).values).toEqual({ place: 'Pune, Maharashtra' });
+  });
+
+  it('keeps what was typed, and says the search is down, when a place cannot be looked up', async () => {
+    // The default stub answers 503, and Mysuru is not a listed place.
+    const location = locationOf(
+      await askPost(formPost('/ask', { text: 'Hello', place: 'Mysuru' })),
+    );
+    const draft = openDraft(draftParam(location));
+    expect(draft.reason).toContain('could not look up');
+    expect(draft.values).toEqual({ place: 'Mysuru' });
+  });
+
+  it('asks for the state when a typed name belongs to several, in a line the draft can hold', async () => {
+    replyWith(recorded('rampur'));
+    const location = locationOf(
+      await savePost(formPost('/household/save', [...withoutPlace, ['place', 'Rampur']])),
+    );
+    const draft = openDraft(draftParam(location));
+    expect(draft.errors?.[0]).toEqual({
+      field: 'place',
+      message:
+        'More than one place has that name. Add your state after a comma, for example Rāmpur, Uttar Pradesh.',
+    });
+    expect(draft.values?.place).toBe('Rampur');
+  });
+
+  it('keeps the place when a plan is edited, however the place was first given', async () => {
+    replyWith(recorded('rampur'));
+    const ways: [string, string][][] = [
+      [['place', 'Mumbai']],
+      [['place', 'Lajpat Nagar']],
+      [['place', 'Rampur, Odisha']],
+      [
+        ['lat', '12.3'],
+        ['lon', '76.6'],
+      ],
+    ];
+    const names: string[] = [];
+    for (const way of ways) {
+      const made = locationOf(
+        await savePost(formPost('/household/save', [...withoutPlace, ...way])),
+      );
+      const first = openHousehold(tokenOf(made));
+      const edited = locationOf(
+        await savePost(formPost('/household/save', valuesOfHousehold(first))),
+      );
+      expect(openHousehold(tokenOf(edited)).place).toEqual(first.place);
+      names.push(`${first.place.name}, ${first.place.admin1}`);
+    }
+    expect(names).toEqual([
+      'Mumbai, Maharashtra',
+      'Lajpat Nagar, Delhi',
+      'Rāmpur, Odisha',
+      'Your location, India',
+    ]);
   });
 });

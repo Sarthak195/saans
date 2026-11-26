@@ -12,8 +12,9 @@ export function recorded(name: string): unknown {
   return file.body;
 }
 
+/** Stubs fetch to answer every call with this body; each call gets a fresh, unread response. */
 export function replyWith(body: unknown, status = 200): ReturnType<typeof vi.fn> {
-  const mock = vi.fn().mockResolvedValue(new Response(JSON.stringify(body), { status }));
+  const mock = vi.fn(() => Promise.resolve(new Response(JSON.stringify(body), { status })));
   vi.stubGlobal('fetch', mock);
   return mock;
 }

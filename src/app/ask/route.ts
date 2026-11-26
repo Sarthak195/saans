@@ -1,50 +1,23 @@
-import { INDIA_LAT, INDIA_LON, MAX_TEXT } from '@/core/profile/schema';
-import type { Place } from '@/core/types';
-import { draftPath, pickedPlace, planPath, toPlace } from '@/server/edits';
-import { userMessage } from '@/server/errors';
+// The front door: a family's own words, and optionally a place or a device location, become a
+// plan. Anything still missing sends them to the household form with what they gave so far.
+import { MAX_TEXT } from '@/core/profile/schema';
+import { draftPath, placeOfForm, placeProblem, planPath, toPlace } from '@/server/edits';
 import { readHousehold } from '@/server/genai';
-import { nearestStaticPlace, resolvePlace } from '@/server/geo/geocode';
-import type { PlaceMatch } from '@/server/geo/geocode';
+import type { GivenPlace } from '@/server/geo/geocode';
+import { valuesOfPlace } from '@/server/household-values';
+import type { FormValues } from '@/server/household-form';
 import { ASK_MAX_BYTES, field, handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { sealDraft, sealHousehold } from '@/server/seal';
 
-const NO_TEXT = "Write a few lines about your family's day first, or use the form.";
+const NO_TEXT = 'Add who is in your family below, or go back and write a few lines about your day.';
 
-function inIndia(lat: number, lon: number): boolean {
-  return (
-    Number.isFinite(lat) &&
-    Number.isFinite(lon) &&
-    lat >= INDIA_LAT.min &&
-    lat <= INDIA_LAT.max &&
-    lon >= INDIA_LON.min &&
-    lon <= INDIA_LON.max
-  );
-}
-
-type Located = { place: PlaceMatch } | { problem: string } | { choose: Place[] } | undefined;
-
-/** The place the family gave, if any: a pick from a sealed list, typed text, or a rounded device location. */
-async function placeFrom(form: FormData): Promise<Located> {
-  const picked = pickedPlace(form);
-  if (picked !== undefined) return { place: { ...picked, source: 'geocoder' } };
-
-  const typed = field(form, 'place', 80);
-  if (typed !== '') {
-    const found = await resolvePlace(typed);
-    if (found.kind === 'one') return { place: found.place };
-    if (found.kind === 'many') return { choose: found.options.map(toPlace) };
-    const message = userMessage('geocode_none');
-    return { problem: `${message.body} ${message.nextAction}` };
-  }
-
-  const lat = Number(field(form, 'lat', 12));
-  const lon = Number(field(form, 'lon', 12));
-  if (field(form, 'lat', 12) === '' || field(form, 'lon', 12) === '') return undefined;
-  if (!inIndia(lat, lon)) return { problem: 'Saans covers India. Type a place in India.' };
-  const named = nearestStaticPlace(lat, lon);
-  return {
-    place: named ?? { name: 'Your location', admin1: 'India', lat, lon, source: 'geocoder' },
-  };
+/**
+ * The place fields the household form opens with: the place that was found (as "name, state",
+ * or its rounded device location), else the text as typed, so the family can correct it.
+ */
+function placeValues(given: GivenPlace, typed: string): FormValues {
+  if (given.kind === 'one') return valuesOfPlace(toPlace(given.place));
+  return typed === '' ? {} : { place: typed };
 }
 
 /** Reads a family's own words into a plan, or sends them to the one thing still needed. */
@@ -53,20 +26,25 @@ export function POST(request: Request): Promise<Response> {
     const now = new Date();
     const form = await readGuardedForm(request, now, ASK_MAX_BYTES);
     const text = field(form, 'text', MAX_TEXT);
-    const toForm = (reason: string): Response =>
-      seeOther(draftPath('/household', { text, options: [], reason }));
-    if (text === '') return toForm(NO_TEXT);
 
-    const located = await placeFrom(form);
-    if (located !== undefined && 'problem' in located) return toForm(located.problem);
-    if (located !== undefined && 'choose' in located) {
-      return seeOther(`/choose/${sealDraft({ text, options: located.choose })}`);
+    // The place is read first, so every way on to the form below keeps it: a family that gave a
+    // place or used their location never has to give it again.
+    const given = await placeOfForm(form);
+    if (given.kind === 'many') {
+      return seeOther(`/choose/${sealDraft({ text, options: given.options.map(toPlace) })}`);
     }
+    const values = placeValues(given, field(form, 'place', 80));
+    const toForm = (reason: string): Response =>
+      seeOther(draftPath('/household', { text, options: [], reason, values }));
+
+    const problem = placeProblem(given);
+    if (problem !== undefined) return toForm(problem);
+    if (text === '') return toForm(NO_TEXT);
 
     const result = await readHousehold({
       text,
       now,
-      ...(located === undefined ? {} : { place: located.place }),
+      ...(given.kind === 'one' ? { place: given.place } : {}),
     });
     switch (result.kind) {
       case 'household': {

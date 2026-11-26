@@ -8,6 +8,7 @@ import { BandBadge } from './band';
 import { bandClass } from './format';
 import { withQuery } from './links';
 import type { PlanContext } from './links';
+import { LocationButton } from './location-button';
 
 export function PlanHeader({
   plan,
@@ -67,9 +68,11 @@ export function PlanHeader({
               type="text"
               autoComplete="address-level2"
               maxLength={80}
-              required
             />
           </div>
+          <p className="actions">
+            <LocationButton />
+          </p>
           <p>
             <button className="button" type="submit">
               Plan for this place

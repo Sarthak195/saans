@@ -1,12 +1,24 @@
 import 'server-only';
 
-import type { Household } from '@/core/types';
+import type { Household, Place } from '@/core/types';
+import { DEVICE_PLACE_NAME } from '@/server/geo/geocode';
 import type { FormValues } from '@/server/household-form';
+
+/**
+ * The place fields that bring a place back on the household form: "name, state", which the
+ * place search reads back to the same place, or, for a device location no listed place names,
+ * its rounded coordinates, because "Your location" is not a name any search can find.
+ */
+export function valuesOfPlace(place: Place): FormValues {
+  return place.name === DEVICE_PLACE_NAME
+    ? { lat: String(place.lat), lon: String(place.lon) }
+    : { place: `${place.name}, ${place.admin1}` };
+}
 
 /** The form values that describe a household, for editing one. Ids become m1.. and r1.. */
 export function valuesOfHousehold(household: Household): FormValues {
   const v: FormValues = {
-    place: `${household.place.name}, ${household.place.admin1}`,
+    ...valuesOfPlace(household.place),
     lang: household.lang,
     cooking: household.home.cooking,
     heating: household.home.heating,
