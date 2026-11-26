@@ -14,3 +14,9 @@ next-env.d.ts
 
 # Local agent worktrees and tool state
 .claude/
+
+# Playwright output
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

@@ -6,3 +6,6 @@ next-env.d.ts
 tests/fixtures
 src/data/recorded
 .claude/
+test-results
+playwright-report
+blob-report
