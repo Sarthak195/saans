@@ -193,6 +193,14 @@ async function inStateNamed(name: string, after: string): Promise<PlaceMatch | u
  * {kind: 'none'}.
  */
 export async function resolvePlace(query: string): Promise<Resolution> {
+  return resolveText(query, true);
+}
+
+/**
+ * resolvePlace's work. Only the first comma splits the text: the part after it is looked up once
+ * as a plain name, so one query makes at most two place searches however many commas it has.
+ */
+async function resolveText(query: string, splitAtComma: boolean): Promise<Resolution> {
   const text = query.trim();
   // Text with no letters or digits, or over-long text, is a clean miss, with no lookup.
   if (foldName(text) === '' || text.length > MAX_QUERY_LENGTH) return { kind: 'none' };
@@ -201,7 +209,7 @@ export async function resolvePlace(query: string): Promise<Resolution> {
   const listed = findStaticPlace(text);
   if (listed) return { kind: 'one', place: listed };
 
-  const comma = text.indexOf(',');
+  const comma = splitAtComma ? text.indexOf(',') : -1;
   const name = comma === -1 ? text : text.slice(0, comma);
   const after = comma === -1 ? '' : text.slice(comma + 1);
   // No comma, or nothing after it ("Rampur,"): the text is just a name.
@@ -214,7 +222,7 @@ export async function resolvePlace(query: string): Promise<Resolution> {
   const inState = await inStateNamed(name, after);
   if (inState) return { kind: 'one', place: inState };
   // The part after the comma is usually the town or city the place is in.
-  const larger = await resolvePlace(after);
+  const larger = await resolveText(after, false);
   return larger.kind === 'none' ? namedIn(name) : larger;
 }
 

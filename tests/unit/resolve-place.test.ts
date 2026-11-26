@@ -150,6 +150,19 @@ describe('resolvePlace with a state, a larger place or an address', () => {
     expect(await resolvePlace('Mysuru,')).toMatchObject({ kind: 'one', place: { name: 'Mysuru' } });
     expect((mock.mock.calls[0] as [string])[0]).toContain('?name=Mysuru&count=5&');
   });
+
+  it('makes at most two searches however many commas the text has', async () => {
+    const mock = replyWith(recorded('sector-62'));
+    expect(await resolvePlace('a1, b2, c3, d4, e5, f6, g7, h8, i9, j10, k11, l12')).toEqual({
+      kind: 'none',
+    });
+    expect(mock).toHaveBeenCalledTimes(2);
+    // The name in the state named after the comma, then the rest read once as one name.
+    expect((mock.mock.calls[0] as [string])[0]).toContain('?name=a1&count=20&');
+    expect((mock.mock.calls[1] as [string])[0]).toContain(
+      `?name=${encodeURIComponent('b2, c3, d4, e5, f6, g7, h8, i9, j10, k11, l12')}&count=5&`,
+    );
+  });
 });
 
 describe('exports', () => {
