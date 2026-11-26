@@ -1,8 +1,11 @@
+// The front-door form: a family writes about their day, and may add a place or a device location.
+// Component layer: it posts to /ask, which does the reading.
 import type { ReactElement } from 'react';
 
 import { PRIVACY_LINE } from './copy';
 import { LocationButton } from './location-button';
 
+/** What the form starts with: the words in the box and the typed place. */
 export interface AskDefaults {
   text: string;
   place: string;
@@ -19,6 +22,8 @@ export function AskForm({
   /** A link that fills the box with an example, or none when there is no example to offer. */
   readonly exampleHref: string | undefined;
 }): ReactElement {
+  // The box holds 1500 characters and the place 80, the same caps the server applies. The privacy
+  // line is tied to the box with aria-describedby so a screen reader reads it with the box.
   return (
     <section aria-labelledby="ask-title" className="section">
       <h2 id="ask-title" tabIndex={-1}>

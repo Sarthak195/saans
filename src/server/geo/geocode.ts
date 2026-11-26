@@ -21,9 +21,14 @@ export { INDIA_BOUNDS, nearestStaticPlace, type PlaceMatch };
 export type Resolution =
   { kind: 'one'; place: PlaceMatch } | { kind: 'many'; options: PlaceMatch[] } | { kind: 'none' };
 
+// The Open-Meteo geocoding search, the only network place lookup the app uses.
 const ENDPOINT = 'https://geocoding-api.open-meteo.com/v1/search';
+// How long one geocoder request may take, in milliseconds, before it counts as a timeout.
 const TIMEOUT_MS = 3000;
+// Typed place text longer than this many characters is not looked up. It matches the
+// 80-character cap the forms put on the place field.
 const MAX_QUERY_LENGTH = 80;
+// The most places a family is asked to choose between.
 const MAX_OPTIONS = 5;
 // "Dwarka, Delhi" is looked up as "Dwarka", and the state is picked from the rows. Five rows can all
 // be in other states (the recorded "Rampur" reply has five rows from three states), so ask for more.
@@ -33,10 +38,12 @@ const STATE_SEARCH_COUNT = 20;
 // PPLW), airports and other features are not somewhere a family lives.
 const POPULATED_PLACE = /^PPL(?:[ACGLRSFX]\d?)?$/;
 
+// The geocoder's long state name for Delhi, shown as the short "Delhi".
 const NAME_FOR_ADMIN1: Readonly<Record<string, string>> = {
   'National Capital Territory of Delhi': 'Delhi',
 };
 
+// The fields of one geocoder row that the app relies on. A row missing a required one is skipped.
 const resultSchema = z.object({
   name: z.string().min(1),
   latitude: z.number(),
@@ -45,8 +52,10 @@ const resultSchema = z.object({
   admin1: z.string().min(1),
   country_code: z.string().optional(),
 });
+// A geocoder reply is an object whose `results` list may be absent when nothing matched.
 const bodySchema = z.object({ results: z.array(z.unknown()).optional() });
 
+/** True when the point is inside the rough box around India (degrees of latitude, longitude). */
 function inIndia(lat: number, lon: number): boolean {
   return (
     lat >= INDIA_BOUNDS.minLat &&
@@ -56,6 +65,7 @@ function inIndia(lat: number, lon: number): boolean {
   );
 }
 
+/** Rounds to two decimals, about a kilometre. */
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -75,6 +85,8 @@ function populatedPlaces(body: unknown): PlaceMatch[] {
     const row = resultSchema.safeParse(raw);
     if (!row.success) continue;
     const r = row.data;
+    // The search is already limited to India, so the country is checked only when a row gives
+    // one. The box test also drops a row whose coordinates are plainly elsewhere.
     const keep =
       POPULATED_PLACE.test(r.feature_code) &&
       (r.country_code === undefined || r.country_code === 'IN') &&
@@ -115,6 +127,7 @@ export function interpretGeocoderBody(body: unknown): Resolution {
     : { kind: 'one', place: best };
 }
 
+/** The request address for a name and a row count; the name is percent-encoded. */
 function geocoderUrl(query: string, count: number): string {
   return `${ENDPOINT}?name=${encodeURIComponent(query)}&count=${String(count)}&language=en&format=json&countryCode=IN`;
 }
@@ -130,6 +143,7 @@ async function search(query: string, count: number): Promise<unknown> {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (error) {
+    // AbortSignal.timeout rejects with a TimeoutError; an AbortError is read the same way.
     const timedOut = error instanceof Error && ['TimeoutError', 'AbortError'].includes(error.name);
     throw new AppError(
       timedOut ? 'upstream_timeout' : 'upstream_unavailable',
@@ -164,6 +178,7 @@ function namedIn(text: string): Resolution {
 /** The place called `name` in a state written after the comma ("Dwarka, Delhi"), if there is one. */
 async function inStateNamed(name: string, after: string): Promise<PlaceMatch | undefined> {
   if (foldName(name) === '') return undefined;
+  // "Dwarka, Delhi, India" has several parts after the first comma; any of them may be the state.
   const states = new Set(after.split(',').map(foldName));
   const rows = populatedPlaces(await search(name, STATE_SEARCH_COUNT));
   return rows.find((row) => states.has(foldName(row.admin1)));
@@ -179,8 +194,10 @@ async function inStateNamed(name: string, after: string): Promise<PlaceMatch | u
  */
 export async function resolvePlace(query: string): Promise<Resolution> {
   const text = query.trim();
+  // Text with no letters or digits, or over-long text, is a clean miss, with no lookup.
   if (foldName(text) === '' || text.length > MAX_QUERY_LENGTH) return { kind: 'none' };
 
+  // A listed place answers first and needs no network.
   const listed = findStaticPlace(text);
   if (listed) return { kind: 'one', place: listed };
 
@@ -193,6 +210,7 @@ export async function resolvePlace(query: string): Promise<Resolution> {
     return found.kind === 'none' ? namedIn(name) : found;
   }
 
+  // Text with a comma: first try the name inside the state written after the comma.
   const inState = await inStateNamed(name, after);
   if (inState) return { kind: 'one', place: inState };
   // The part after the comma is usually the town or city the place is in.
@@ -234,6 +252,7 @@ export async function placeFromInput(input: PlaceInput): Promise<GivenPlace> {
       throw error;
     }
   }
+  // No typed text: fall back to the device location, which the browser already rounded.
   if (input.lat === '' || input.lon === '') return { kind: 'not_given' };
   const lat = Number(input.lat);
   const lon = Number(input.lon);
@@ -241,6 +260,7 @@ export async function placeFromInput(input: PlaceInput): Promise<GivenPlace> {
   if (!inIndia(lat, lon)) return { kind: 'outside_india' };
   return {
     kind: 'one',
+    // A listed place near the fix names it; otherwise the coordinates are kept as they came.
     place: nearestStaticPlace(lat, lon) ?? {
       name: DEVICE_PLACE_NAME,
       admin1: 'India',

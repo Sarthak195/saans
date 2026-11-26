@@ -1,15 +1,20 @@
+// Field components for the household form: each ties its label, hint and error line together for
+// screen readers. Component layer: they show the state they are given and decide nothing.
 import type { ReactElement } from 'react';
 
 import type { FormError, FormState } from '@/server/household-form';
 
+/** The id of a field's input, also the target of the links in the error summary. */
 export function fieldId(name: string): string {
   return `f-${name}`;
 }
 
+// The message for a field, or undefined when it has no error.
 function errorOf(state: FormState, name: string): string | undefined {
   return state.errors.find((e) => e.field === name)?.message;
 }
 
+// The error text under a label, with the id that aria-describedby points to.
 function ErrorLine({
   name,
   message,
@@ -24,6 +29,8 @@ function ErrorLine({
   );
 }
 
+// The ids of the hint and error lines a field has, joined for aria-describedby, or
+// undefined when it has neither.
 function describedBy(
   name: string,
   hint: string | undefined,
@@ -36,6 +43,10 @@ function describedBy(
   return ids.length === 0 ? undefined : ids.join(' ');
 }
 
+/**
+ * A labelled text, number or time input with an optional hint and error. It starts from the saved
+ * value, so a form sent back with mistakes shows what the family typed.
+ */
 export function TextField(props: {
   state: FormState;
   name: string;
@@ -49,6 +60,7 @@ export function TextField(props: {
 }): ReactElement {
   const { state, name, label, hint } = props;
   const message = errorOf(state, name);
+  // Optional attributes are added only when they are set.
   return (
     <div className="field">
       <label htmlFor={fieldId(name)}>{label}</label>
@@ -74,6 +86,10 @@ export function TextField(props: {
   );
 }
 
+/**
+ * A labelled select. It starts from the saved value, else `fallback`, else the first choice;
+ * `blank` adds an empty first choice.
+ */
 export function SelectField(props: {
   state: FormState;
   name: string;
@@ -107,6 +123,10 @@ export function SelectField(props: {
   );
 }
 
+/**
+ * A group of checkboxes sharing one name. The saved value is the chosen keys joined by commas, and
+ * the fieldset can take focus so an error link can reach it.
+ */
 export function CheckGroup(props: {
   state: FormState;
   name: string;
@@ -114,6 +134,7 @@ export function CheckGroup(props: {
   options: readonly (readonly [string, string])[];
 }): ReactElement {
   const { state, name } = props;
+  // A value that was never saved splits to one empty key, which matches no option.
   const chosen = (state.values[name] ?? '').split(',');
   const message = errorOf(state, name);
   return (
@@ -135,7 +156,10 @@ export function CheckGroup(props: {
   );
 }
 
-/** What is wrong, as links to the fields, shown first and announced as soon as the page loads. */
+/**
+ * What is wrong, as links to the fields, shown first and announced as soon as the page loads.
+ * It renders nothing when there are no errors.
+ */
 export function ErrorSummary({
   errors,
 }: {

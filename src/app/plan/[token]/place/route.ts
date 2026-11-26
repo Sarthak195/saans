@@ -7,6 +7,7 @@ import type { GivenPlace } from '@/server/geo/geocode';
 import { handleForm, readGuardedForm, seeOther } from '@/server/http';
 import { openHousehold, sealDraft, sealHousehold } from '@/server/seal';
 
+// The route context Next.js passes: the plan link from the path.
 interface Context {
   params: Promise<{ token: string }>;
 }
@@ -22,13 +23,17 @@ const PROBLEM_NOTE: Record<Exclude<GivenPlace['kind'], 'one' | 'many'>, NoteKey>
 /** Plans the same household somewhere else, or says why the place could not be used. */
 export function POST(request: Request, { params }: Context): Promise<Response> {
   return handleForm(async () => {
+    // Same-site, size-capped and token-checked before the plan link is opened.
     const form = await readGuardedForm(request, new Date());
     const { token } = await params;
+    // An old, forged or damaged link throws here and is shown as a plain error page.
     const household = openHousehold(token);
+    // The day and air choices that go on to the next page; anything else in the form is dropped.
     const keep = keepFromForm(form);
 
     const given = await placeOfForm(form);
     switch (given.kind) {
+      // Same family, new place, sealed into a new plan link.
       case 'one':
         return seeOther(
           planPath(
@@ -45,6 +50,7 @@ export function POST(request: Request, { params }: Context): Promise<Response> {
             ...keep,
           }),
         );
+      // The place could not be used: back to the unchanged plan, with a fixed note key.
       case 'none':
       case 'outside_india':
       case 'unreachable':

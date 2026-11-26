@@ -1,26 +1,39 @@
 // Fixed wording shared by several pages, kept in one place so the pages and their tests agree.
 
+/** The notice that marks the recorded Delhi smog day as not live. */
 export const SMOG_DAY_LABEL =
   'Recorded smog day: Delhi, 13 Dec 2025 (GRAP Stage IV was in force). Not live.';
 
+/** The health disclaimer shown in the footer of every page and on the about page. */
 export const DISCLAIMER_LINE =
   'General public-health guidance, not medical advice. See a doctor for breathlessness, chest pain or a cough that will not settle.';
 
+/** What a family is told before their own words are sent to Gemini. */
 export const PRIVACY_LINE =
   "Your text is sent to Google's Gemini API to read it. On the free tier Google may use it to improve its products. Avoid names and exact addresses. Saans keeps no copy of it.";
 
+/** The warning beside the share advice: the link itself carries the family's details. */
 export const SHARE_WARNING = "This link contains your family's profile.";
 
+/** The credit line for the air quality and place name data, shown on the about page. */
 export const ATTRIBUTION =
   'Air quality data: Open-Meteo.com (CC BY 4.0), CAMS; place names: GeoNames.';
 
+/** The Central Pollution Control Board air quality site. */
 export const CPCB_URL = 'https://airquality.cpcb.gov.in';
+/** The CPCB app page on Google Play. */
 export const SAMEER_URL = 'https://play.google.com/store/apps/details?id=com.cpcb';
+/** The home page of Open-Meteo, the source of the air quality forecast. */
 export const OPEN_METEO_URL = 'https://open-meteo.com/';
+/** The home page of GeoNames, the source of place names. */
 export const GEONAMES_URL = 'https://www.geonames.org/';
+/** The home page of OpenAQ, the source of nearby monitor readings. */
 export const OPENAQ_URL = 'https://openaq.org/';
 
-/** One short line per action, shown in a status region after a redirect. Keys are fixed, never user text. */
+/**
+ * One short line per action, shown in a status region after a redirect. Keys are fixed, never
+ * user text.
+ */
 export const STATUS_LINES = {
   made: 'Your plan is ready. It is built from the details you gave.',
   changed: 'Your change is applied. The plan below shows the new time or mode.',
@@ -28,8 +41,10 @@ export const STATUS_LINES = {
   asked: 'Your question is answered below.',
 } as const;
 
+/** The fixed keys a link may carry for a status line. */
 export type StatusKey = keyof typeof STATUS_LINES;
 
+/** The status line for a key, or undefined when the key is missing or not one of ours. */
 export function statusLine(key: string | undefined): string | undefined {
   return key !== undefined && Object.hasOwn(STATUS_LINES, key)
     ? STATUS_LINES[key as StatusKey]
@@ -58,8 +73,10 @@ export const NOTE_LINES = {
   placeMissing: 'Type a place in India, or use your location.',
 } as const;
 
+/** The fixed keys a link may carry for a note. */
 export type NoteKey = keyof typeof NOTE_LINES;
 
+/** The note for a key, or undefined when the key is missing or not one of ours. */
 export function noteLine(key: string | undefined): string | undefined {
   return key !== undefined && Object.hasOwn(NOTE_LINES, key)
     ? NOTE_LINES[key as NoteKey]

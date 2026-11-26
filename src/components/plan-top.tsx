@@ -1,3 +1,5 @@
+// The top of a plan page and its small boxes: header, jump bar, status line, answer, summary and
+// question box. Component layer: it renders a plan already built and decides nothing about air.
 import type { ReactElement } from 'react';
 
 import { BAND_LABEL } from '@/core/aqi';
@@ -10,6 +12,10 @@ import { withQuery } from './links';
 import type { PlanContext } from './links';
 import { LocationButton } from './location-button';
 
+/**
+ * The page heading with the place, a notice when a nearby monitor reads worse than the forecast,
+ * links to the other days, and a form to plan for another place.
+ */
 export function PlanHeader({
   plan,
   ctx,
@@ -19,6 +25,8 @@ export function PlanHeader({
   readonly ctx: PlanContext;
   readonly smogDay: boolean;
 }): ReactElement {
+  // The day links are left out on the recorded smog day, which is one fixed day. The change-place
+  // form posts to the place route of this plan and carries the form token.
   return (
     <header className="plan-header">
       <h1 id="plan-title" tabIndex={-1}>
@@ -84,6 +92,10 @@ export function PlanHeader({
   );
 }
 
+/**
+ * Links to the sections of the page, in page order. The answer and summary links appear only when
+ * the page has those sections.
+ */
 export function JumpBar({
   hasAnswer,
   hasBriefing,
@@ -91,6 +103,7 @@ export function JumpBar({
   readonly hasAnswer: boolean;
   readonly hasBriefing: boolean;
 }): ReactElement {
+  // Each target is the id of a section on the plan page.
   const links: [string, string][] = [
     ...(hasAnswer ? ([['#answer', 'Answer']] as [string, string][]) : []),
     ...(hasBriefing ? ([['#summary', 'In short']] as [string, string][]) : []),
@@ -113,8 +126,10 @@ export function JumpBar({
   );
 }
 
+/** The status region shown on every plan page, with the line for the last action or nothing. */
 export function StatusLine({ text }: { readonly text: string | undefined }): ReactElement {
-  // The region exists on every page so a screen reader announces text that arrives after an action.
+  // The region exists on every page so a screen reader announces text that arrives after
+  // an action.
   return (
     <p role="status" className="status-line">
       {text ?? ''}
@@ -122,7 +137,10 @@ export function StatusLine({ text }: { readonly text: string | undefined }): Rea
   );
 }
 
-/** The level chip comes from the day the answer speaks about, and is left out when that has no reading. */
+/**
+ * The answer to a family's question. The level chip comes from the day the answer speaks about,
+ * and is left out when that day has no reading.
+ */
 export function AnswerCard({
   answer,
   question,
@@ -130,6 +148,7 @@ export function AnswerCard({
   readonly answer: QuestionAnswer;
   readonly question?: string | undefined;
 }): ReactElement {
+  // A null level gives the class answer--none.
   const { level } = answer;
   return (
     <section
@@ -152,6 +171,10 @@ export function AnswerCard({
   );
 }
 
+/**
+ * The short written summary, who wrote it, and buttons to have it written again in English or in
+ * Hindi. `keep` is posted as hidden fields.
+ */
 export function BriefingSection({
   briefing,
   action,
@@ -163,6 +186,7 @@ export function BriefingSection({
   readonly formToken: string;
   readonly keep: Readonly<Record<string, string>>;
 }): ReactElement {
+  // Says who wrote the text: Gemini, or the template Saans falls back on.
   const source =
     briefing.by === 'gemini'
       ? 'Written by Gemini from your plan; every number checked by Saans'
@@ -196,7 +220,10 @@ export function BriefingSection({
   );
 }
 
-/** A box for one more question about the plan, read by Gemini and answered from the plan's own numbers. */
+/**
+ * A box for one more question about the plan, read by Gemini and answered from the plan's own
+ * numbers. The question is capped at 300 characters; `keep` is posted as hidden fields.
+ */
 export function AskSection({
   action,
   formToken,

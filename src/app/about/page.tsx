@@ -1,3 +1,5 @@
+// The about page: what Saans is, where its numbers come from, the disclaimer and the privacy
+// note. Route layer, written text only; shared lines come from components/copy.ts.
 import type { Metadata } from 'next';
 import type { ReactElement } from 'react';
 
@@ -10,9 +12,12 @@ import {
   OPEN_METEO_URL,
 } from '@/components/copy';
 
+/** The page title. */
 export const metadata: Metadata = { title: 'About Saans, sources and disclaimer' };
 
+/** The static page about Saans: its sources, a disclaimer and how it treats a family's details. */
 export default function AboutPage(): ReactElement {
+  // The disclaimer line is shared with the page footer; the rest is written here.
   return (
     <>
       <h1 id="plan-title" tabIndex={-1}>

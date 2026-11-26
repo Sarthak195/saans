@@ -1,3 +1,6 @@
+// The household form as fields, for a family that prefers a form to writing a few lines.
+// Component layer: it shows the values and errors it is given and posts to /household/save,
+// where the server does the checking.
 import type { ReactElement } from 'react';
 
 import { CheckGroup, ErrorSummary, SelectField, TextField } from './form-fields';
@@ -13,6 +16,8 @@ function coordsOf(values: FormState['values']): Coords | undefined {
     : { lat: values.lat, lon: values.lon };
 }
 
+// The form offers up to 6 people and 8 routines. The first 2 people and 3 routines show at once;
+// the rest sit in a disclosure.
 const MEMBER_ROWS = 6;
 const ROUTINE_ROWS = 8;
 const VISIBLE_MEMBERS = 2;
@@ -35,9 +40,12 @@ function MoreRows({
   readonly children: (row: number) => ReactElement;
 }): ReactElement {
   const rowsHere = rows(to).filter((n) => n >= from);
+  // Row fields are named by prefix, row number and "_", such as m3_age or r4_start.
   const filled = rowsHere.some((n) =>
     Object.keys(state.values).some((k) => k.startsWith(`${prefix}${String(n)}_`)),
   );
+  // The disclosure opens when a hidden row holds a value or an error, so nothing the family
+  // entered is hidden from them.
   return (
     <details
       open={
@@ -53,7 +61,11 @@ function MoreRows({
   );
 }
 
-/** The whole household as fields, for people who prefer to fill in a form over writing a few lines. */
+/**
+ * The whole household as fields. `draftText` and `draftReason` come from an earlier step that
+ * needed one more answer. The form is not checked in the browser: the server checks it and sends
+ * every mistake back at once.
+ */
 export function HouseholdForm({
   state,
   formToken,
@@ -66,6 +78,8 @@ export function HouseholdForm({
   readonly draftText?: string | undefined;
   readonly draftReason?: string | undefined;
 }): ReactElement {
+  // Order: the error summary, the reason and the words from an earlier step, then the form in four
+  // parts (where, who, routines, home).
   return (
     <>
       <ErrorSummary errors={state.errors} />

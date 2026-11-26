@@ -1,8 +1,13 @@
+// The list of places that share a name, one button each. Component layer: every choice is its own
+// small form, so picking works without a script.
 import type { ReactElement } from 'react';
 
 import type { Place } from '@/core/types';
 
-/** Several places share a name, and the air differs a lot between them, so the family picks one. */
+/**
+ * Several places share a name, and the air differs a lot between them, so the family picks
+ * one.
+ */
 export function ChoosePlace({
   options,
   action,
@@ -22,6 +27,8 @@ export function ChoosePlace({
   readonly keep: Readonly<Record<string, string>>;
 }): ReactElement {
   const name = options[0]?.name ?? 'this place';
+  // A choice posts the sealed list and its position in it, never a place of its own, so the server
+  // reads the place back from the list it sealed. The words are sent only when there are some.
   return (
     <>
       <h1 id="plan-title" tabIndex={-1}>

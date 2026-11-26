@@ -1,3 +1,6 @@
+// Small helpers shared by the form routes and pages: reading a place from a form, checking a
+// clock time or a mode, changing one routine, and building the addresses of the next page. Server
+// layer: nothing is stored, and a changed household is always a new value for the caller to seal.
 import 'server-only';
 
 import { withQuery } from '@/components/links';
@@ -9,13 +12,18 @@ import { AppError, userMessage } from '@/server/errors';
 import { openDraft, sealDraft } from '@/server/seal';
 import type { Draft } from '@/server/seal';
 
+// A 24-hour clock time written "HH:MM", from 00:00 to 23:59: "07:05" and "17:30" match, "7:05" and
+// "24:00" do not.
 const CLOCK = /^([01]\d|2[0-3]):[0-5]\d$/;
+// The day names a form may carry on to the next page.
 const DAYS = ['today', 'tomorrow', 'day_after'] as const;
 
+/** True when the text is a clock time written "HH:MM" on a 24-hour clock. */
 export function validClock(value: string): boolean {
   return CLOCK.test(value);
 }
 
+/** The travel mode the text names, or undefined when it is not one of the known modes. */
 export function modeOf(value: string): Mode | undefined {
   return MODES.find((m) => m === value);
 }
@@ -25,6 +33,10 @@ function round1(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
+/**
+ * A place as a household keeps it: name, state and position rounded to one decimal degree. The
+ * source of the match is not kept.
+ */
 export function toPlace(match: Pick<PlaceMatch, 'name' | 'admin1' | 'lat' | 'lon'>): Place {
   return {
     name: match.name,
@@ -39,9 +51,11 @@ export function toPlace(match: Pick<PlaceMatch, 'name' | 'admin1' | 'lat' | 'lon
  * a client cannot name a place of its own. None when the form is not a pick.
  */
 export function pickedPlace(form: FormData): Place | undefined {
+  // 2000 characters is the longest token seal.ts accepts.
   const draft = field(form, 'draft', 2000);
   if (draft === '') return undefined;
   const index = field(form, 'option', 2);
+  // The position must be one digit; openDraft throws token_invalid for a draft we did not seal.
   const place = /^\d$/.test(index) ? openDraft(draft).options[Number(index)] : undefined;
   if (place === undefined) throw new AppError('token_invalid', 'no such place in the list');
   return place;
@@ -53,8 +67,10 @@ export function pickedPlace(form: FormData): Place | undefined {
  * the place this way, so each accepts the same answers and says the same thing about a problem.
  */
 export async function placeOfForm(form: FormData): Promise<GivenPlace> {
+  // A pick is checked first, so a sealed choice wins over any typed text sent with it.
   const picked = pickedPlace(form);
   if (picked !== undefined) return { kind: 'one', place: { ...picked, source: 'geocoder' } };
+  // Each field is cut to a fixed length: 80 characters for the place, 12 for a coordinate.
   return placeFromInput({
     typed: field(form, 'place', 80),
     lat: field(form, 'lat', 12),
@@ -68,6 +84,8 @@ const PLACE_UNREACHABLE =
 
 /** The line a family reads when the place they gave cannot be used, or none when it can. */
 export function placeProblem(given: GivenPlace): string | undefined {
+  // Only these three kinds are problems. A place, a list to choose from and no place given are
+  // not.
   switch (given.kind) {
     case 'none':
     case 'outside_india': {
@@ -87,6 +105,7 @@ export function placeProblem(given: GivenPlace): string | undefined {
 export function keepFromForm(form: FormData): { day?: string; air?: string } {
   const day = field(form, 'day', 12);
   const air = field(form, 'air', 12);
+  // Only known values are kept, so a form cannot put other text into the next address.
   return {
     ...(DAYS.some((d) => d === day) ? { day } : {}),
     ...(air === 'smog-day' ? { air } : {}),
@@ -99,8 +118,10 @@ export function withRoutineChange(
   change: { routineId: string; newStart?: string | undefined; newMode?: Mode | undefined },
 ): Household | undefined {
   const index = household.routines.findIndex((r) => r.id === change.routineId);
+  // An unknown id gives index -1, which has no routine: nothing is changed.
   const routine = household.routines[index];
   if (routine === undefined) return undefined;
+  // A start time that is not "HH:MM" is ignored; the routine keeps the time it had.
   const changed = {
     ...routine,
     ...(change.newStart !== undefined && validClock(change.newStart)

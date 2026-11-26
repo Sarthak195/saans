@@ -10,6 +10,7 @@ export interface Coords {
   lon: string;
 }
 
+// The line shown while a device location is held.
 const USING =
   'Using your location, rounded to about 11 km. If you type a place, that is used instead.';
 
@@ -41,14 +42,18 @@ export function LocationButton({
 }: {
   readonly initial?: Coords | undefined;
 } = {}): ReactElement {
+  // False on the server and in a browser that cannot locate, so the button stays hidden there.
   const ready = useSyncExternalStore(noSubscription, canLocate, cannotLocateOnServer);
+  // A location carried from an earlier page starts out in use, with the same line.
   const [message, setMessage] = useState(initial === undefined ? '' : USING);
   const [coords, setCoords] = useState<Coords | undefined>(initial);
 
+  // Asks the browser once. Success sets the coordinates; an error clears them.
   function locate(): void {
     setMessage('Finding your location.');
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        // Rounded here in the browser, before anything is sent.
         setCoords({
           lat: round1(position.coords.latitude),
           lon: round1(position.coords.longitude),
@@ -65,6 +70,8 @@ export function LocationButton({
     );
   }
 
+  // The hidden fields exist only while a location is held, so a failed or cleared one sends none.
+  // The button stays hidden until the browser says it can locate.
   return (
     <>
       {coords === undefined ? null : (

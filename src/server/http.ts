@@ -1,13 +1,21 @@
+// What every form route needs: the guarded read of a posted form, a 303 redirect, a plain page for
+// a form that failed, and a text field reader. Server layer: no state, and the clock is passed in
+// as `now`. The responses built here say `private, no-store`.
 import 'server-only';
 
 import { AppError, userMessage } from '@/server/errors';
 import type { AppErrorKind } from '@/server/errors';
 import { assertSameOrigin, readFormLimited, verifyFormToken } from '@/server/guards';
 
-/** A page of text in the user's own words can reach about 14 KB once percent-encoded in Devanagari. */
+/**
+ * The most bytes the route that reads a family's own words accepts, 16 KiB. A page of text in the
+ * user's own words can reach about 14 KB once percent-encoded in Devanagari.
+ */
 export const ASK_MAX_BYTES = 16 * 1024;
+/** The name of the hidden form field that carries the signed form token. */
 export const FORM_TOKEN_FIELD = 'formToken';
 
+// The HTTP status each known failure is answered with. A failure not listed here is a 502.
 const STATUS: Partial<Record<AppErrorKind, number>> = {
   cross_origin: 403,
   body_too_large: 413,
@@ -21,6 +29,7 @@ const STATUS: Partial<Record<AppErrorKind, number>> = {
   upstream_timeout: 504,
 };
 
+// Keeps browsers and shared caches from storing a response that follows a family's form.
 const NO_STORE = { 'Cache-Control': 'private, no-store' } as const;
 
 /** A 303 to a path on this site. The path stays relative so a proxy cannot turn it into another origin. */
@@ -28,10 +37,12 @@ export function seeOther(path: string): Response {
   return new Response(null, { status: 303, headers: { Location: path, ...NO_STORE } });
 }
 
+/** Escapes the five characters that can open or close markup, as numeric character references. */
 function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, (c) => `&#${String(c.charCodeAt(0))};`);
 }
 
+/** A link shown on a message page: where it goes and the words on it. */
 export interface PageLink {
   href: string;
   label: string;
@@ -46,6 +57,7 @@ export function messagePage(
   message: { title: string; body: string; nextAction: string },
   links: readonly PageLink[],
 ): Response {
+  // Every value that reaches the markup is escaped, including the link addresses.
   const items = links
     .map((l) => `<li><a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a></li>`)
     .join('');
@@ -62,6 +74,7 @@ export function messagePage(
 export function errorResponse(error: unknown, startAgain = '/'): Response {
   if (!(error instanceof AppError)) throw error;
   const message = userMessage(error.kind);
+  // An expired form is offered "Start again"; every other failure is offered the home page.
   const label = error.kind === 'form_expired' ? 'Start again' : 'Go to the home page';
   return messagePage(STATUS[error.kind] ?? 502, message, [{ href: startAgain, label }]);
 }
@@ -84,8 +97,10 @@ export async function readGuardedForm(
   now: Date,
   maxBytes?: number,
 ): Promise<FormData> {
+  // The origin is checked before the body is read. The token is in the body, so it comes last.
   assertSameOrigin(request);
   const form = await readFormLimited(request, maxBytes);
+  // verifyFormToken accepts a token signed with our key that is not too old and not too far ahead.
   const token = form.get(FORM_TOKEN_FIELD);
   if (typeof token !== 'string' || !verifyFormToken(token, now)) {
     throw new AppError('form_expired', 'form token missing, forged or old');
