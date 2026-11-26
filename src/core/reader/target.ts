@@ -1,3 +1,6 @@
+// Works out which member, routine, hour or day a question points at, from the words the family
+// quoted. Pure core: no clock, network or environment. A pointer is set only when the quote
+// supports it, so a wrong guess from the model cannot change who the answer is about.
 import type { QuestionTarget } from '@/core/plan/types';
 import { hoursIn } from '@/core/reader/clock';
 import type { QuestionAbout } from '@/core/reader/schema';
@@ -12,6 +15,8 @@ export interface TargetContext {
   routines: readonly { id: string; memberId: string; kind: RoutineKind }[];
 }
 
+// The id of the member whose label is in the quote, or of the member labelled "me" when the
+// speaker refers to themselves ("my walk"). Undefined when neither applies.
 function memberNamed(quote: string, ctx: TargetContext): string | undefined {
   const named = ctx.members.find((m) => hasTerm(quote, m.label));
   if (named) return named.id;
@@ -19,6 +24,8 @@ function memberNamed(quote: string, ctx: TargetContext): string | undefined {
   return speaks ? ctx.members.find((m) => normalizeText(m.label) === 'me')?.id : undefined;
 }
 
+// The id of the one routine the quote points at, or undefined when there is none or it is
+// ambiguous. A routine is matched by the words for its kind, narrowed to the named member.
 function routineOf(
   quote: string,
   memberId: string | undefined,
@@ -27,7 +34,9 @@ function routineOf(
   const byKind = ctx.routines.filter((r) => termsForValue(r.kind).some((t) => hasTerm(quote, t)));
   const mine = byKind.filter((r) => memberId === undefined || r.memberId === memberId);
   if (mine.length === 1) return mine[0]?.id;
+  // Two or more routines fit, so none is chosen.
   if (mine.length > 1) return undefined;
+  // No member is named and the activity matches one routine of anyone.
   if (byKind.length === 1 && memberId === undefined) return byKind[0]?.id;
   // "Can my son play?" names a member who has one routine: that is the routine.
   const ofMember = ctx.routines.filter((r) => r.memberId === memberId);
@@ -46,11 +55,13 @@ export function resolveTarget(
 ): QuestionTarget {
   const target: QuestionTarget = {};
   const named = about.about;
+  // The quote must really be in the family's text before anything is read from it.
   if (named && quoteInText(text, named.quote)) {
     const memberId = memberNamed(named.quote, ctx);
     const routineId = routineOf(named.quote, memberId, ctx);
     if (routineId !== undefined) {
       target.routineId = routineId;
+      // The routine's own member wins, so the member and routine always belong together.
       const owner = ctx.routines.find((r) => r.id === routineId)?.memberId ?? memberId;
       if (owner !== undefined) target.memberId = owner;
     } else if (memberId !== undefined) {
@@ -58,6 +69,7 @@ export function resolveTarget(
     }
   }
   const hour = about.hour;
+  // The hour (0 to 23) must be one the quote's clock times can mean, such as 17 for "5 pm".
   if (hour && quoteInText(text, hour.quote) && hoursIn(hour.quote).includes(hour.value)) {
     target.hour = hour.value;
   }

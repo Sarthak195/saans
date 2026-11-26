@@ -1,6 +1,14 @@
+// The instructions for the Gemini job that words a family's daily summary. Server layer: plain
+// text only. The facts (placeholders and numbers) follow it in the request, and code
+// checks every reply against the plan before it is shown. See docs/PROMPTS.md.
+
 /** Bump the version on every change to the wording, and add a line to docs/PROMPTS.md. */
 export const BRIEFING_PROMPT_VERSION = 'briefing-2';
 
+/**
+ * The fixed instructions for the family summary, in English or Hindi. They ask for 4 to 6
+ * sentences, only the numbers given, routines named by placeholder, and no reassurance.
+ */
 export const BRIEFING_SYSTEM = `You write a short air quality briefing for a family, in plain, kind words, from a JSON object of facts that arrives after these instructions.
 
 Rules:

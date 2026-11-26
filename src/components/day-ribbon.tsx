@@ -1,3 +1,6 @@
+// The hour-by-hour strip on a plan page: a PM2.5 cell for each hour, with the family's routines
+// marked above it. React component layer: it only draws what the plan already decided.
+// It is a real table, so it reads hour by hour without CSS or script.
 import type { ReactElement } from 'react';
 
 import { BAND_LABEL } from '@/core/aqi';
@@ -5,10 +8,13 @@ import type { AirSummary, Window } from '@/core/plan/types';
 
 import { bandClass, clockOf } from './format';
 
+// Markers are placed over the hourly cells from 06:00 to 21:00, which is 16 hours.
 const FIRST_HOUR = 6;
 const HOURS = 16;
+// A routine marker is drawn four hour-columns wide, or less when it would run off the end.
 const MARKER_SPAN = 4;
 
+/** A routine to mark on the strip. Only its start hour sets where the marker goes. */
 export interface RibbonMarker {
   /** Who and when, such as 'Son 17:00'. */
   label: string;
@@ -16,6 +22,7 @@ export interface RibbonMarker {
   start: string;
 }
 
+/** A marker with its grid position: 1-based column and row, and the number of columns it spans. */
 interface PlacedMarker extends RibbonMarker {
   column: number;
   span: number;
@@ -24,11 +31,14 @@ interface PlacedMarker extends RibbonMarker {
 
 /** Puts each marker over its starting hour, on the first line where it does not touch another. */
 export function placeMarkers(markers: readonly RibbonMarker[]): PlacedMarker[] {
+  // The first free column of each line so far, so a later marker can reuse a line that has room.
   const lineEnds: number[] = [];
   const placed: PlacedMarker[] = [];
+  // Zero-padded 'HH:MM' strings sort in time order, and earlier markers get the lower row numbers.
   const sorted = [...markers].sort((a, b) => a.start.localeCompare(b.start));
   for (const marker of sorted) {
     const hour = Number(marker.start.slice(0, 2));
+    // A routine outside the 06:00 to 21:59 strip has no cell to sit over, so it is left out.
     if (hour < FIRST_HOUR || hour >= FIRST_HOUR + HOURS) continue;
     const column = hour - FIRST_HOUR + 1;
     const span = Math.min(MARKER_SPAN, HOURS - column + 1);
@@ -40,6 +50,8 @@ export function placeMarkers(markers: readonly RibbonMarker[]): PlacedMarker[] {
   return placed;
 }
 
+// True when an hour cell falls inside the cleaner window. An end such as 10:30 rounds up, so the
+// 10:00 cell is included. A day with no window marks nothing.
 function inWindow(hour: number, window: Window | null): boolean {
   if (window === null) return false;
   const start = Number(window.start.slice(0, 2));
@@ -63,13 +75,19 @@ export function DayRibbon({
   readonly window: Window | null;
 }): ReactElement {
   const placed = placeMarkers(markers);
+  // The hour is read from the stamp of each cell, then flagged when it is in the window.
   const cells = hourly.map((cell, index) => {
     const hour = Number(clockOf(cell.hour).slice(0, 2));
     return { ...cell, index, hour, win: inWindow(hour, window) };
   });
+  // The first and last window cells get an extra class, so CSS can close the outline at each end.
   const firstWin = cells.find((c) => c.win)?.index;
   const lastWin = cells.filter((c) => c.win).at(-1)?.index;
 
+  // In the markup, the sr-only text gives a screen reader the band and the window flag of each
+  // cell. A missing reading shows 'n/a' and 'no data'. Every other value gets the rb-alt class,
+  // which CSS hides on a narrow screen. Marker positions go in data attributes, which the CSS
+  // reads, because the content security policy does not allow style attributes.
   return (
     <div className="ribbon-block">
       <p className="ribbon-title" aria-hidden="true">

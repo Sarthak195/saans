@@ -1,40 +1,58 @@
+// The failures the app expects, each with the plain message a family sees. Server layer. It
+// imports nothing, so pages, routes and components can all share it.
+
+/**
+ * Every failure the app handles by name. They fall in groups: the air data service, place
+ * search, sealed links and forms, requests, and the Gemini writer.
+ */
 export type AppErrorKind =
+  // The air data service.
   | 'upstream_timeout'
   | 'upstream_bad_shape'
   | 'upstream_unavailable'
   | 'no_data'
+  // Place search.
   | 'geocode_none'
   | 'geocode_ambiguous'
   | 'outside_india'
+  // Sealed links, form tokens and request limits.
   | 'token_invalid'
   | 'token_too_large'
   | 'form_expired'
   | 'body_too_large'
   | 'cross_origin'
+  // The Gemini writer. None of these stops the plan, which is always built in code.
   | 'genai_quota'
   | 'genai_blocked'
   | 'genai_schema'
   | 'genai_timeout'
   | 'genai_unavailable';
 
-/** A failure the app understands. The kind decides what the family sees and which fallback runs. */
+/**
+ * A failure the app understands. The kind decides what the family sees and which fallback
+ * runs.
+ */
 export class AppError extends Error {
   override readonly name = 'AppError';
   readonly kind: AppErrorKind;
 
+  // The detail is for logs and tests (it defaults to the kind); families see userMessage(kind).
   constructor(kind: AppErrorKind, detail?: string, options?: { cause?: unknown }) {
     super(detail ?? kind, options);
     this.kind = kind;
   }
 }
 
+/** What a family reads for one failure: a title, what happened, and one thing to do next. */
 export interface UserMessage {
   title: string;
   body: string;
   nextAction: string;
 }
 
-// Written for a parent reading on a phone: what is going on, in plain words, then one thing to do.
+// One message per kind, grouped as in AppErrorKind. Written for a parent reading on a phone: what
+// is going on, in plain words, then one thing to do. The Record type forces a message for
+// every kind.
 const MESSAGES: Record<AppErrorKind, UserMessage> = {
   upstream_timeout: {
     title: 'The air data is slow to load',
@@ -123,6 +141,7 @@ const MESSAGES: Record<AppErrorKind, UserMessage> = {
   },
 };
 
+/** The family-facing message for a failure kind. Every kind has one, so this always returns. */
 export function userMessage(kind: AppErrorKind): UserMessage {
   return MESSAGES[kind];
 }

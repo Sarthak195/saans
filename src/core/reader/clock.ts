@@ -1,3 +1,7 @@
+// Reads clock times, durations and weekdays from the words a family wrote, in code rather than
+// by the model. Core layer: pure, with no clock, network or environment. Times are 'HH:MM' on
+// the 24-hour clock, durations are in minutes, and days are the plan's weekday codes.
+
 import { normalizeText } from '@/core/text';
 import { extractNumbersWithSmallWords } from '@/core/text/numbers';
 import type { Weekday } from '@/core/types';
@@ -20,10 +24,12 @@ const DASH_BETWEEN = new RegExp(
   'g',
 );
 
+// A number as at least two digits: 5 gives "05".
 function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
+// An hour and a minute as 'HH:MM'.
 function clock(hour: number, minute: number): string {
   return `${pad(hour)}:${pad(minute)}`;
 }
@@ -39,9 +45,14 @@ export function tidyClock(value: string): string | undefined {
 // "5 pm", "5pm", "6:30 am", "17:00", "8:30", "5 baje"; the lookahead keeps "5 km" and "45 minutes" out.
 const TIME =
   /(?<![\d:.])(\d{1,2})(?::([0-5]\d))?\s*(am|pm|baje|बजे)?(?![\d:]|\s*(?:km|min|minutes?|hours?|hrs?|years?|saal|sal|%|m\b))/gu;
+// A bare hour after "at", "around" or "by" ("at 8"), with no am, pm or unit after it.
 const AT_BARE =
   /\b(?:at|around|by)\s+(\d{1,2})(?![\d:]|\s*(?:am|pm|baje|बजे|km|min|minutes?|hours?|years?|saal|%))/gu;
 
+// The 24-hour hours a written hour can mean. With am or pm there is one reading (12 am is 0,
+// 12 pm is 12). Without either, 0, 12 or later, or an hour with a leading zero ("07") is read as
+// written; any other hour can be morning or evening. An hour above 12 with am or pm, or above
+// 23 without, gives none.
 function hoursFor(hour: number, suffix: string | undefined, leadingZero: boolean): number[] {
   if (suffix === 'am') return hour > 12 ? [] : [hour % 12];
   if (suffix === 'pm') return hour > 12 ? [] : [hour === 12 ? 12 : hour + 12];
@@ -65,8 +76,10 @@ function narrowByDayPart(hours: number[], text: string): number[] {
  * a bare "8:30" or "9 baje" can be morning or evening unless the words around it say which.
  */
 export function clockTimes(quote: string): string[] {
+  // "5 p.m." is turned into "5 pm" so one pattern reads both.
   const text = normalizeText(quote).replace(/\b([ap])\.m\.?/g, '$1m');
   const found: string[] = [];
+  // Adds each reading of the time once, in the order found.
   const add = (hour: number, minute: number, suffix: string | undefined, raw: string): void => {
     const leadingZero = raw.length === 2 && raw.startsWith('0');
     const hours = narrowByDayPart(hoursFor(hour, suffix, leadingZero), text);
@@ -85,12 +98,14 @@ export function clockTimes(quote: string): string[] {
     const [, h = ''] = m;
     add(Number(h), 0, undefined, h);
   }
+  // "noon" has no digits, so it is added on its own.
   if (hasTerm(text, 'noon') && !found.includes('12:00')) found.push('12:00');
   return found;
 }
 
 /** A quote that is only an hour ("6"): the times it can mean, kept when the text itself gives that time. */
 export function bareClockTimes(quote: string, text: string): string[] {
+  // Only a quote that is nothing but one or two digits is a bare hour.
   const hour = /^\s*(\d{1,2})\s*$/.exec(quote)?.[1];
   if (hour === undefined) return [];
   const own = narrowByDayPart(hoursFor(Number(hour), undefined, false), normalizeText(text));
@@ -100,6 +115,7 @@ export function bareClockTimes(quote: string, text: string): string[] {
 
 /** A time of day named only by a part of the day: used, with a note, when no hour is given. */
 export function dayPartClock(quote: string): string | undefined {
+  // One fixed time per part of the day: morning 07:00, afternoon 14:00, evening 17:00, night 20:00.
   const text = normalizeText(quote);
   if (mentionsAny(text, ['subah', 'morning', 'सुबह'])) return '07:00';
   if (mentionsAny(text, ['dopahar', 'afternoon', 'दोपहर'])) return '14:00';
@@ -113,6 +129,7 @@ export function hoursIn(quote: string): number[] {
   return [...new Set(clockTimes(quote).map((t) => Number(t.slice(0, 2))))];
 }
 
+// Words that make the number before them a count of hours, then of minutes.
 const HOUR_WORDS = ['hour', 'hours', 'hr', 'hrs', 'ghanta', 'ghante', 'घंटा', 'घंटे'];
 const MINUTE_WORDS = ['min', 'mins', 'minute', 'minutes', 'minat', 'मिनट'];
 
@@ -124,10 +141,12 @@ export function minutesIn(quote: string): number[] {
     const isHour = HOUR_WORDS.includes(token);
     if (!isHour && !MINUTE_WORDS.includes(token)) return;
     const prev = tokens[i - 1] ?? '';
+    // "half hour", "half an hour" and "aadha ghanta" are 30 minutes.
     if (prev === 'half' || prev === 'aadha' || (prev === 'an' && tokens[i - 2] === 'half')) {
       found.push(30);
       return;
     }
+    // The amount before the unit: digits, a number word ("two"), or "a" and "an" for one.
     const amount = /^\d+(?:\.\d+)?$/.test(prev)
       ? Number(prev)
       : (extractNumbersWithSmallWords(prev)[0] ?? (prev === 'an' || prev === 'a' ? 1 : undefined));
@@ -136,6 +155,8 @@ export function minutesIn(quote: string): number[] {
   return [...new Set(found)];
 }
 
+// The days from one weekday to another in week order, wrapping past Sunday: Sat to Mon gives
+// Sat, Sun, Mon.
 function daysBetween(from: Weekday, to: Weekday): Weekday[] {
   const start = WEEK_ORDER.indexOf(from);
   const out: Weekday[] = [];
@@ -148,6 +169,7 @@ function daysBetween(from: Weekday, to: Weekday): Weekday[] {
   return out;
 }
 
+// The weekday a single word names, ignoring a plural "s" ("mondays"); undefined for other words.
 function dayOf(word: string): Weekday | undefined {
   return WEEK_ORDER.find((day) => WEEKDAY_NAMES[day].includes(word.replace(/s$/, '')));
 }
@@ -159,11 +181,13 @@ export function daysIn(quote: string): Weekday[] {
   // The first group is "every day"; it only applies when nothing narrower is named.
   const [daily, ...narrower] = DAY_GROUPS;
   const group = narrower.find((g) => mentionsAny(text, g.terms));
+  // Day names found word by word; a range such as "mon to fri" is joined by a bridge word below.
   const names = text.split(' ').map(dayOf);
   const tokens = text.split(' ');
   const days = new Set<Weekday>(group?.days ?? []);
   names.forEach((day, i) => {
     if (day === undefined) return;
+    // A day, a bridge word, then another day ("mon to fri", "somvar se shukravar") is a range.
     const bridge = tokens[i + 1];
     const end =
       bridge !== undefined && ['to', 'se', 'till', 'through', 'tak'].includes(bridge)

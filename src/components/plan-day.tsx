@@ -1,3 +1,6 @@
+// The sections of a plan page that describe the day itself: the glance, the severe-air banner,
+// the timeline of routines and the per-person summary. Components layer: it only renders what the
+// pure core already decided and puts nothing new into the advice.
 import type { ReactElement } from 'react';
 
 import { BAND_LABEL } from '@/core/aqi';
@@ -8,13 +11,16 @@ import { SLOT_LABEL } from './format';
 import { RoutineItem } from './routine-item';
 import type { WhatIfTarget } from './routine-item';
 
+// The parts of the day, in the order the timeline lists them.
 const SLOTS: readonly DaySlot[] = ['morning', 'afternoon', 'evening'];
+// How a person's sensitivity is put to them in the "Each person" list.
 const SENSITIVITY_WORD = {
   high: 'Needs the most care',
   raised: 'Needs some extra care',
   general: 'Usual care',
 } as const;
 
+// Says a window as "start to end, PM2.5 about N (band)", or that there are no hours with data.
 function span(window: Window | null): ReactElement {
   if (window === null) return <>No hours with data</>;
   return (
@@ -24,6 +30,8 @@ function span(window: Window | null): ReactElement {
   );
 }
 
+// The airing advice as one sentence: open as usual, air in a window, or keep shut with the least
+// bad hour.
 function airingLine(airing: Airing): string {
   switch (airing.kind) {
     case 'normal':
@@ -35,6 +43,10 @@ function airingLine(airing: Airing): string {
   }
 }
 
+/**
+ * The day at a glance: the cleanest and the worst three hours, what to do about airing the home,
+ * and the one action that matters most. The plan has already decided each of these.
+ */
 export function GlanceSection({ glance }: { readonly glance: Glance }): ReactElement {
   return (
     <section id="glance" aria-labelledby="glance-title" className="section">
@@ -73,6 +85,7 @@ export function SevereBanner({
   readonly scoped: boolean;
   readonly hoursOnly: boolean;
 }): ReactElement {
+  // The first step reads differently when the plan keeps some hard exercise or play at set hours.
   return (
     <section aria-labelledby="severe-title" className="severe">
       <h2 id="severe-title">
@@ -103,6 +116,8 @@ export function SevereBanner({
   );
 }
 
+// The routines of one part of the day, earliest first. Starts are zero-padded 'HH:MM', so
+// comparing them as text puts them in time order.
 function bySlot(routines: readonly RoutineAdvice[], slot: DaySlot): RoutineAdvice[] {
   return routines.filter((r) => r.slot === slot).sort((a, b) => a.start.localeCompare(b.start));
 }
@@ -121,6 +136,7 @@ export function Timeline({
   /** True when there is no air data: routines are listed, with no advice yet. */
   readonly noAir?: boolean;
 }): ReactElement {
+  // A part of the day with no routines is left out. `before` goes only to its own routine.
   return (
     <section id="timeline" tabIndex={-1} aria-labelledby="timeline-title" className="section">
       <h2 id="timeline-title">Timeline</h2>
@@ -155,12 +171,18 @@ export function Timeline({
   );
 }
 
+/**
+ * One line per person: how much less PM2.5 their outdoor routines get with this plan than with
+ * their usual schedule. Returns null when the household has no members.
+ */
 export function MemberSummaries({
   members,
 }: {
   readonly members: readonly MemberSummary[];
 }): ReactElement | null {
   if (members.length === 0) return null;
+  // Three cases: no outdoor exposure on the usual schedule; otherwise some saving, where a cut of
+  // 100 per cent gets its own wording about moving indoors; otherwise no change.
   return (
     <section id="people" aria-labelledby="people-title" className="section">
       <h2 id="people-title">Each person</h2>

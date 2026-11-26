@@ -1,3 +1,6 @@
+// One routine of the day as the plan shows it: the decision, the reason, a cleaner time, how to
+// protect against the air and the what-if form. Components layer: it renders the advice the core
+// built, and the what-if form is a plain HTML post that works without JavaScript.
 import type { ReactElement } from 'react';
 
 import { BAND_LABEL } from '@/core/aqi';
@@ -9,19 +12,24 @@ import { BandBadge, DecisionTag } from './band';
 import { SourceLink } from './source-link';
 import { DECISION_WORD, KIND_LABEL, MODE_LABEL, WEEKDAY_LONG } from './format';
 
+/** Where the what-if form posts and what it carries back, so the new page matches this one. */
 export interface WhatIfTarget {
   /** Where the what-if form posts, such as '/plan/<token>/whatif'. */
   action: string;
+  /** The signed form token the route checks before it accepts the post (SECURITY.md). */
   formToken: string;
   /** Values the new plan page should keep, such as the day, sent back with the form. */
   keep?: Readonly<Record<string, string>>;
 }
 
+// The air for a routine in words: PM2.5 (micrograms per cubic metre) and its band, or a note
+// that the routine's hours have no data.
 function reading(advice: RoutineAdvice): string {
   if (advice.pm25 === null || advice.level === null) return 'no air data for this time';
   return `PM2.5 about ${String(advice.pm25)} (${BAND_LABEL[advice.level]})`;
 }
 
+// A phrase giving the decision, start time, mode if set, and the air reading.
 function summaryOf(advice: RoutineAdvice): string {
   const mode = advice.mode === undefined ? '' : `, ${MODE_LABEL[advice.mode].toLowerCase()}`;
   return `${DECISION_WORD[advice.decision]} at ${advice.start}${mode}, ${reading(advice)}`;
@@ -42,6 +50,8 @@ function ChangeNote({
   );
 }
 
+// The "Try another time or mode" form for one routine. Both buttons post the same fields; the
+// `change` value ("time" or "mode") says which of the two the family asked to try.
 function WhatIfForm({
   advice,
   target,
@@ -49,7 +59,10 @@ function WhatIfForm({
   readonly advice: RoutineAdvice;
   readonly target: WhatIfTarget;
 }): ReactElement {
+  // Field ids carry the routine id, so several forms on one page keep their labels apart.
   const id = `whatif-${advice.routineId}`;
+  // The start time is pre-filled with the cleaner time when the advice found one, and with the
+  // routine's own start otherwise. An empty mode value means "Not set".
   return (
     <details className="whatif">
       <summary>Try another time or mode</summary>
@@ -109,6 +122,8 @@ export function RoutineItem({
   readonly noAir?: boolean;
 }): ReactElement {
   const title = `${advice.memberLabel}: ${KIND_LABEL[advice.kind].toLowerCase()}`;
+  // Three shapes, in order: a routine that does not happen on this weekday gets a one-line
+  // note; with no air data only its time is listed; otherwise the full advice follows below.
   if (!advice.scheduled) {
     return (
       <li className="routine routine--off">
@@ -129,6 +144,10 @@ export function RoutineItem({
     );
   }
   const { window } = advice;
+  // The id and tabIndex -1 let a link to #routine-<id> land on this routine and focus it. The
+  // level badge is left out when the routine's hours have no data. The "before" note, the
+  // cleaner time, the protection list and the what-if form each appear only when there is
+  // something to show.
   return (
     <li className="routine" id={`routine-${advice.routineId}`} tabIndex={-1}>
       <h4>{title}</h4>

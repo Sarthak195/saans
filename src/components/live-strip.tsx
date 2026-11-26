@@ -1,3 +1,5 @@
+// The Delhi air strip on the home page. React component layer: it shows a LiveStrip that the
+// server already loaded, and says plainly whether it is live, saved or missing.
 import type { ReactElement } from 'react';
 
 import type { LiveStrip } from '@/server/live-strip';
@@ -5,8 +7,14 @@ import type { LiveStrip } from '@/server/live-strip';
 import { BandBadge } from './band';
 import { clockOf, dateLabel } from './format';
 
-/** Delhi's air today, in one place that needs no input from the visitor. */
+/**
+ * Delhi's air today, in one place that needs no input from the visitor. A live reading shows the
+ * AQI and its band with the data hour in IST. A saved reading is dated and marked as not live,
+ * and when there is nothing it says so and points to the sample plans.
+ */
 export function LiveStripView({ strip }: { readonly strip: LiveStrip }): ReactElement {
+  // The heading names the AQI only for a live reading. A saved reading shows its AQI in its own
+  // line, after the note that it is not live.
   return (
     <section className="live-strip" aria-labelledby="live-title">
       {strip.kind === 'now' ? (

@@ -1,3 +1,5 @@
+// How sensitive a household member is to polluted air: general, raised or high.
+// Layer: core (pure). Used to choose how strict the plan is for that person.
 import type { Member, Sensitivity } from '@/core/types';
 
 /**

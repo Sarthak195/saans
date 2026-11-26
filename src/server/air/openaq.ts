@@ -1,3 +1,6 @@
+// Finds the nearest recent reading from a fixed air-quality monitor through OpenAQ v3, as an
+// optional extra beside the model data. Server layer: I/O only, no module-scope mutable state.
+// The key goes in a header and nowhere else, and any failure means "no station", never an error.
 import 'server-only';
 
 import { unstable_cache } from 'next/cache';
@@ -23,6 +26,7 @@ const FAILURE_PAUSE_SECONDS = 60;
 const SEARCH_LIMIT = 100;
 // How many of the nearest stations are read, so one with a stopped PM2.5 sensor does not hide the rest.
 const CANDIDATES = 3;
+// The monitor list is kept in the framework cache for 3 hours, latest values for 15 minutes.
 const LOCATIONS_REVALIDATE_SECONDS = 3 * 60 * 60;
 const LATEST_REVALIDATE_SECONDS = 15 * 60;
 /** CPCB data trails the clock by two to three hours, so a reading a little under four hours old still counts. */
@@ -31,8 +35,11 @@ const FRESH_MS = 4 * 60 * 60 * 1000;
 const FUTURE_SLACK_MS = 10 * 60 * 1000;
 /** No real ambient PM reading is below zero or above this, in micrograms per cubic metre. */
 const MAX_PLAUSIBLE = 2000;
+// Mean radius of the Earth, used for the distance between two points.
 const EARTH_RADIUS_KM = 6371;
 
+// The parts of an OpenAQ reply that are read. Fields the API may leave out or set to null are
+// optional here, so an odd monitor is skipped later instead of failing the whole reply.
 const sensorSchema = z.object({
   id: z.number(),
   parameter: z.object({ name: z.string() }),
@@ -61,9 +68,12 @@ const latestBodySchema = z.object({
   ),
 });
 
+/** One monitoring location in an OpenAQ locations reply. */
 export type OpenAqLocation = z.infer<typeof locationSchema>;
+/** One latest value from one sensor in an OpenAQ latest reply. */
 export type OpenAqLatest = z.infer<typeof latestBodySchema>['results'][number];
 
+/** The options for a station lookup; all are for tests or for cancelling a request. */
 export interface StationOptions {
   /** The clock, injectable so a test can fix the time. */
   now?: () => Date;
@@ -72,6 +82,7 @@ export interface StationOptions {
   remember?: Remember;
 }
 
+/** Runs `produce` once per key and reuses its outcome for a short time. */
 export type Remember = <T>(key: string[], produce: () => Promise<T>) => Promise<T>;
 
 /**
@@ -87,6 +98,7 @@ const rememberBriefly: Remember = async (key, produce) => {
   }
 };
 
+// The great-circle distance in kilometres between two points (haversine formula).
 function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
   const rad = (degrees: number): number => (degrees * Math.PI) / 180;
   const h =
@@ -95,23 +107,27 @@ function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): nu
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
 }
 
-/** True when the timestamp is recent enough to describe the air now, judged against the given clock. */
+/** True when the timestamp is recent enough to describe the air now, assessed against the given clock. */
 export function isFresh(utc: string, now: Date): boolean {
   const at = Date.parse(utc);
+  // An unreadable timestamp is not fresh.
   if (Number.isNaN(at)) return false;
   const age = now.getTime() - at;
   return age <= FRESH_MS && age >= -FUTURE_SLACK_MS;
 }
 
+// The ids of this location's sensors that measure the given pollutant.
 function sensorIds(location: OpenAqLocation, parameter: 'pm25' | 'pm10'): number[] {
   return location.sensors.filter((s) => s.parameter.name === parameter).map((s) => s.id);
 }
 
+// Kilometres from the household's point to a location, or null when it cannot be told.
 function kmFrom(lat: number, lon: number, location: OpenAqLocation): number | null {
   if (location.coordinates) {
     return haversineKm(lat, lon, location.coordinates.latitude, location.coordinates.longitude);
   }
   // The search measures from the rounded point; better than dropping a station with no coordinates.
+  // OpenAQ gives that distance in metres.
   return typeof location.distance === 'number' ? location.distance / 1000 : null;
 }
 
@@ -127,6 +143,7 @@ export function rankLocations(
 ): { location: OpenAqLocation; distanceKm: number }[] {
   const ranked: { location: OpenAqLocation; distanceKm: number }[] = [];
   for (const location of locations) {
+    // Only fixed monitors count: a listing must be marked as a monitor and not as mobile.
     if (location.isMonitor !== true || location.isMobile === true) continue;
     if (sensorIds(location, 'pm25').length === 0) continue;
     if (!location.datetimeLast || !isFresh(location.datetimeLast.utc, now)) continue;
@@ -137,6 +154,7 @@ export function rankLocations(
   return ranked.sort((a, b) => a.distanceKm - b.distanceKm);
 }
 
+// A chosen reading: its value in micrograms per cubic metre and its UTC timestamp.
 interface Pick {
   value: number;
   at: string;
@@ -150,6 +168,7 @@ function newest(readings: readonly OpenAqLatest[], ids: readonly number[], now: 
   let best: (Pick & { time: number }) | null = null;
   for (const reading of readings) {
     const { value } = reading;
+    // Only this location's own sensors, and only a real number in the plausible range.
     if (!ids.includes(reading.sensorsId) || typeof value !== 'number') continue;
     if (!Number.isFinite(value) || value < 0 || value > MAX_PLAUSIBLE) continue;
     if (!isFresh(reading.datetime.utc, now)) continue;
@@ -167,23 +186,29 @@ export function toStation(
   now: Date,
 ): StationReading | null {
   const pm25 = newest(readings, sensorIds(location, 'pm25'), now);
+  // PM10 is an extra: without a fresh PM2.5 there is no reading, without PM10 it is null.
   if (pm25 === null) return null;
   const pm10 = newest(readings, sensorIds(location, 'pm10'), now);
   return {
     provider: 'openaq',
     name: location.name,
+    // Distance to one decimal place, in kilometres.
     distanceKm: Math.round(distanceKm * 10) / 10,
     pm25: pm25.value,
     pm10: pm10?.value ?? null,
+    // The time of the PM2.5 value, written in India time.
     measuredAt: istIso(new Date(pm25.at)),
   };
 }
 
+/** The search request for monitors around a point: the point rounded to 0.1 degree, as "lat,lon". */
 export function locationsUrl(lat: number, lon: number): string {
   const point = `${roundCoord(lat).toFixed(1)},${roundCoord(lon).toFixed(1)}`;
   return `${BASE}/locations?coordinates=${point}&radius=${String(SEARCH_RADIUS_M)}&limit=${String(SEARCH_LIMIT)}`;
 }
 
+// One authenticated GET that returns the parsed JSON, kept in the framework cache for the
+// given seconds. Throws on a non-2xx status.
 async function getJson(
   url: string,
   apiKey: string,
@@ -200,6 +225,8 @@ async function getJson(
   return (await response.json()) as unknown;
 }
 
+// The full lookup: list monitors, read the nearest few, return the nearest with fresh PM2.5.
+// It never throws; every failure gives null.
 async function lookUp(
   lat: number,
   lon: number,
@@ -207,6 +234,7 @@ async function lookUp(
   opts: StationOptions,
 ): Promise<StationReading | null> {
   try {
+    // One 2 second timeout covers the list request and all the latest requests together.
     const timeout = AbortSignal.timeout(TIMEOUT_MS);
     const signal = opts.signal ? AbortSignal.any([opts.signal, timeout]) : timeout;
     const now = (opts.now ?? (() => new Date()))();
@@ -230,10 +258,12 @@ async function lookUp(
           );
           return toStation(location, distanceKm, latest.results, now);
         } catch {
+          // One station failing leaves the others in play.
           return null;
         }
       }),
     );
+    // The candidates are in nearest-first order, so the first non-null reading is the nearest.
     return readings.find((reading) => reading !== null) ?? null;
   } catch {
     return null;
@@ -254,6 +284,7 @@ export async function fetchStation(
   opts: StationOptions = {},
 ): Promise<StationReading | undefined> {
   if (!apiKey) return undefined;
+  // The cache key is the search URL, which holds the rounded point and not the API key.
   const key = ['saans-openaq-station', locationsUrl(lat, lon)];
   const found = await (opts.remember ?? rememberBriefly)(key, () => lookUp(lat, lon, apiKey, opts));
   return found ?? undefined;

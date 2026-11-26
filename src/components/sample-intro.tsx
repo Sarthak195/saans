@@ -1,8 +1,13 @@
+// The "About this sample" block on a sample plan page. React component layer: it only shows
+// the text the sample was described with, and a form that posts that text to /ask.
 import type { ReactElement } from 'react';
 
 import { PRIVACY_LINE } from './copy';
 
-/** How a sample household was described, with a way to see Gemini read the same words. */
+/**
+ * How a sample household was described, with a way to see Gemini read the same words. When the
+ * sample was set up with the form instead, `text` is undefined and only a note is shown.
+ */
 export function SampleIntro({
   text,
   formToken,

@@ -1,3 +1,6 @@
+// The page for a society, school or office: the same household and day as its plan, shown as a
+// notice the community can copy and send. Server layer: it loads the plan view, checks any
+// sealed written notice, and hands plain data to the CommunityView component.
 import 'server-only';
 
 import type { ReactElement } from 'react';
@@ -15,7 +18,9 @@ import { airOf, first } from '@/server/query';
 import type { SearchParams } from '@/server/query';
 import { openWritten } from '@/server/written-draft';
 
+/** What a route hands the community page: the household, the page's links, and the query. */
 export interface CommunityPageProps {
+  /** The household whose plan the notice is written for. */
   household: Household;
   /** The page's own path. */
   base: string;
@@ -23,17 +28,24 @@ export interface CommunityPageProps {
   planHref: string;
   /** The sealed household that the notice form posts to. */
   token: string;
+  /** The address's query values: kind, air, lang and a sealed notice (n). */
   searchParams: SearchParams;
 }
 
-/** The view for a society, school or office, planned for the same household and day as its plan. */
+/**
+ * The view for a society, school or office, planned for the same household and day as its
+ * plan.
+ */
 export async function CommunityPage(props: CommunityPageProps): Promise<ReactElement> {
   const { household } = props;
+  // The address may name another kind of community; otherwise the household's own, then a society.
   const kind = communityKindOf(
     first(props.searchParams, 'kind'),
     household.community?.kind ?? 'society',
   );
+  // Only the name 'smog-day' selects the recording; every other value means live air.
   const air = airOf(first(props.searchParams, 'air'));
+  // The language the notice form will ask for: Hindi if the address says so, else the household's.
   const lang: Language = first(props.searchParams, 'lang') === 'hi' ? 'hi' : household.lang;
   const now = new Date();
 
@@ -42,9 +54,11 @@ export async function CommunityPage(props: CommunityPageProps): Promise<ReactEle
   const loaded = await settle(async () => {
     const view = await loadPlanView({ household: withCommunityKind(household, kind), now, air });
     const { community } = view;
+    // The household was given a community kind above, so a missing community is a bug, not input.
     if (community === undefined) throw new Error('The community view was not built');
     return { view, community };
   });
+  // A known failure becomes one plain message with a way back, never a broken page.
   if (loaded instanceof AppError) {
     return (
       <ErrorNotice
@@ -57,6 +71,8 @@ export async function CommunityPage(props: CommunityPageProps): Promise<ReactEle
     );
   }
 
+  // Reads the sealed notice back. It comes out as undefined unless it was written for this very
+  // household, day, air, language and audience, and still passes the checks against this plan.
   const written = openWritten(first(props.searchParams, 'n'), {
     token: props.token,
     view: loaded.view,
@@ -64,6 +80,8 @@ export async function CommunityPage(props: CommunityPageProps): Promise<ReactEle
     audience: kind,
     now,
   });
+  // With no usable written notice the page shows the code-built one. The write form is offered
+  // only in that case, and only when the plan has air data to write from.
   return (
     <CommunityView
       plan={loaded.view.plan}

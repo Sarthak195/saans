@@ -1,3 +1,6 @@
+// Turns the model's reading of a family's text into a household draft. Pure core: no clock,
+// network or environment. Each value is kept only when the family's own words back it, so a
+// wrong or invented value from the model never reaches the plan.
 import { MAX_TEXT, householdSchema } from '@/core/profile/schema';
 import type { QuestionTarget } from '@/core/plan/types';
 import { readHome } from '@/core/reader/home';
@@ -21,10 +24,14 @@ export interface HouseholdDraft {
   notes: string[];
 }
 
+// detectLang counts matches of these. The "u" flag is needed for the p{...} escapes.
 const DEVANAGARI = /\p{Script=Devanagari}/gu;
 const LETTERS = /\p{L}/gu;
 
-/** Hindi when most of the letters are Devanagari; Hinglish in Latin letters stays English. */
+/**
+ * Hindi when more than 30% of the letters are Devanagari; Hinglish in Latin letters stays
+ * English.
+ */
 export function detectLang(text: string): Language {
   const letters = text.match(LETTERS)?.length ?? 0;
   const hindi = text.match(DEVANAGARI)?.length ?? 0;
@@ -32,7 +39,8 @@ export function detectLang(text: string): Language {
 }
 
 // A sentence asks something when it has a question mark or a question word. "My dadi walks at 7"
-// is a statement, even if the model echoes it back as the question.
+// is a statement, even if the model echoes it back as the question. This list holds English,
+// Hinglish (Latin letters) and Devanagari question words.
 const QUESTION_WORDS = [
   'what',
   'when',
@@ -82,7 +90,9 @@ const QUESTION_OPENERS = new Set([
   'okay',
 ]);
 
+// True when the text reads as a question: a question mark, an opening word, or a question word.
 function asksSomething(question: string): boolean {
+  // The first word with every non-letter stripped, lower-cased: "Is" and "is," both give "is".
   const first =
     question
       .trim()
@@ -90,13 +100,16 @@ function asksSomething(question: string): boolean {
       ?.toLowerCase()
       .replace(/[^\p{L}]/gu, '') ?? '';
   return (
+    // The second mark in the pattern is the full-width question mark.
     /[?？]/u.test(question) || QUESTION_OPENERS.has(first) || mentionsAny(question, QUESTION_WORDS)
   );
 }
 
+// The place the family named, only when the quote is in their text and names the place's city.
 function placeQueryOf(text: string, output: ReaderOutput): string | undefined {
   const place = output.place;
   if (!place || !quoteInText(text, place.quote)) return undefined;
+  // "Noida, Uttar Pradesh" gives "Noida": the quote must contain the city name.
   const city = place.value.split(',')[0] ?? place.value;
   return hasTerm(place.quote, city) ? place.value : undefined;
 }
@@ -108,6 +121,7 @@ function placeQueryOf(text: string, output: ReaderOutput): string | undefined {
  */
 export function readDraft(text: string, output: ReaderOutput): HouseholdDraft {
   const members = readMembers(text, output);
+  // Routines are matched to members, so the members are read first.
   const routines = readRoutines(text, output, members);
   const home = readHome(text, output);
   const placeQuery = placeQueryOf(text, output);
@@ -129,6 +143,8 @@ export function readDraft(text: string, output: ReaderOutput): HouseholdDraft {
       ? asked.text.value
       : undefined;
 
+  // Optional fields are left out of the object, not set to undefined. A question longer than
+  // MAX_TEXT is dropped, and the target is returned only when a question passed the checks above.
   return {
     ...(placeQuery === undefined ? {} : { placeQuery }),
     members: members.members,
@@ -140,12 +156,14 @@ export function readDraft(text: string, output: ReaderOutput): HouseholdDraft {
   };
 }
 
+/** The result of finishing a draft: a checked household, or a plain reason it failed. */
 export type FinishedDraft =
   | { ok: true; household: Household; target?: QuestionTarget; notes: string[] }
   | { ok: false; reason: string };
 
 /** Attaches the place, sets the language and checks the whole household against the profile schema. */
 export function finishHousehold(draft: HouseholdDraft, place: Place, text: string): FinishedDraft {
+  // The profile schema is the last check; v is its version number.
   const parsed = householdSchema.safeParse({
     v: 1,
     place,

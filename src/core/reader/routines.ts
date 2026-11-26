@@ -1,3 +1,7 @@
+// Reads a family's outdoor routines from what the model extracted, keeping each value only when
+// its quote is in the text. Core layer: pure, with no clock, network or environment. Every value
+// the text does not give is left out, or replaced by a listed default that the notes report.
+
 import { WEEKDAYS } from '@/core/profile/schema';
 import {
   bareClockTimes,
@@ -23,7 +27,9 @@ import { normalizeText, quoteInText, valueSupportedByQuote } from '@/core/text';
 import { LEXICON_ENTRIES, termsForValue } from '@/core/text/lexicon';
 import type { Intensity, Mode, Routine, RoutineKind, Weekday } from '@/core/types';
 
+// Length of a routine, in minutes, when the text states none.
 const DEFAULT_MINUTES = 60;
+// Effort assumed for each kind of routine when the text gives no intensity word.
 const DEFAULT_INTENSITY: Record<RoutineKind, Intensity> = {
   school_run: 'light',
   outdoor_play: 'moderate',
@@ -32,7 +38,8 @@ const DEFAULT_INTENSITY: Record<RoutineKind, Intensity> = {
   commute: 'light',
   errand: 'light',
 };
-// A trip to somewhere has no fixed time slack; other routines can move a little either side.
+// How far a routine can move either side of its start, in whole hours. School runs and commutes
+// are fixed; the others can move a little.
 const FLEX_HOURS: Record<RoutineKind, number> = {
   school_run: 0,
   outdoor_play: 2,
@@ -41,12 +48,17 @@ const FLEX_HOURS: Record<RoutineKind, number> = {
   commute: 0,
   errand: 2,
 };
+// Largest distance in kilometres a routine may state; a larger one is ignored.
 const MAX_KM = 200;
+// Words after a number that make it a distance in kilometres.
 const KM_WORDS = ['km', 'kms', 'kilometre', 'kilometer', 'kilometres', 'kilometers', 'किमी'];
+// Levels checked from hardest to easiest, so a quote with words of two levels reads as the harder.
 const INTENSITY_ORDER: readonly Intensity[] = ['vigorous', 'moderate', 'light'];
 
+// One routine as the model drafted it, before the text has checked any of its values.
 type RoutineDraft = ReaderOutput['routines'][number];
 
+// True when the value has a quote and that quote is found in the family's text.
 function inText(text: string, q: Quoted<unknown> | undefined): boolean {
   return q !== undefined && quoteInText(text, q.quote);
 }
@@ -72,6 +84,8 @@ function kindQuoteInText(text: string, q: Quoted<unknown>): boolean {
   return inText(text, q) || quoteInTextAsWords(text, q.quote);
 }
 
+// True when the quote supports the kind: by the shared value check, a listed term, or a word that
+// is another form of a listed term ("walks" for "walk").
 function kindSupported(kind: RoutineKind, quote: string): boolean {
   const words = wordsOf(quote);
   return (
@@ -81,6 +95,7 @@ function kindSupported(kind: RoutineKind, quote: string): boolean {
   );
 }
 
+// The routine kind whose listed terms appear in the quote; undefined when no kind matches.
 function kindFromLexicon(quote: string): RoutineKind | undefined {
   return LEXICON_ENTRIES.find(
     (e) => e.category === 'routine' && mentionsAny(quote, termsForValue(e.value)),
@@ -92,6 +107,7 @@ function nameOf(kind: RoutineKind, quote: string): string {
   return firstTerm(quote, termsForValue(kind)) ?? kind.replace('_', ' ');
 }
 
+// The way of travelling (a mode), kept only when its quote is in the text and says it.
 function modeOf(text: string, draft: RoutineDraft): Mode | undefined {
   const mode = draft.mode;
   return mode && inText(text, mode) && valueSupportedByQuote(mode.value, mode.quote)
@@ -99,11 +115,14 @@ function modeOf(text: string, draft: RoutineDraft): Mode | undefined {
     : undefined;
 }
 
+// The start time as 'HH:MM'. A time written in the text wins; failing that, a part of the day
+// gives a fixed time and is marked as assumed. Undefined when the text gives neither.
 function startOf(
   text: string,
   draft: RoutineDraft,
   quotes: string[],
 ): { start: string; assumed: boolean } | undefined {
+  // The model's own time is trusted only when the same time is also read from the quotes.
   const claimed = draft.start ? tidyClock(draft.start.value) : undefined;
   const times = quotes
     .filter((q) => quoteInText(text, q))
@@ -115,6 +134,8 @@ function startOf(
   return part === undefined ? undefined : { start: part, assumed: true };
 }
 
+// The routine's length in minutes, from a duration the text states. Undefined when none is found
+// or it is outside 1 to 480 minutes (eight hours).
 function minutesOf(text: string, draft: RoutineDraft, quotes: string[]): number | undefined {
   const heard = quotes.filter((q) => quoteInText(text, q)).flatMap(minutesIn);
   const claimed = draft.minutes?.value;
@@ -125,6 +146,8 @@ function minutesOf(text: string, draft: RoutineDraft, quotes: string[]): number 
   return pick !== undefined && pick >= 1 && pick <= 480 ? pick : undefined;
 }
 
+// The distance in kilometres, kept only when the text says it with a km word and it is above 0
+// and at most 200.
 function kmOf(text: string, draft: RoutineDraft): number | undefined {
   const km = draft.km;
   // A quote that is only the number ("9") counts when the text says that number with km.
@@ -135,6 +158,8 @@ function kmOf(text: string, draft: RoutineDraft): number | undefined {
   return ok ? km.value : undefined;
 }
 
+// The effort level: the model's claim when its quote holds a word for that level, else the
+// hardest level whose words appear in the routine's quotes. Undefined when none.
 function intensityOf(text: string, draft: RoutineDraft, quotes: string[]): Intensity | undefined {
   const heard = quotes.filter((q) => quoteInText(text, q)).join(' ');
   const claimed = draft.intensity;
@@ -148,6 +173,7 @@ function intensityOf(text: string, draft: RoutineDraft, quotes: string[]): Inten
   return INTENSITY_ORDER.find((level) => mentionsAny(heard, INTENSITY_TERMS[level]));
 }
 
+// The weekdays of a routine, in week order without repeats. Undefined when the text names none.
 function daysOf(text: string, draft: RoutineDraft, quotes: string[]): Weekday[] | undefined {
   const named = draft.days;
   const heard = named && inText(text, named) ? daysIn(named.quote) : [];
@@ -157,6 +183,8 @@ function daysOf(text: string, draft: RoutineDraft, quotes: string[]): Weekday[] 
   return unique.length > 0 ? unique : undefined;
 }
 
+// The id of the member a routine belongs to: the speaker for "I" words, a member named in the
+// quote, or the only member when there is just one. Undefined when it cannot be told.
 function ownerOf(text: string, who: Quoted<string>, members: ReadMembers): string | undefined {
   if (inText(text, who)) {
     const me = members.names.get('me');
@@ -169,12 +197,16 @@ function ownerOf(text: string, who: Quoted<string>, members: ReadMembers): strin
   return members.members.length === 1 ? members.members[0]?.id : undefined;
 }
 
+/** The routines read from the text, and notes on the guesses made and the routines left out. */
 export interface ReadRoutines {
   routines: Routine[];
   notes: string[];
 }
 
-/** Routines whose kind, time and owner trace to the text; every missing value gets a listed default. */
+/**
+ * Routines whose kind, time and owner trace to the text. Missing minutes, effort and days get a
+ * listed default.
+ */
 export function readRoutines(
   text: string,
   output: ReaderOutput,
@@ -184,16 +216,19 @@ export function readRoutines(
   const notes: string[] = [];
   const everyDay: string[] = [];
   for (const draft of output.routines) {
+    // At most eight routines are kept; later drafts are ignored.
     if (routines.length >= 8) break;
     const quotes = quotesOf(draft);
     const mode = modeOf(text, draft);
     const kindQuoted = kindQuoteInText(text, draft.kind);
+    // The model's kind stands only when its quote supports it; otherwise the listed terms decide.
     const claimed = kindQuoted && kindSupported(draft.kind.value, draft.kind.quote);
     const fromWords = kindQuoted ? kindFromLexicon(draft.kind.quote) : undefined;
     // "I drive to Gurugram at 8:30" names no activity, but a trip by a verified mode is a commute.
     const byMode = !claimed && fromWords === undefined && mode !== undefined;
     const kind = claimed ? draft.kind.value : (fromWords ?? (byMode ? 'commute' : undefined));
     const memberId = ownerOf(text, draft.who, members);
+    // A routine with no recognised kind or no owner is dropped without a note.
     if (kind === undefined || memberId === undefined) continue;
     const name = nameOf(kind, draft.kind.quote);
     if (byMode) {
@@ -201,6 +236,7 @@ export function readRoutines(
       notes.push(`Treated the ${word} as a commute. Change it in the form.`);
     }
 
+    // A routine with no time of day is left out, and the family is told in the notes.
     const start = startOf(text, draft, quotes);
     if (start === undefined) {
       notes.push(`Left out the ${name} because no time was given. Add it in the form.`);
@@ -216,10 +252,12 @@ export function readRoutines(
     if (intensity === undefined && (kind === 'outdoor_play' || kind === 'sport')) {
       notes.push(`Assumed ${DEFAULT_INTENSITY[kind]} effort for ${name}. Change it in the form.`);
     }
+    // Days are not noted one by one; they are collected into a single note after the loop.
     const days = daysOf(text, draft, quotes);
     if (days === undefined) everyDay.push(name);
     const km = kmOf(text, draft);
 
+    // The id is the kind and the routine's position, for example "walk-1".
     routines.push({
       id: `${kind}-${String(routines.length + 1)}`,
       memberId,

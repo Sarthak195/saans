@@ -1,3 +1,6 @@
+// The plan page for one household, shared by sealed links and sample pages. Server layer: it
+// reads the address, loads the plan view, picks the written summary to show, and hands plain
+// data to the PlanBody component. It stores nothing.
 import 'server-only';
 
 import type { ReactElement, ReactNode } from 'react';
@@ -19,20 +22,27 @@ import { autoBriefing } from '@/server/auto-briefing';
 import { openHousehold } from '@/server/seal';
 import { openWritten } from '@/server/written-draft';
 
+/** What a route hands the plan page: the household, the page's links and the address's query. */
 export interface PlanPageProps {
   household: Household;
   /** The page's own path. */
   base: string;
   /** The sealed household that forms on this page post to. */
   token: string;
+  /** The address's query values: day, air, lang, status, note, a sealed summary (b) and so on. */
   searchParams: SearchParams;
   /** True when the page address carries the family's profile. */
   shareable: boolean;
+  /** The community page for the same household. */
   communityHref: string;
+  /** Optional content the plan body shows, such as the introduction on a sample page. */
   intro?: ReactNode;
 }
 
-/** The routine as an earlier version of the household planned it, so the page can show before and after. */
+/**
+ * The routine as an earlier version of the household planned it, so the page can show before and
+ * after.
+ */
 async function routineBefore(
   fromToken: string | undefined,
   routineId: string | undefined,
@@ -40,6 +50,7 @@ async function routineBefore(
   day: PlanDay['relative'] | undefined,
   air: AirMode | undefined,
 ): Promise<RoutineAdvice | undefined> {
+  // With no earlier version or no routine named in the address there is nothing to compare.
   if (fromToken === undefined || routineId === undefined) return undefined;
   try {
     const earlier = await loadPlanView({ household: openHousehold(fromToken), now, day, air });
@@ -51,15 +62,20 @@ async function routineBefore(
   }
 }
 
+/** Joins the status and note lines with a space, or gives nothing when both are empty. */
 function joinStatus(...parts: (string | undefined)[]): string | undefined {
   const text = parts.filter((p) => p !== undefined && p !== '').join(' ');
   return text === '' ? undefined : text;
 }
 
-/** One plan, from a household: used for a shared link and for a sample, which differ only in the address. */
+/**
+ * One plan, from a household: used for a shared link and for a sample, which differ only in the
+ * address.
+ */
 export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
   const q = readPlanQuery(props.searchParams);
   const now = new Date();
+  // Values outside the allowed few (three days, one named recording) read as "not chosen".
   const day = dayOf(q.day);
   const air: AirMode | undefined = airOf(q.air);
 
@@ -67,6 +83,7 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
   try {
     view = await loadPlanView({ household: props.household, now, day, air });
   } catch (error) {
+    // Only failures the app knows become a friendly message with a way back; a bug still throws.
     if (!(error instanceof AppError)) throw error;
     return (
       <ErrorNotice
@@ -91,6 +108,7 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
           now,
         })
       : undefined;
+  // Order of preference: the sealed summary, then a quick model summary, then the code-built one.
   const briefing =
     view.unavailable !== undefined
       ? undefined
@@ -100,8 +118,11 @@ export async function PlanPage(props: PlanPageProps): Promise<ReactElement> {
           text: templateBriefing(view.plan),
           lang: 'en' as const,
         });
+  // The same routine under the earlier household, for the before and after line after an edit.
   const before = await routineBefore(q.from, q.r, now, day, air);
 
+  // A plan with no air data shows a notice above the body and no summary. The form token is
+  // issued fresh for each view, and the status line joins the two fixed messages from the address.
   return (
     <>
       {view.unavailable === undefined ? null : (

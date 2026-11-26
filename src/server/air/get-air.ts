@@ -1,3 +1,5 @@
+// Picks the air data for a point, applying the failure ladder: live Open-Meteo, then a dated
+// recording for the sample places, then an error. Server layer: I/O only, no module-scope state.
 import 'server-only';
 
 import type { AirSeries } from '@/core/air/types';
@@ -7,6 +9,7 @@ import { fetchRecordedSeries, recordedIdForPoint } from '@/server/air/recorded';
 import { getEnv } from '@/server/env';
 import { AppError } from '@/server/errors';
 
+/** The options for getAirSeries: those of the live fetch, plus the station key and switch. */
 export interface GetAirOptions extends FetchAirOptions {
   /** The OpenAQ key, injectable for tests; by default it comes from the environment. */
   openAqKey?: string;
@@ -50,7 +53,9 @@ export async function getAirSeries(
     const reading = await station;
     return reading ? { ...series, station: reading } : series;
   } catch (error) {
+    // No recording stands in for a point outside India, so that error goes straight up.
     if (error instanceof AppError && error.kind === 'outside_india') throw error;
+    // Any other failure falls back to the recording, but only for the sample places.
     const recorded = recordedIdForPoint(lat, lon);
     if (recorded !== undefined) return fetchRecordedSeries(recorded);
     // The specific cause stays attached for logs; the family sees one message for all of them.

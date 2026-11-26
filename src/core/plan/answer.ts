@@ -1,3 +1,6 @@
+// Answers the family's question about one routine in a single sentence.
+// Layer: core (pure). The text is built only from advice the plan already computed, so every
+// number in it can be traced to the plan; nothing is looked up or generated here.
 import { BAND_LABEL } from '@/core/aqi';
 import type { Evaluated } from '@/core/plan/advice';
 import { toMinutes } from '@/core/format';
@@ -7,15 +10,19 @@ import { numbersIn } from '@/core/plan/words';
 import type { PlanDay } from '@/core/time';
 import type { Weekday } from '@/core/types';
 
+// The routine's start as hours after midnight, so two routines can be compared by distance.
 function startHour(advice: RoutineAdvice): number {
   return toMinutes(advice.start) / 60;
 }
 
 /** The scheduled routine nearest an hour; with no hour, the first one the plan changes, else the first. */
 function pick(candidates: Evaluated[], hour: number | undefined): Evaluated | undefined {
+  // Prefer routines that run on the plan day; fall back to all of them only when none does.
   const scheduled = candidates.filter((c) => c.advice.scheduled);
   const pool = scheduled.length > 0 ? scheduled : candidates;
+  // With no hour to go by, the routine that matters most is the first one the plan changes.
   if (hour === undefined) return pool.find((c) => c.advice.decision !== 'keep') ?? pool[0];
+  // Strict comparison: on a tie the earlier routine in the list stays.
   let nearest: Evaluated | undefined;
   for (const c of pool) {
     if (
@@ -42,6 +49,7 @@ function matchRoutine(evaluated: Evaluated[], target: QuestionTarget): Evaluated
   return target.hour === undefined ? undefined : pick(evaluated, target.hour);
 }
 
+// Words for when the routine happens, such as "this evening" or "Friday morning".
 function whenPhrase(day: PlanDay, slot: DaySlot): string {
   if (day.relative === 'today') return `this ${slot}`;
   if (day.relative === 'tomorrow') return `tomorrow ${slot}`;
@@ -59,12 +67,15 @@ function spokenAbout(found: Evaluated, next?: NextRun): Evaluated {
   return !found.advice.scheduled && next?.later ? next.later.found : found;
 }
 
+// The sentence that answers the question, written from the routine's computed advice alone.
 function sentenceFor(found: Evaluated, day: PlanDay, next?: NextRun): string {
   const { advice } = found;
   if (!advice.scheduled) {
+    // The routine is not on the plan day: say so, then point to its next run if there is one.
     const notOn = `That routine is not on ${WEEKDAY_FULL[day.weekday]}s`;
     if (next?.later) {
       const { later } = next;
+      // The next run is described on its own day, without looking further ahead.
       return `${notOn}, so here is the next day it runs, ${WEEKDAY_FULL[later.day.weekday]}. ${sentenceFor(later.found, later.day)}`;
     }
     if (next) {
@@ -72,6 +83,7 @@ function sentenceFor(found: Evaluated, day: PlanDay, next?: NextRun): string {
     }
     return `${notOn}, so nothing changes.`;
   }
+  // Without a forecast for the hours there is nothing to base an answer on, so nothing changes.
   if (advice.level === null || advice.pm25 === null) {
     return 'There is no air data for that time, so nothing is changed.';
   }
@@ -84,16 +96,20 @@ function sentenceFor(found: Evaluated, day: PlanDay, next?: NextRun): string {
       return `Go lighter ${when}: ${reading} Keep it shorter and gentler.`;
     case 'move': {
       const w = advice.window;
+      // No cleaner window was kept for the routine, so the sentence cannot name one.
       if (!w) return `Not ${when} outdoors: ${reading}`;
+      // The "less" clause is left out when the move saves nothing.
       const percent = advice.impact.percentLess ?? 0;
       const less = percent > 0 ? `, about ${String(percent)}% less` : '';
       return `Not ${when} outdoors: ${reading} ${w.start} to ${w.end} is cleaner at about ${String(w.pm25)}${less}.`;
     }
     case 'indoors': {
+      // moveFailed: another time was tried and none was good enough.
       const why = found.moveFailed ? ', and no cleaner time was found' : '';
       return `Not ${when} outdoors: ${reading} Staying indoors is the better choice${why}.`;
     }
     case 'essential':
+      // Only the first protection line is quoted; trim drops the space left when there is none.
       return `This trip stays ${when}: ${reading} ${advice.protection[0] ?? ''}`.trim();
   }
 }
@@ -111,9 +127,12 @@ export function buildAnswer(args: {
   nextRun?: (found: Evaluated) => NextRun | undefined;
 }): QuestionAnswer | undefined {
   const found = matchRoutine(args.evaluated, args.target);
+  // No routine matches the question: there is no computed advice to answer from.
   if (!found) return undefined;
+  // The next run is looked up only for a routine that is not on the plan day.
   const next = found.advice.scheduled ? undefined : args.nextRun?.(found);
   const sentence = sentenceFor(found, args.day, next);
+  // A question about a time already past is answered for tomorrow, and the text says so first.
   const text = args.shifted
     ? `This ${found.advice.slot} is already over, so here is tomorrow. ${sentence}`
     : sentence;
@@ -121,6 +140,7 @@ export function buildAnswer(args: {
     text,
     routineRef: found.advice.ref,
     level: spokenAbout(found, next).advice.level,
+    // The numbers the text states, kept so they can be checked against the plan's own numbers.
     numbers: numbersIn(text),
     shiftedToNextDay: args.shifted,
   };

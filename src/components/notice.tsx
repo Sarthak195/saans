@@ -1,12 +1,16 @@
+// Two ways to show a failure to a family: a full error page and an alert inside a working page.
+// React component layer. Both draw a UserMessage (title, what happened, what to do next) as text.
 import type { ReactElement } from 'react';
 
 import type { UserMessage } from '@/server/errors';
 
+/** A button-styled link offered under a notice, such as 'Try again' or 'Go home'. */
 export interface NoticeLink {
   href: string;
   label: string;
 }
 
+// The row of links under a notice. It draws nothing when there are none.
 function Links({ links }: { readonly links: readonly NoticeLink[] }): ReactElement | null {
   if (links.length === 0) return null;
   return (
@@ -20,7 +24,10 @@ function Links({ links }: { readonly links: readonly NoticeLink[] }): ReactEleme
   );
 }
 
-/** A whole page for something that went wrong: what happened, what to do, and where to go. */
+/**
+ * A whole page for something that went wrong: what happened, what to do, and where to go.
+ * Its title is the page's main heading, with the id 'plan-title'.
+ */
 export function ErrorNotice({
   text,
   links,

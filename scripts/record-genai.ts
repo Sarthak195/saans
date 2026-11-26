@@ -35,13 +35,17 @@ import {
   schoolCase,
 } from '../tests/helpers/genai';
 
+// The name of the environment variable that holds the key, as written in a .env file.
 const KEY_NAME = 'GEMINI_API_KEY';
 
+// Looks for GEMINI_API_KEY in .env.local, then .env, of each directory in turn and returns the
+// first value found. Throws, naming the directories but never a value, when there is none.
 function readKey(dirs: readonly string[]): string {
   for (const dir of dirs) {
     for (const file of ['.env.local', '.env']) {
       const path = resolve(dir, file);
       if (!existsSync(path)) continue;
+      // A line is KEY=value; the value is trimmed and loses any quote at its start or end.
       for (const line of readFileSync(path, 'utf8').split(/\r?\n/)) {
         const match = new RegExp(`^${KEY_NAME}=(.*)$`).exec(line.trim());
         const value = match?.[1]?.trim().replace(/^["']|["']$/g, '');
@@ -52,6 +56,7 @@ function readKey(dirs: readonly string[]): string {
   throw new Error(`No ${KEY_NAME} found in ${dirs.join(', ')}`);
 }
 
+// The value after a command-line flag such as --only, or undefined when the flag is absent.
 function argValue(name: string): string | undefined {
   const at = process.argv.indexOf(name);
   return at === -1 ? undefined : process.argv[at + 1];
@@ -64,10 +69,13 @@ const MODELS = {
   fallback: 'gemini-3.1-flash-lite',
 };
 
+// The dependencies the app code takes, with the recording call, no cache (so every case really
+// calls the model) and the default models.
 function deps(call: ModelCall): GenaiDeps {
   return { call, models: MODELS, cache: noCache };
 }
 
+// One reply kept from the model, with the model that gave it.
 interface Captured {
   model: string;
   reply: string;
@@ -89,6 +97,7 @@ function capturing(inner: ModelCall, log: Captured[]): ModelCall {
   };
 }
 
+// The reply as one-line JSON when it parses; otherwise the trimmed text as it came.
 function minified(reply: string): string {
   try {
     return JSON.stringify(JSON.parse(reply));
@@ -97,6 +106,8 @@ function minified(reply: string): string {
   }
 }
 
+// One recording: its name (also the file name), the prompt version it was made with, and the
+// code to run against the recording call.
 interface Case {
   name: string;
   prompt: string;
@@ -105,6 +116,8 @@ interface Case {
   run: (call: ModelCall) => Promise<unknown>;
 }
 
+// Builds the list of recordings: four reader cases, English and Hindi briefings, a school notice
+// and a question. Each runs the real pipeline, so the stored reply is what the app would get.
 function cases(
   family: Awaited<ReturnType<typeof familyCase>>,
   school: Awaited<ReturnType<typeof schoolCase>>,
@@ -163,6 +176,7 @@ function cases(
   ];
 }
 
+// A short word for how a case ended, taken from the outcome's kind or by field, for the log.
 function describe(outcome: unknown): string {
   if (typeof outcome !== 'object' || outcome === null) return 'none';
   const record = outcome as Record<string, unknown>;
@@ -171,12 +185,16 @@ function describe(outcome: unknown): string {
 }
 
 async function main(): Promise<void> {
+  // --dry runs every case against a canned reply and writes nothing, so no key is needed.
   const dry = process.argv.includes('--dry');
   const only = argValue('--only');
+  // Where to look for the key: --env, the current directory, then three levels up (the checkout
+  // a worktree was made from).
   const dirs = [argValue('--env'), process.cwd(), resolve(process.cwd(), '../../..')].filter(
     (d): d is string => d !== undefined,
   );
   const real = dry ? undefined : makeGeminiCall(readKey(dirs));
+  // A canned reply with empty lists, so the pipeline can run without a model.
   const dryReply = '{"members":[],"routines":[],"home":{"habits":[]}}';
   const inner: ModelCall = real ?? (() => Promise.resolve(dryReply));
 
@@ -188,8 +206,10 @@ async function main(): Promise<void> {
     if (only !== undefined && only !== item.name) continue;
     const log: Captured[] = [];
     const outcome = await item.run(capturing(inner, log));
+    // Only the first reply is stored, whatever the pipeline then does with it.
     const first = log[0];
     if (!first) throw new Error(`${item.name}: the model was never called`);
+    // recordedOn is the date of this run, as YYYY-MM-DD.
     const fixture = {
       provenance: {
         case: item.name,

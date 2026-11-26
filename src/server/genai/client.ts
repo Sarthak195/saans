@@ -1,3 +1,5 @@
+// The only place the Gemini SDK is used. Server layer: it turns our own ModelRequest into one SDK
+// call and turns every failure into an AppError. It keeps no state between calls.
 import 'server-only';
 
 import { GoogleGenAI } from '@google/genai';
@@ -6,12 +8,12 @@ import { AppError } from '@/server/errors';
 import { classifyError } from '@/server/genai/classify';
 import type { ModelCall, ModelRequest } from '@/server/genai/model';
 
-/** The only place the Gemini SDK is used. */
-
+/** How long one model call may take, in milliseconds, before it is aborted as a timeout. */
 export const CALL_TIMEOUT_MS = 6000;
 
 /** Turns an answer that is not a finished text reply into the kind of failure it is. */
 function failureOf(status: string, text: string | undefined): AppError | undefined {
+  // A completed answer with no text is no use either, so it counts as a refusal.
   if (status === 'completed') {
     return text === undefined || text.trim() === ''
       ? new AppError('genai_blocked', 'The model returned no text')
@@ -22,6 +24,7 @@ function failureOf(status: string, text: string | undefined): AppError | undefin
   return new AppError('genai_unavailable', `The model ended with status ${status}`);
 }
 
+// Makes one SDK call and returns its text, or throws when the answer is not a finished text reply.
 async function send(apiKey: string, request: ModelRequest): Promise<string> {
   // Built per call: a client held at module scope would be state shared between requests.
   const ai = new GoogleGenAI({ apiKey });
@@ -32,6 +35,7 @@ async function send(apiKey: string, request: ModelRequest): Promise<string> {
       store: false,
       input: request.input,
       system_instruction: request.system,
+      // Only asks for JSON when the caller gave a schema; the writer's replies are plain text.
       ...(request.schema === undefined
         ? {}
         : {
@@ -53,6 +57,7 @@ async function send(apiKey: string, request: ModelRequest): Promise<string> {
   );
   const failure = failureOf(interaction.status, interaction.output_text);
   if (failure) throw failure;
+  // failureOf has already rejected a missing text, so the empty string is only a type fallback.
   return interaction.output_text ?? '';
 }
 
@@ -62,6 +67,7 @@ export function makeGeminiCall(apiKey: string): ModelCall {
     try {
       return await send(apiKey, request);
     } catch (error) {
+      // Callers see only the app's own error kinds, never the SDK's error or its message.
       throw classifyError(error);
     }
   };

@@ -1,6 +1,14 @@
+// The instructions for the Gemini job that words a notice for a society, school or office. Server
+// layer: plain text only. The community facts follow it in the request, and code checks every
+// reply before it is shown. See docs/PROMPTS.md.
+
 /** Bump the version on every change to the wording, and add a line to docs/PROMPTS.md. */
 export const NOTICE_PROMPT_VERSION = 'notice-1';
 
+/**
+ * The fixed instructions for a community notice. They ask for 3 to 5 sentences, only the numbers
+ * given, no names of people or families, and no reassurance about outdoor time.
+ */
 export const NOTICE_SYSTEM = `You write a short air quality notice for a society, school or office to copy and send, in plain, kind words, from a JSON object of facts that arrives after these instructions.
 
 Rules:

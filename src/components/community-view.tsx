@@ -1,3 +1,6 @@
+// The community page for a housing society, school or office: what to do today, the best time
+// outdoors, and a notice to send round. Components layer: it renders what the core's community
+// plan holds, and the notice text arrives already written.
 import type { ReactElement } from 'react';
 
 import { BAND_LABEL } from '@/core/aqi';
@@ -10,6 +13,7 @@ import { SMOG_DAY_LABEL } from './copy';
 import { withQuery } from './links';
 import { ReasonLine } from './source-link';
 
+// The label for each kind of community, in the order the audience links are listed.
 const KIND_NAME: Record<CommunityKind, string> = {
   society: 'Housing society',
   school: 'School',
@@ -18,9 +22,11 @@ const KIND_NAME: Record<CommunityKind, string> = {
 
 /** The link that shares a notice. It carries the notice text and nothing else: never a plan link. */
 export function whatsappLink(notice: string): string {
+  // The text is percent-encoded so spaces, line breaks and symbols survive inside the address.
   return `https://wa.me/?text=${encodeURIComponent(notice)}`;
 }
 
+// Links to switch between the three audiences; the current one is marked for screen readers.
 function KindLinks({
   base,
   current,
@@ -49,10 +55,13 @@ function KindLinks({
 
 /** What the "Write it with Gemini" button posts: where, the audience and the language to write in. */
 export interface WriteForm {
+  /** Where the form posts. */
   readonly action: string;
+  /** The signed form token the route checks before it accepts the post (SECURITY.md). */
   readonly formToken: string;
   readonly kind: CommunityKind;
   readonly lang: string;
+  /** The air setting the page was opened with, such as 'smog-day', or undefined. */
   readonly air: string | undefined;
 }
 
@@ -78,6 +87,11 @@ export function CommunityView({
   readonly smogDay: boolean;
 }): ReactElement {
   const { bestOutdoorWindow: window, aggregate } = community;
+  // `window` is null when no outdoor slot has a usable time, and the section says so. The notice
+  // is marked with its own language (`notice.lang`). Its byline says whether Gemini or the code
+  // wrote it, with the note (if any) after it. The share link holds only the notice text. The
+  // write form is drawn only when the page offers it, and it carries the audience, language and
+  // air setting so the new notice matches this page.
   return (
     <>
       <h1 id="plan-title" tabIndex={-1}>

@@ -1,3 +1,6 @@
+// Builds the whole Plan for a household on one plan day from an air series: advice for every
+// routine, then the day at a glance, the member totals and the answer to a question if one was
+// asked. Core layer: pure. The moment and the data are passed in.
 import type { AirSeries } from '@/core/air/types';
 import { aqiToday, pm25Level } from '@/core/aqi';
 import type { Decision } from '@/core/decision';
@@ -18,6 +21,7 @@ import type { PlanDay } from '@/core/time';
 import { WEEKDAYS } from '@/core/profile/schema';
 import type { Household } from '@/core/types';
 
+// Re-exported: the type of the `question` field of PlanInput.
 export type { QuestionTarget } from '@/core/plan/types';
 
 // AQI 301 is where Very Poor starts; the plan's `severe` flag means Very Poor or worse.
@@ -30,6 +34,10 @@ const OUTCOME_ORDER: readonly Decision[] = ['indoors', 'move', 'essential', 'lig
 // After this IST hour, "today" for an evening question means the evening has gone.
 const EVENING_OVER_HOUR = 17;
 
+/**
+ * Everything buildPlan needs: the household, the air series, the moment and the optional day and
+ * question.
+ */
 export interface PlanInput {
   household: Household;
   series: AirSeries;
@@ -38,7 +46,12 @@ export interface PlanInput {
    * so the plan reads the recorded day rather than the real date.
    */
   now: Date;
+  /**
+   * Which plan day to build for. The default plan day for `now` is used when this is absent or
+   * matches none.
+   */
   day?: PlanDay['relative'] | undefined;
+  /** What a family's question points at. When present, the plan carries an answer. */
   question?: QuestionTarget | undefined;
 }
 
@@ -58,6 +71,8 @@ function activeStays(household: Household, evaluated: Evaluated[]): boolean {
   });
 }
 
+// The strongest decision among routines that have data, or 'none'. Routines with no data (usual is
+// null) are left out.
 function strongest(evaluated: Evaluated[]): Outcome {
   const seen = new Set(evaluated.filter((e) => e.usual !== null).map((e) => e.advice.decision));
   return OUTCOME_ORDER.find((outcome) => seen.has(outcome)) ?? 'none';
@@ -69,6 +84,7 @@ function strongest(evaluated: Evaluated[]): Outcome {
  */
 export function buildPlan(input: PlanInput): Plan {
   const { household, series, now } = input;
+  // The clock is read in IST from the moment passed in.
   const parts = istParts(now);
   const days = planDays(now);
   const day = days.find((d) => d.relative === input.day) ?? defaultPlanDay(now);
@@ -78,6 +94,8 @@ export function buildPlan(input: PlanInput): Plan {
   const station = stationDecision({ series, pm, day, now });
   const aqi = aqiToday(series, parts.hourStamp);
   const dayBand = planDayBand(series, pm, day);
+  // The advice context for a plan day. Another day gets its own day band, and it is built again
+  // when a question needs a later day.
   const contextFor = (forDay: PlanDay) => ({
     day: forDay,
     pm: station.pm,
@@ -87,15 +105,19 @@ export function buildPlan(input: PlanInput): Plan {
   });
   const ctx = contextFor(day);
 
+  // One advice per routine, numbered from 1 in household order.
   const evaluated = household.routines.map((routine, index) => {
     const at = household.members.findIndex((m) => m.id === routine.memberId);
     const member = household.members[at];
+    // A routine whose member is missing means a broken household, so fail instead of guessing.
     if (!member)
       throw new RangeError(`Routine ${routine.id} names a member who is not in the household`);
     return adviseRoutine(routine, member, { routine: index + 1, member: at + 1 }, ctx);
   });
 
+  // Severe is AQI today at Very Poor or worse, or any block of the plan day at that level.
   const severe = (aqi.kind === 'ok' && aqi.aqi >= VERY_POOR_AQI) || hasSevereBlock(pm, day);
+  // The glance reads the same station-adjusted hours as the routines.
   const glance = buildGlance({
     day,
     pm,
@@ -115,10 +137,12 @@ export function buildPlan(input: PlanInput): Plan {
     gridLon: series.gridLon,
     fetchedAt: series.fetchedAt,
     ...(series.recordedOn === undefined ? {} : { recordedOn: series.recordedOn }),
+    // The monitor reading is shown only for model data from open-meteo-cams.
     ...(series.station === undefined || series.source !== 'open-meteo-cams'
       ? {}
       : { station: series.station }),
     ...(station.precaution === undefined ? {} : { precaution: station.precaution }),
+    // The hourly strip: 16 values from 06:00, with null where the series has no hour.
     hourly: Array.from({ length: STRIP_HOURS }, (_, i) => {
       const hour = hourOfDay(day, STRIP_FROM + i);
       const value = pm.get(hour);
@@ -130,6 +154,7 @@ export function buildPlan(input: PlanInput): Plan {
     }),
   };
 
+  // True when the question was about today but the plan day is tomorrow and the evening has gone.
   const shifted =
     input.question?.aboutToday === true &&
     day.relative === 'tomorrow' &&
@@ -141,6 +166,8 @@ export function buildPlan(input: PlanInput): Plan {
     const later = days
       .slice(days.findIndex((d) => d.date === day.date) + 1)
       .find((d) => routine.days.includes(d.weekday));
+    // The routine runs on no later plan day, so only the next weekday it runs is named, wrapping
+    // round the week, with no advice.
     if (!later) {
       const from = WEEKDAYS.indexOf(day.weekday);
       const weekday = [...WEEKDAYS.slice(from + 1), ...WEEKDAYS.slice(0, from + 1)].find((w) =>
@@ -152,6 +179,7 @@ export function buildPlan(input: PlanInput): Plan {
     const member = household.members[at];
     if (!member) return undefined;
     const numbers = { routine: evaluated.indexOf(found) + 1, member: at + 1 };
+    // Advice for the later day is built the same way as for the plan day.
     const laterCtx = contextFor(later);
     return {
       weekday: later.weekday,

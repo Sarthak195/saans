@@ -1,3 +1,6 @@
+// The advice sections of a plan page: the home, cleaner ways to travel, GRAP in Delhi NCR, and
+// links to the other views. Components layer: it lists advice the core already chose, each item
+// with its reason and source where there is one.
 import type { ReactElement } from 'react';
 
 import type { TransitOption } from '@/core/alternatives';
@@ -8,6 +11,7 @@ import { withQuery } from './links';
 import type { PlanContext } from './links';
 import { SHARE_WARNING } from './copy';
 
+// One piece of home advice: title, body, its effect if the core worked one out, and why.
 function AdviceItem({ item }: { readonly item: HomeAdvice }): ReactElement {
   return (
     <li>
@@ -21,9 +25,12 @@ function AdviceItem({ item }: { readonly item: HomeAdvice }): ReactElement {
 
 /** Advice for the home: safety first, then the rest, and the myths to drop in their own list. */
 export function HomeSection({ home }: { readonly home: readonly HomeAdvice[] }): ReactElement {
+  // The main list holds what is neither a safety item nor a myth. Filtering keeps the order the
+  // core gave.
   const safety = home.filter((h) => h.safety === true);
   const myths = home.filter((h) => h.myth === true);
   const rest = home.filter((h) => h.safety !== true && h.myth !== true);
+  // A list is drawn only when it has items, and an empty day says so in one line.
   return (
     <section id="home" aria-labelledby="home-title" className="section">
       <h2 id="home-title">At home</h2>
@@ -107,6 +114,10 @@ export function AlternativesSection({
   );
 }
 
+/**
+ * What the Graded Response Action Plan (GRAP) says for Delhi NCR today, with its source. Returns
+ * null when the plan carries no GRAP note, so the section is left out.
+ */
 export function GrapSection({ grap }: { readonly grap: GrapNote | null }): ReactElement | null {
   if (grap === null) return null;
   return (
@@ -135,6 +146,10 @@ export function MoreSection({
   readonly shareable: boolean;
   readonly smogDay: boolean;
 }): ReactElement {
+  // The second link flips with the view: on the recorded smog day it goes back to the live plan
+  // and keeps only the language; on a live plan it opens the smog day and keeps what the page
+  // already carries. The share note appears only for a plan whose address holds the profile,
+  // with the warning that says so.
   return (
     <section id="more" aria-labelledby="more-title" className="section">
       <h2 id="more-title">More from this plan</h2>

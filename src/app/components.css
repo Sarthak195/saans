@@ -1,6 +1,8 @@
 /* Styles for the pages and components. Quiet by design: no shadows, no gradients, no card grid.
    The air is the one loud thing, so the band colours and the day ribbon carry the page. */
 
+/* Utilities: text for screen readers only, small muted text, section spacing, plain lists,
+   rows of actions, labels and the disclosure widget. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -67,6 +69,7 @@ details {
   flex: none;
 }
 
+/* One class per CPCB band, plus none for a cell with no reading. Colours come from globals.css. */
 .band--good {
   background: var(--band-good-bg);
   color: var(--band-good-fg);
@@ -96,6 +99,7 @@ details {
   color: var(--color-text);
 }
 
+/* A bordered decision label, and the line that holds the AQI number beside its band. */
 .decision {
   display: inline-flex;
   align-items: center;
@@ -119,6 +123,7 @@ details {
   line-height: 1;
 }
 
+/* Callouts: a plain notice, then the answer card. */
 .notice {
   padding: var(--space-2) var(--space-3);
   border-left: 0.25rem solid var(--color-text-muted);
@@ -158,12 +163,14 @@ details {
   border-left-color: var(--band-severe-bg);
 }
 
+/* The severe-air panel: a heavy border in the Severe band colour. */
 .severe {
   margin-top: var(--space-6);
   padding: var(--space-3) var(--space-4);
   border: 3px solid var(--band-severe-bg);
 }
 
+/* Status and place lines, the day links and jump bar, and link-styled buttons. */
 .status-line {
   min-height: 1.5em;
   margin: var(--space-2) 0;
@@ -203,6 +210,8 @@ button.link-button {
   cursor: pointer;
 }
 
+/* Plan content: the at-a-glance list, routines, advice, sample lists, the change note and the
+   live strip. */
 .glance div {
   margin-bottom: var(--space-3);
 }
@@ -390,7 +399,8 @@ td {
   }
 }
 
-/* Marker positions: set by data attributes, because inline styles are not allowed by the content security policy. */
+/* Marker positions are set by data attributes (column 1 to 16, span 1 to 4, row 1 to 8),
+   because the content security policy does not allow inline styles. */
 .ribbon-markers [data-col='1'] {
   grid-column-start: 1;
 }
@@ -506,6 +516,7 @@ textarea {
   max-width: 100%;
   min-height: 9rem;
 }
+/* An input or select marked invalid gets the Very Poor band's red border. */
 input[aria-invalid='true'],
 select[aria-invalid='true'] {
   border-color: var(--band-very-poor-bg);
@@ -540,6 +551,7 @@ input[type='checkbox'] {
   width: 1.5rem;
   height: 1.5rem;
 }
+/* The error summary at the top of a form. */
 .error-summary {
   margin: var(--space-4) 0;
   padding: var(--space-3) var(--space-4);
@@ -548,6 +560,7 @@ input[type='checkbox'] {
 .error-summary h2 {
   margin-bottom: var(--space-2);
 }
+/* Text shown to the family as written, with its line breaks kept. */
 .notice-text {
   max-width: 70ch;
   padding: var(--space-2) var(--space-3);

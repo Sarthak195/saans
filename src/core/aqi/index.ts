@@ -1,3 +1,4 @@
+// The names the AQI code makes public, gathered in one place. Layer: core (pure).
 export { aqiToday } from '@/core/aqi/today';
 export type { AqiToday } from '@/core/aqi/today';
 export { bandOfIndex, pm25Level, subIndex } from '@/core/aqi/subindex';

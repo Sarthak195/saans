@@ -1,3 +1,6 @@
+// Checks that something a model extracted from a user's own words is really in those words: a
+// quote, a number, a profile value or an age. Layer: core (pure). Every check normalises the text
+// first, so case, spacing and punctuation do not matter.
 import { conditionPhrases, termsForValue } from '@/core/text/lexicon';
 import { normalizeText } from '@/core/text/normalize';
 import { extractNumbersWithSmallWords } from '@/core/text/numbers';
@@ -10,21 +13,26 @@ function looseKey(s: string): string {
     .trim();
 }
 
+// The words of a text after loose normalisation; empty text gives no words.
 function tokensOf(s: string): string[] {
   const key = looseKey(s);
   return key === '' ? [] : key.split(' ');
 }
 
+// One letter, mark or digit in any script, used to find whole-word edges.
 const WORD_CHAR = String.raw`[\p{L}\p{M}\p{N}]`;
 // Inflections people actually write: "walks", "running", "drives", "khelta hai", "टहलने".
 // Kept to an explicit list because a general suffix would let "दिल" match "दिल्ली" (Delhi).
 const SUFFIXES = 'ning|ting|ping|ing|ner|ers|er|es|ed|s|ta|ti|te|ता|ती|ते|ना|ने|ों|ें';
 const SUFFIXED = new RegExp(`^(?:${SUFFIXES})$`, 'u');
 
+// Makes a plain string safe to place inside a regular expression.
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
 }
 
+// Whether a lexicon term appears as a whole word in the text, with an optional inflection.
+// A term ending in 'e' also matches its -ing form ("drive" and "driving").
 function termInText(term: string, text: string): boolean {
   const stems = term.endsWith('e')
     ? `(?:${escapeRegex(term)}|${escapeRegex(term.slice(0, -1))}ing)`
@@ -58,8 +66,10 @@ const NEGATORS = new Set([
 ]);
 // "asthma nahi hai": Hindi and Hinglish put the negator after the thing it denies.
 const AFTER_NEGATORS = new Set(['nahi', 'nahin', 'nhi', 'नहीं', 'नही']);
+// How many words either side of a condition are searched for a negator.
 const NEGATION_REACH = 2;
 
+// Whether a source token is this word. Only the last word of a phrase may carry a listed suffix.
 function wordMatches(word: string, token: string, last: boolean): boolean {
   if (token === word) return true;
   return last && token.startsWith(word) && SUFFIXED.test(token.slice(word.length));
@@ -94,6 +104,7 @@ function namesDeniedCondition(source: readonly string[], at: number, length: num
   return mentions.length > 0 && mentions.every((m) => m.denied);
 }
 
+// Every position in `source` where the quote's words appear in a row, whole word for whole word.
 function runStarts(source: readonly string[], quote: readonly string[]): number[] {
   const starts: number[] = [];
   for (let at = 0; at + quote.length <= source.length; at += 1) {
@@ -113,9 +124,11 @@ export function quoteInText(source: string, quote: string): boolean {
   const wanted = tokensOf(quote);
   if (wanted.length === 0) return false;
   const text = tokensOf(source);
+  // One occurrence that does not deny a condition is enough.
   return runStarts(text, wanted).some((at) => !namesDeniedCondition(text, at, wanted.length));
 }
 
+// Words for a count of years, then of months, then of weeks, in English, Hindi and Hinglish.
 const YEAR_WORDS = new Set([
   'year',
   'years',
@@ -132,6 +145,7 @@ const YEAR_WORDS = new Set([
 ]);
 const MONTH_WORDS = new Set(['month', 'months', 'mahine', 'mahina', 'महीने', 'महीना', 'महीनों']);
 const WEEK_WORDS = new Set(['week', 'weeks', 'hafte', 'hafta', 'हफ्ते', 'हफ्ता', 'सप्ताह']);
+// How many words before a unit word are read as its number, so "twenty five years" gives 25.
 const NUMBER_REACH = 3;
 
 /** Digits glued to letters ("7yo", "8months") are split so the unit stands as its own word. */
@@ -139,11 +153,13 @@ function ageTokens(quote: string): string[] {
   return tokensOf(quote.normalize('NFKC').replace(/(\d)(\p{L})/gu, '$1 $2'));
 }
 
+// The number just before the unit word at `unitAt`, or undefined when there is none.
 function numberBefore(tokens: readonly string[], unitAt: number): number | undefined {
   const previous = tokens[unitAt - 1];
   if (previous === undefined || extractNumbersWithSmallWords(previous).length === 0) {
     return undefined;
   }
+  // The last number in the window wins, so a multi-word number such as "twenty five" is whole.
   const window = tokens.slice(Math.max(0, unitAt - NUMBER_REACH), unitAt).join(' ');
   return extractNumbersWithSmallWords(window).at(-1);
 }
@@ -159,6 +175,7 @@ export function ageYearsFromQuote(claimed: number, quote: string): number | unde
   for (const [at, token] of tokens.entries()) {
     const n = numberBefore(tokens, at);
     if (n === undefined) continue;
+    // Years must match the claim exactly.
     if (YEAR_WORDS.has(token) && n === claimed) return n;
     // A reader that mistook the count of months for years claims the same number, or 0.
     if (MONTH_WORDS.has(token) && (n === claimed || claimed === 0)) return n / 12;
@@ -173,6 +190,7 @@ function withoutDurations(quote: string): string {
   const drop = new Set<number>();
   for (const [at, token] of tokens.entries()) {
     if (!MONTH_WORDS.has(token) && !WEEK_WORDS.has(token)) continue;
+    // Walk back over the digits and number words that make up the count.
     for (let back = at - 1; back >= Math.max(0, at - NUMBER_REACH); back -= 1) {
       if (extractNumbersWithSmallWords(tokens[back] ?? '').length === 0) break;
       drop.add(back);
@@ -196,6 +214,7 @@ export function valueSupportedByQuote(value: string | number, quote: string): bo
   if (typeof value === 'number') {
     return extractNumbersWithSmallWords(withoutDurations(quote)).includes(value);
   }
+  // Profile values are matched against lexicon terms as whole words, with listed inflections.
   const text = normalizeText(quote);
   return termsForValue(value).some((term) => termInText(term, text));
 }

@@ -1,3 +1,5 @@
+// Small drawn markers for the air band and for the plan's decision on a routine. React
+// component layer. Each one pairs a shape with a word, so meaning never rests on colour alone.
 import type { ReactElement } from 'react';
 
 import { BAND_LABEL } from '@/core/aqi';
@@ -7,7 +9,8 @@ import type { Decision } from '@/core/decision';
 import { bandClass, DECISION_WORD } from './format';
 
 // One shape per band, so the band is never carried by colour alone. Good is the calmest shape
-// and Severe is a stop sign.
+// and Severe is a stop sign. Good and Satisfactory are drawn directly (a circle and a square), so
+// this table holds only the four polygons, as points in a 16 by 16 box.
 const SHAPE_POINTS: Record<Exclude<Band, 'good' | 'satisfactory'>, string> = {
   moderate: '8,2 15,14 1,14',
   poor: '8,1 15,8 8,15 1,8',
@@ -15,7 +18,9 @@ const SHAPE_POINTS: Record<Exclude<Band, 'good' | 'satisfactory'>, string> = {
   severe: '5,1 11,1 15,5 15,11 11,15 5,15 1,11 1,5',
 };
 
+/** The band's own shape as a 16 by 16 icon in the text colour, hidden from screen readers. */
 export function BandShape({ band }: { readonly band: Band }): ReactElement {
+  // Good is a circle, Satisfactory a square, and the four worse bands read from the table.
   return (
     <svg className="shape" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
       {band === 'good' ? (
@@ -46,6 +51,8 @@ export function BandBadge({
   );
 }
 
+// One small drawing for each decision: a tick (keep), a dash (lighten), a clock (move), a house
+// (indoors) and a shield (go, with protection). They are all 16 by 16 line drawings.
 const DECISION_PATH: Record<Decision, ReactElement> = {
   keep: <path d="M3 8.5 6.5 12 13 4" fill="none" stroke="currentColor" strokeWidth="2" />,
   lighten: <path d="M3 8h10" fill="none" stroke="currentColor" strokeWidth="2" />,

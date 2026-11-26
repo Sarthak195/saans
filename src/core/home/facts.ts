@@ -1,3 +1,5 @@
+// Turns a household and a plan day into the facts the home advice rows test. Core layer, pure:
+// the date comes from the plan, so no clock is read here.
 import type { FactValue } from '@/core/rules/evaluate';
 import { planLevel } from '@/core/advice/level';
 import type { PlanLevel } from '@/core/advice/level';
@@ -28,11 +30,14 @@ export interface HomeFacts extends Record<string, FactValue> {
 
 /** Diwali falls in October or November, so the whole of both months counts as festival season. */
 function inFestivalSeason(date: string): boolean {
+  // The plan day is 'YYYY-MM-DD', so characters 5 and 6 are the month number.
   return INDOOR.assumptions.festivalMonths.value.includes(Number(date.slice(5, 7)));
 }
 
+/** The facts about this household and plan day that the home rows can test. */
 export function homeFacts(household: Household, plan: Plan): HomeFacts {
   const { home } = household;
+  // Habits become one flag each, and the purifier fit comes from checking the room and the unit.
   return {
     level: planLevel(plan),
     airing: plan.glance.airing.kind,

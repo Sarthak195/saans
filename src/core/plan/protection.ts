@@ -1,3 +1,5 @@
+// Picks the protection lines for a trip that has to happen, from the sourced protection rows.
+// Layer: core (pure). Children get no mask lines; their rows give shorter, quieter trips.
 import type { Band } from '@/core/aqi';
 import { PROTECTION } from '@/core/plan/rules-data';
 import type { AgeBand, Mode } from '@/core/types';
@@ -10,6 +12,7 @@ import type { AgeBand, Mode } from '@/core/types';
  */
 export function protectionFor(mode: Mode | undefined, ageBand: AgeBand, level: Band): string[] {
   const wanted = mode ?? 'unspecified';
+  // A row applies when its mode and age band match and, if it names levels, the level is listed.
   return PROTECTION.filter(
     (row) =>
       row.modes.includes(wanted) &&

@@ -1,3 +1,6 @@
+// Reads the home a family described (cooking, heating, habits, room and purifier numbers) from
+// the model's output. Pure core: no clock, network or environment. A value is kept only when
+// the family's own words say it, and a number only when it comes with its unit.
 import { M3H_PER_CFM } from '@/core/home/purifier';
 import { COOKING, HABITS, HEATING } from '@/core/profile/schema';
 import type { Quoted, ReaderOutput } from '@/core/reader/schema';
@@ -11,6 +14,8 @@ import {
 import { quoteInText, valueSupportedByQuote } from '@/core/text';
 import type { Home } from '@/core/types';
 
+// How a number must be written to count: the unit words that go with it and the range a real
+// home can have.
 interface Measure {
   /** The words that show the number is this measure and not another. */
   units: readonly string[];
@@ -18,11 +23,13 @@ interface Measure {
   max: number;
 }
 
+// Room floor area, 20 to 5000 square feet.
 const ROOM: Measure = {
   units: ['sq ft', 'sqft', 'sq. ft', 'square feet', 'square foot', 'sq feet'],
   min: 20,
   max: 5000,
 };
+// Ceiling height, 6 to 30 feet.
 const CEILING: Measure = { units: ['ft', 'feet', 'foot'], min: 6, max: 30 };
 // A purifier rating counts only with its unit: cfm, or m3/h which is converted. Many purifiers sold
 // in India give CADR in m3/h, so a bare "CADR 400" is not assumed to be cfm.
@@ -40,8 +47,10 @@ const PURIFIER_M3H: Measure = {
     'cubic meters per hour',
   ],
   min: 2,
+  // The same 2000 cfm ceiling as above, written in cubic metres per hour.
   max: Math.round(2000 * M3H_PER_CFM),
 };
+// "CADR" with no cfm or m3/h unit: only used to tell the family the unit is missing.
 const PURIFIER_BARE: Measure = { units: ['cadr'], min: 1, max: PURIFIER_M3H.max };
 
 /**
@@ -57,10 +66,14 @@ function measured(
   if (!valueSupportedByQuote(field.value, field.quote)) return undefined;
   if (field.value < measure.min || field.value > measure.max) return undefined;
   const unit = measure.units.map(escapeRegex).join('|');
+  // The number then its unit, as in "120 sq ft". The lookbehind stops "1120" or "3.120" from
+  // matching 120, and the lookahead stops the unit from being the start of a longer word.
   const after = new RegExp(
     String.raw`(?<![\d.])${String(field.value)}\s*(?:${unit})(?![\p{L}])`,
     'iu',
   );
+  // The unit then its number, as in "CADR: 400" or "cfm of 400". The lookaheads stop 400 from
+  // matching the start of 4000 or 400.5.
   const before = new RegExp(
     String.raw`(?:${unit})\s*(?:of|is|:)?\s*${String(field.value)}(?!\d)(?!\.\d)`,
     'iu',
@@ -76,6 +89,7 @@ function readPurifier(
   const cfm = measured(text, field, PURIFIER_CFM);
   if (cfm !== undefined) return { cfm };
   const m3h = measured(text, field, PURIFIER_M3H);
+  // Cubic metres per hour are converted to cfm, never below 1.
   if (m3h !== undefined) return { cfm: Math.max(1, Math.round(m3h / M3H_PER_CFM)) };
   if (measured(text, field, PURIFIER_BARE) !== undefined) {
     return {
@@ -85,6 +99,8 @@ function readPurifier(
   return {};
 }
 
+// A value from a fixed list (cooking, heating, one habit), kept only when its quote is in the
+// text and contains one of the words listed for that value.
 function termed<V extends string>(
   text: string,
   field: Quoted<V> | undefined,
@@ -95,11 +111,17 @@ function termed<V extends string>(
   return ok ? field.value : undefined;
 }
 
-/** The home the family described, and a note when a part of it had to be assumed. */
+/**
+ * The home the family described, and a note when a part of it had to be assumed. Cooking and
+ * heating fall back to the first listed option (LPG or PNG cooking, no heating); a size or
+ * purifier rating that is not backed by the text is left out.
+ */
 export function readHome(text: string, output: ReaderOutput): { home: Home; notes: string[] } {
   const draft = output.home;
   const cooking = termed(text, draft.cooking, COOKING_TERMS);
   const heating = termed(text, draft.heating, HEATING_TERMS);
+  // Habits are listed in the schema's own order, each kept only when the model's entry for it
+  // is backed by a quote.
   const habits = HABITS.filter((habit) =>
     draft.habits.some((h) => h.value === habit && termed(text, h, HABIT_TERMS) !== undefined),
   );
@@ -107,6 +129,7 @@ export function readHome(text: string, output: ReaderOutput): { home: Home; note
   const ceilingFt = measured(text, draft.ceilingFt, CEILING);
   const purifier = readPurifier(text, draft.purifierCadrCfm);
   const purifierCadrCfm = purifier.cfm;
+  // The first entry of each list is the default: COOKING[0] and HEATING[0].
   const home: Home = {
     cooking: cooking ?? COOKING[0],
     habits,
@@ -115,6 +138,7 @@ export function readHome(text: string, output: ReaderOutput): { home: Home; note
     ...(ceilingFt === undefined ? {} : { ceilingFt }),
     ...(purifierCadrCfm === undefined ? {} : { purifierCadrCfm }),
   };
+  // The family is told about the default only when neither cooking nor heating was read.
   const notes = [
     ...(cooking === undefined && heating === undefined
       ? ['Assumed cooking on LPG or PNG and no heating. Change it in the form.']

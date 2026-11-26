@@ -1,3 +1,6 @@
+// Asks the model for the English plan summary when a plan page is opened, but never for long.
+// Server layer (I/O). The page always has a code-built summary to fall back on, so a slow or
+// failed model costs the family nothing.
 import 'server-only';
 
 import type { WrittenText } from '@/server/genai';
@@ -16,6 +19,7 @@ export const AUTO_WAIT_MS = 4000;
  */
 export async function autoBriefing(view: PlanView): Promise<WrittenText | undefined> {
   if (view.mode !== 'live' || view.unavailable !== undefined) return undefined;
+  // Kept outside the try so the finally block can always cancel the wait.
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const pending = writeBriefing({
@@ -32,10 +36,13 @@ export async function autoBriefing(view: PlanView): Promise<WrittenText | undefi
         resolve(undefined);
       }, AUTO_WAIT_MS);
     });
+    // Whichever settles first wins: the reply, or undefined once the wait is over.
     const written = await Promise.race([pending, late]);
+    // Only model text is kept. A code-built reply would just repeat what the page builds itself.
     return written?.by === 'gemini' ? written : undefined;
   } catch {
-    // Any failure, even a missing key, leaves the plain summary: the page never waits on the model.
+    // Any failure, even a missing key, leaves the plain summary: the page never waits on the
+    // model.
     return undefined;
   } finally {
     clearTimeout(timer);

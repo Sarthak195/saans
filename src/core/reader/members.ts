@@ -1,3 +1,7 @@
+// Reads the household members out of what the model extracted from a family's own words.
+// Core layer: pure, so no clock, network or environment. Every value is kept only when its
+// quote is found in the family's text; anything else is dropped or replaced by a listed default.
+
 import type { Quoted, ReaderOutput } from '@/core/reader/schema';
 import {
   SPEAKER_TERMS,
@@ -10,6 +14,7 @@ import {
 import { ageYearsFromQuote, normalizeText, quoteInText, valueSupportedByQuote } from '@/core/text';
 import type { AgeBand, Member } from '@/core/types';
 
+// Longest member label and member id kept, in characters.
 const MAX_LABEL = 40;
 const MAX_ID = 24;
 
@@ -22,6 +27,7 @@ export function ageBandOfYears(years: number): AgeBand {
   return years < 60 ? 'adult' : 'older';
 }
 
+// How a guessed age band is described to the family in the notes.
 const BAND_PHRASE: Record<AgeBand, string> = {
   infant: 'a baby under 1',
   under5: 'a child under 5',
@@ -31,6 +37,7 @@ const BAND_PHRASE: Record<AgeBand, string> = {
   older: 'an older adult, 60 or more',
 };
 
+// True for the words the family uses for the writer: the member is then shown as "Me".
 function isSpeaker(label: string): boolean {
   return ['me', 'i', 'myself'].includes(normalizeText(label));
 }
@@ -43,13 +50,17 @@ function labelIsQuoted(text: string, label: Quoted<string>): boolean {
   return hasTerm(label.quote, label.value);
 }
 
+// Trims and shortens a label for display, calls the speaker "Me", and capitalises the first letter.
 function displayLabel(raw: string): string {
   const label = raw.trim().slice(0, MAX_LABEL);
   const shown = isSpeaker(label) ? 'me' : label;
   return shown.charAt(0).toUpperCase() + shown.slice(1);
 }
 
+// A short id made from the label, with -2, -3 and so on added when it is already taken.
 function slug(label: string, taken: ReadonlySet<string>): string {
+  // Runs of anything but a letter or digit become one hyphen; edge hyphens go. "Dadi ji!" gives
+  // "dadi-ji". A label with nothing usable falls back to "member".
   const base =
     normalizeText(label)
       .replace(/[^a-z0-9]+/g, '-')
@@ -60,13 +71,16 @@ function slug(label: string, taken: ReadonlySet<string>): string {
   return id;
 }
 
+/** The members read from the text, a label map for matching routine owners, and notes. */
 export interface ReadMembers {
   members: Member[];
-  /** The label as the family wrote it, to match a routine's owner. */
+  /** The normalised label of each member to the member's id, to match a routine's owner. */
   names: Map<string, string>;
+  /** Plain sentences about every guess made, shown to the family so they can correct it. */
   notes: string[];
 }
 
+// Words that say the number before them is an age in years.
 const YEAR_WORDS = new Set([
   'year',
   'years',
@@ -179,18 +193,27 @@ const PLAUSIBLE: Record<AgeBand, readonly [number, number] | undefined> = {
 // "father is 72", "father who is 72": the marker sits at most one word after the label, so a number
 // in a later part of the sentence ("mother thinks it is 65 outside") is not taken as her age.
 const MARKER_REACH = 1;
+// Hedging words allowed between "is" and the number: "is about 72".
 const FILLERS = new Set(['about', 'around', 'nearly', 'almost', 'just', 'only', 'abhi']);
+// Where one clause ends: sentence punctuation (including the Hindi danda) or a joining word such as
+// "and" or "aur". Ages are looked for one clause at a time so a number never crosses clauses.
 const CLAUSE_END = /(?:[.;!?\n।]+(?=\s|$))|\s+(?:and|aur|but|lekin|while)\s+/giu;
 
-/** The ages in years a text states about one person: next to a year word, after "is", or between commas. */
+/**
+ * True when the text states the claimed age in years for this person: next to a year word, after
+ * a marker such as "is", or set off between commas. A number that is a time or a size is not
+ * an age.
+ */
 function statedAgeFor(text: string, who: Quoted<string>, claimed: number): boolean {
   const bare = String(claimed);
   const label = wordsOf(who.quote);
   for (const clause of text.split(CLAUSE_END)) {
     const words = wordsOf(clause);
+    // Find where the person's label sits in this clause; skip clauses that do not mention them.
     const at = words.findIndex((_, i) => label.every((w, k) => words[i + k] === w));
     if (at < 0) continue;
     const afterLabel = at + label.length;
+    // "my father, 72, walks": the age set off by commas right after the label.
     const appositive = new RegExp(String.raw`${escapeRegex(who.quote)}\s*,\s*${bare}\s*,`, 'iu');
     if (appositive.test(clause)) return plausible(who.value, claimed);
     for (const [i, word] of words.entries()) {
@@ -198,6 +221,7 @@ function statedAgeFor(text: string, who: Quoted<string>, claimed: number): boole
       const next = words[i + 1] ?? '';
       if (YEAR_WORDS.has(next)) return true;
       if (NOT_AN_AGE.has(next)) continue;
+      // Step back over hedging words to the word that should say this number is an age.
       let before = i - 1;
       while (before > at && FILLERS.has(words[before] ?? '')) before -= 1;
       const markerNear = before >= afterLabel && before - afterLabel <= MARKER_REACH;
@@ -209,18 +233,21 @@ function statedAgeFor(text: string, who: Quoted<string>, claimed: number): boole
   return false;
 }
 
+// Whether an age fits the role in the label; the speaker and unknown roles accept 1 to 110.
 function plausible(label: string, years: number): boolean {
   const band = isSpeaker(label) ? undefined : roleBand(label);
   const range = band === undefined ? ([1, 110] as const) : PLAUSIBLE[band];
   return range !== undefined && years >= range[0] && years <= range[1];
 }
 
+// The age band for one member: from a stated age, then an age word, then a guess from the role.
 function ageOf(
   text: string,
   draft: ReaderOutput['members'][number],
   label: string,
   notes: string[],
 ): AgeBand {
+  // The most exact source first: a number of years that the text itself backs up.
   const years = draft.years;
   if (years && quoteInText(text, years.quote) && years.value >= 0 && years.value <= 110) {
     // The quote must carry a year word next to the number; months or weeks read as under one.
@@ -234,6 +261,7 @@ function ageOf(
       return ageBandOfYears(years.value);
     }
   }
+  // Next an age word, accepted only when its quote is in the text and says that age.
   const word = draft.ageWord;
   if (word && quoteInText(text, word.quote) && valueSupportedByQuote(word.value, word.quote)) {
     return word.value;
@@ -253,14 +281,18 @@ export function readMembers(text: string, output: ReaderOutput): ReadMembers {
   const notes: string[] = [];
   const ids = new Set<string>();
   for (const draft of output.members) {
+    // A household holds at most six members; later drafts are ignored.
     if (members.length >= 6) break;
+    // A member the family never named is dropped, however sure the model was.
     if (!labelIsQuoted(text, draft.label)) continue;
     const label = displayLabel(draft.label.value);
     const key = normalizeText(label);
+    // The same person written twice becomes one member.
     if (names.has(key)) continue;
     const id = slug(label, ids);
     ids.add(id);
     names.set(key, id);
+    // A health condition counts only when its quote is in the text and says it.
     const conditions = draft.conditions
       .filter((c) => quoteInText(text, c.quote) && valueSupportedByQuote(c.value, c.quote))
       .map((c) => c.value);

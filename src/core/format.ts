@@ -33,16 +33,20 @@ export function toMinutes(hhmm: string): number {
   return Number(h) * 60 + Number(m);
 }
 
+/** 'HH:MM' for minutes after midnight, the reverse of toMinutes. Whole minutes are expected. */
 export function fromMinutes(minutes: number): string {
   return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
 }
 
 /** 'HH:MM' from either a clock time or an hour stamp such as '2026-11-24T14:00'. */
 export function clockOf(value: string): string {
+  // Matches an 'HH:MM' at the very end, so '2026-11-24T14:00' gives '14:00'. A value with none is
+  // returned as it is.
   const m = /(\d{2}:\d{2})$/.exec(value);
   return m?.[1] ?? value;
 }
 
+/** The values fillTemplate may put into {name} placeholders. */
 export type Vars = Readonly<Record<string, string | number>>;
 
 /**
@@ -50,7 +54,9 @@ export type Vars = Readonly<Record<string, string | number>>;
  * rather than showing a family a raw brace.
  */
 export function fillTemplate(text: string, vars: Vars): string {
+  // Matches {name} with letters, digits or underscores, such as {level}.
   return text.replaceAll(/\{(\w+)\}/g, (_whole, name: string) => {
+    // Own keys only, so a name such as 'constructor' counts as missing.
     const value = Object.hasOwn(vars, name) ? vars[name] : undefined;
     if (value === undefined) throw new Error(`No value for {${name}} in: ${text}`);
     return String(value);

@@ -1,14 +1,19 @@
+// Checks that written text about a plan does not reassure a family about something the plan
+// advises against. Layer: core (pure). The checks are lexical, using the reassurance word list.
 import { reassurancePhrases } from '@/core/text/lexicon';
 import { normalizeText } from '@/core/text/normalize';
 import type { Decision } from '@/core/decision';
 
+/** What the plan advises for an item: keep, lighten, move, indoors or essential. */
 export type { Decision };
 
+/** One routine or member the text must treat correctly: its placeholder ref and decision. */
 export interface PolarityItem {
   ref: string;
   decision: Decision;
 }
 
+/** The outcome of checkPolarity: `ok` is true only when all three lists are empty. */
 export interface PolarityResult {
   ok: boolean;
   /** Non-keep refs the text never mentions. */
@@ -21,6 +26,7 @@ export interface PolarityResult {
 
 // A full stop between digits is a decimal point, not the end of a sentence.
 const SENTENCE_BREAK = /(?<!\d)\.|\.(?!\d)|[!?।॥\n\r]+/;
+// A placeholder such as routine_3 or member_1, not part of a longer word.
 const REF_LIKE = /(?<![a-z0-9_])(?:routine|member)_\d+(?![a-z0-9_])/gi;
 
 // "not safe" and "safe nahi hai" warn; they must not be mistaken for reassurance.
@@ -36,17 +42,22 @@ const NEGATORS = new Set([
   'wont',
 ]);
 const AFTER_NEGATORS = new Set(['nahi', 'nahin', 'not', 'नहीं']);
+// How many words before a phrase are searched for a negator.
 const NEGATION_LOOKBACK = 2;
 
+// Whether the sentence names this exact ref, so routine_1 does not match routine_10.
 function namesRef(sentence: string, ref: string): boolean {
   const escaped = ref.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
   return new RegExp(`(?<![a-z0-9_])${escaped}(?![a-z0-9_])`).test(sentence);
 }
 
+// Whether the phrase's words appear in order starting at position `at`.
 function phraseAt(tokens: readonly string[], phrase: readonly string[], at: number): boolean {
   return phrase.every((word, i) => tokens[at + i] === word);
 }
 
+// Whether a phrase at `at` is negated, by a negator just before it ("not safe") or by a word just
+// after it ("safe nahi hai"), unless the phrase itself ends in that word.
 function isNegated(tokens: readonly string[], phrase: readonly string[], at: number): boolean {
   const before = tokens.slice(Math.max(0, at - NEGATION_LOOKBACK), at);
   if (before.some((t) => NEGATORS.has(t))) return true;
@@ -60,6 +71,7 @@ function isNegated(tokens: readonly string[], phrase: readonly string[], at: num
   );
 }
 
+// Whether a sentence holds a reassurance phrase that is not negated.
 function reassures(sentence: string): boolean {
   const tokens = normalizeText(sentence).split(' ');
   return reassurancePhrases().some((phrase) =>
@@ -73,8 +85,10 @@ function reassures(sentence: string): boolean {
  * one may reassure, and the text may not refer to a placeholder the plan never defined.
  */
 export function checkPolarity(text: string, items: readonly PolarityItem[]): PolarityResult {
+  // Refs are lower case in the text and in the lookups, so case never hides a mention.
   const lower = text.toLowerCase();
   const sentences = lower.split(SENTENCE_BREAK);
+  // Only changed items need to be named; a kept item may be left out or mentioned freely.
   const nonKeep = items.filter((i) => i.decision !== 'keep').map((i) => i.ref.toLowerCase());
   const known = new Set(items.map((i) => i.ref.toLowerCase()));
 
@@ -82,6 +96,7 @@ export function checkPolarity(text: string, items: readonly PolarityItem[]): Pol
   const reassuringAboutNonKeep = nonKeep.filter((ref) =>
     sentences.some((s) => namesRef(s, ref) && reassures(s)),
   );
+  // Any routine_N or member_N that is not one of the plan's refs was made up by the writer.
   const invented = [...new Set(lower.match(REF_LIKE) ?? [])].filter((ref) => !known.has(ref));
 
   return {

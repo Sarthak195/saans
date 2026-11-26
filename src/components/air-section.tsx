@@ -1,3 +1,6 @@
+// The "Air today" section of a plan page: the day's AQI with its band, where the data came from,
+// any nearby monitor reading, and why the number can differ from an app. Components layer: it
+// shows numbers the core already worked out and never recomputes them.
 import type { ReactElement } from 'react';
 
 import type { StationReading } from '@/core/air/types';
@@ -10,14 +13,18 @@ import { BandBadge } from './band';
 import { CPCB_URL, SAMEER_URL, SMOG_DAY_LABEL } from './copy';
 import { clockOf, coordinate, dateLabel, whole } from './format';
 
+// Names for the gases the model returns besides particles, keyed by the field names of the data.
 const GAS_NAME: Record<string, string> = {
   no2: 'Nitrogen dioxide',
   o3: 'Ozone',
   co: 'Carbon monoxide',
   so2: 'Sulphur dioxide',
 };
+// The order the gas rows are listed in.
 const GAS_ORDER = ['no2', 'o3', 'co', 'so2'] as const;
 
+// Names the data source, the model grid point it describes, the hour of the data and when it was
+// fetched.
 function SourceLine({ air }: { readonly air: AirSummary }): ReactElement {
   const grid = `${coordinate(air.gridLat)} N ${coordinate(air.gridLon)} E`;
   return (
@@ -34,8 +41,10 @@ function StationLine({ station }: { readonly station: StationReading }): ReactEl
     station.pm25 === null ? null : `PM2.5 ${whole(station.pm25)}`,
     station.pm10 === null ? null : `PM10 ${whole(station.pm10)}`,
   ].filter((r) => r !== null);
+  // Show nothing rather than a half line: no readings, or a time that does not parse.
   const measured = new Date(station.measuredAt);
   if (readings.length === 0 || Number.isNaN(measured.getTime())) return null;
+  // The measurement time is shown on the Indian clock, whatever the offset it arrived with.
   const when = istParts(measured);
   const clock = `${String(when.hour).padStart(2, '0')}:${String(when.minute).padStart(2, '0')}`;
   return (
@@ -52,6 +61,8 @@ function StationLine({ station }: { readonly station: StationReading }): ReactEl
   );
 }
 
+// A notice when the numbers are not live: the recorded smog day, or a saved copy used because
+// the live data could not be reached. Live data gets no notice.
 function Provenance({
   air,
   smogDay,
@@ -59,6 +70,7 @@ function Provenance({
   readonly air: AirSummary;
   readonly smogDay: boolean;
 }): ReactElement | null {
+  // The smog-day label is checked first, so it takes the place of the saved-copy notice.
   if (smogDay) return <p className="notice notice--recorded">{SMOG_DAY_LABEL}</p>;
   if (air.source === 'recorded' && air.recordedOn !== undefined) {
     return (
@@ -71,6 +83,7 @@ function Provenance({
   return null;
 }
 
+// A collapsed table of the gas averages that are present. Nothing is drawn when none are.
 function GasTable({
   gases,
 }: {
@@ -121,6 +134,10 @@ export function AirSection({
   readonly unavailable?: boolean;
 }): ReactElement {
   const { aqi } = air;
+  // With no air data at all, the notice, source and monitor lines are skipped, since there is
+  // nothing to describe. When the AQI itself is missing, the text says whether the data failed to
+  // load or there were too few hours, and the hourly numbers still guide the plan. The monitor
+  // line appears only when a nearby reading was found. The gas table needs a usable AQI.
   return (
     <section aria-labelledby="air-title" id="air" className="section">
       <h2 id="air-title">Air today</h2>

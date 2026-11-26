@@ -1,3 +1,6 @@
+// The repeating blocks of the household form: one fieldset for each person and one for each
+// routine. React component layer: it only draws fields, and reads their values from FormState.
+// Field names are row-numbered ('m1_label', 'r2_start') so the server can read them back.
 import type { ReactElement } from 'react';
 
 import { CheckGroup, SelectField, TextField } from './form-fields';
@@ -5,16 +8,23 @@ import type { FormState } from '@/server/household-form';
 import { AGE, CONDITIONS, DAYS, INTENSITY } from './form-options';
 import { KIND_LABEL, MODE_LABEL } from './format';
 
+// How many person rows a routine can name as its member.
 const MEMBER_ROWS = 6;
 
+/** The row numbers 1 to count, for drawing that many fieldsets. */
 export function rows(count: number): number[] {
   return Array.from({ length: count }, (_, i) => i + 1);
 }
 
+// True when the form posted a value for this field, even an empty one.
 function used(state: FormState, prefix: string, key: string): boolean {
   return state.values[`${prefix}${key}`] !== undefined;
 }
 
+/**
+ * One person's fieldset: a name or role, an age group and any health conditions. Field names start
+ * with 'm' and the row number, such as 'm1_age'.
+ */
 export function MemberRow({
   state,
   row,
@@ -39,6 +49,10 @@ export function MemberRow({
   );
 }
 
+/**
+ * One routine's fieldset: what it is, who does it, when, how long and how hard, plus trip and
+ * flexibility details. Field names start with 'r' and the row number, such as 'r1_start'.
+ */
 export function RoutineRow({
   state,
   row,
@@ -47,12 +61,14 @@ export function RoutineRow({
   readonly row: number;
 }): ReactElement {
   const p = `r${String(row)}_`;
+  // The people already named above, as [member id, label] pairs for the "Who does it" choices.
   const people = rows(MEMBER_ROWS)
     .filter((n) => used(state, `m${String(n)}_`, 'label'))
     .map(
       (n) =>
         [`m${String(n)}`, state.values[`m${String(n)}_label`] ?? `Person ${String(n)}`] as const,
     );
+  // With nobody named yet, offer every row as 'Person n' so a routine can still pick someone.
   const memberOptions =
     people.length > 0
       ? people

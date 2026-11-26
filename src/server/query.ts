@@ -1,11 +1,15 @@
+// Reads the query part of a page address into the few values the app understands. Server layer.
+// It has no side effects and imports only a type, so routes and pages can all share it.
 import type { PlanDay } from '@/core/time';
 
+/** The query values as Next hands them over: one string, a list when repeated, or nothing. */
 export type SearchParams = Record<string, string | string[] | undefined>;
 
 /** The first value of a query parameter, whether the framework gave one or a list. */
 export function first(params: SearchParams, name: string): string | undefined {
   const value = params[name];
   const one = Array.isArray(value) ? value[0] : value;
+  // An empty value (such as "?day=") counts as absent.
   return one === '' ? undefined : one;
 }
 
@@ -21,6 +25,7 @@ export function readPlanQuery(params: SearchParams): {
   /** A sealed written summary from the explain step. */
   b?: string | undefined;
 } {
+  // The values are raw text. dayOf and airOf below check the ones that must be one of a few words.
   return {
     day: first(params, 'day'),
     air: first(params, 'air'),
@@ -33,6 +38,7 @@ export function readPlanQuery(params: SearchParams): {
   };
 }
 
+// The three plan days, in order from now.
 const DAYS: readonly PlanDay['relative'][] = ['today', 'tomorrow', 'day_after'];
 
 /** A day choice from a query or a form, or none when it is not one of the three. */
