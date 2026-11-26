@@ -183,7 +183,7 @@ gcloud logging sinks update _Default --add-exclusion='name=saans-request-urls,fi
 - A band is always a word plus a shape plus a colour, never colour alone. A decision is a word plus a drawing.
 - Tables have captions and header cells, with stacked cards on narrow screens. Pages have a single main heading, a skip link, a jump bar and a status line that announces what changed. Buttons, form fields, summaries and sample links are at least 44 px tall.
 - The Hindi summary is marked `lang="hi"`. No external fonts are loaded.
-- Tested with axe-core on the rendered components (bands, the hour strip, the answer and routine items, the home page components, both forms and the place chooser). The tests run in jsdom, which cannot check colour contrast, so contrast rests on the design tokens and has no automated test (see [Known gaps](#known-gaps)).
+- Tested three ways. axe-core runs on the rendered components in jsdom (bands, the hour strip, the answer and routine items, the home page components, both forms and the place chooser). Every colour pair the pages draw text or a control boundary with is checked against WCAG 2.2 from the stylesheets: 4.5:1 for text, 3:1 for borders and the focus ring (`tests/unit/contrast.test.ts`). A browser suite (`tests/e2e`, Playwright) runs axe with the WCAG 2.2 AA tags on 14 page states in Chromium, at 1280 and 320 px and under a light and a dark colour preference, checks that no page scrolls sideways at 320 px and that the skip link and the Change place controls work by keyboard, and walks the place paths, including an empty change of place, in Chromium and Firefox.
 
 ## Running locally
 
@@ -206,20 +206,20 @@ Environment variables (see `.env.example`):
 | `GEMINI_MODEL_READER`, `GEMINI_MODEL_WRITER`, `GEMINI_MODEL_FALLBACK` | no     | Model ids. Defaults: `gemini-3.5-flash-lite`, `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`.                                              |
 | `OPENAQ_API_KEY`                                                      | no     | A free OpenAQ key. It turns on the "Measured nearby" line and the precaution. Without it no OpenAQ request is made and nothing else changes. |
 
-Generate a key with `openssl rand -base64 32`. `npm run verify` runs typecheck, lint, format check, the tests and the repository checks. `npm run build` makes the production build. After a build, `npm start` and then `BASE_URL=http://localhost:3000 npx tsx scripts/smoke.ts` check the pages' status codes and security header against a running server.
+Generate a key with `openssl rand -base64 32`. `npm run verify` runs typecheck, lint, format check, the tests and the repository checks. `npm run build` makes the production build. After a build, `npm start` and then `BASE_URL=http://localhost:3000 npx tsx scripts/smoke.ts` check the pages' status codes and security header against a running server. After a build, `npm run test:e2e` runs the browser suite (install the browsers once with `npx playwright install chromium firefox`).
 
 ## Measurements
 
 All taken on 2026-11-26 (IST), with the commands shown.
 
-| What                         | Result                                                                                                                   | Command                 |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
-| Tests                        | 1,501 tests in 68 files, all passing                                                                                     | `npx vitest run`        |
-| Coverage, all of `src`       | 96.94% of lines (95.44% statements, 89.56% branches, 96.67% functions)                                                   | `npm run coverage`      |
-| Coverage thresholds enforced | 80% lines overall, 90% lines under `src/core` (the run passes)                                                           | `vitest.config.mts`     |
-| Tracked files                | 313 files, 1.76 MB (`npm run check:repo`)                                                                                | `git ls-files \| wc -l` |
-| Lines                        | 16,756 in `src` (without `src/data`), 4,301 in `src/data`, 13,127 in `tests` (without fixtures), 385 in `tests/fixtures` | `npm run check:repo`    |
-| Data rows                    | 28 decision-grid rows, 25 indoor rows, 18 community rows, 7 trip rules, 9 transit cities, 41 listed places, 6 samples    | the command below       |
+| What                         | Result                                                                                                                   | Command                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
+| Tests                        | 1,525 unit tests in 69 files, and 82 browser tests in 4 files (Chromium and Firefox), all passing                        | `npx vitest run`, `npm run test:e2e` |
+| Coverage, all of `src`       | 96.94% of lines (95.44% statements, 89.58% branches, 96.66% functions)                                                   | `npm run coverage`                   |
+| Coverage thresholds enforced | 80% lines overall, 90% lines under `src/core` (the run passes)                                                           | `vitest.config.mts`                  |
+| Tracked files                | 320 files, 1.78 MB (`npm run check:repo`)                                                                                | `git ls-files \| wc -l`              |
+| Lines                        | 16,769 in `src` (without `src/data`), 4,301 in `src/data`, 13,591 in `tests` (without fixtures), 385 in `tests/fixtures` | `npm run check:repo`                 |
+| Data rows                    | 28 decision-grid rows, 25 indoor rows, 18 community rows, 7 trip rules, 9 transit cities, 41 listed places, 6 samples    | the command below                    |
 
 ```
 node -e "const d=n=>require('./src/data/'+n+'.json');console.log(d('rules').grid.length,d('indoor').rows.length,d('community').rows.length,d('transit').rules.length,Object.keys(d('transit').cities).length,d('places').length,d('samples').length)"
@@ -240,7 +240,6 @@ prints, in order: decision-grid rows, indoor rows, community rows, trip rules, t
 - **Hindi is modest.** The interface is English. The summary and notice can be written in Hindi by Gemini and checked; code supplies the Hindi words for each decision, the air band and the day. There is no Hindi template, so a failed Hindi request falls back to English with a note. Code checks a Hindi text for numbers, script and tone but not for fluency, so the wording is plain and can read stiffly.
 - **Coverage of places and transport.** Transport options are listed for the cities counted under Measurements and other places get a generic bus line. The place search finds populated places only, and small localities may be missing. Place names in Devanagari, PIN codes and "NCR" are not recognised, and a listed name followed by another state ("Andheri, Punjab") is read as the listed place.
 - **Free-tier limits.** Open-Meteo's free service is for non-commercial use and has no uptime guarantee. The Gemini free tier is a shared quota and there is no rate limiter, a deliberate choice recorded in SECURITY.md. When the quota is used up, or Google answers that a model is overloaded (HTTP 503, seen for the fallback model on 24 Nov 2026), text comes from code and the own-words box falls back to word matching.
-- **No automated contrast test**, and the axe tests run on components in jsdom, not on full pages in a browser.
 - **Samples use a recording only when live data fails.** Sample pages are built from live air for their place; the recordings (fetched 2026-11-21) are a fallback and the source of the smog-day comparison.
 - **Several rows are P-FETCH.** They were read through a page summary and need their wording rechecked against the source before being relied on. See [ADR 0009](docs/adr/0009-rules-as-sourced-data.md).
 - **Not medical advice.** See [DISCLAIMER.md](DISCLAIMER.md).
