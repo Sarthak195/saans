@@ -1,6 +1,8 @@
 // Runs axe-core over whole rendered pages in a real browser, in light and dark colours and at a
-// desktop and a phone width. The jsdom tests in tests/unit cannot compute colour contrast or see
-// the real layout, so contrast and anything that depends on a stylesheet is only checked here.
+// desktop and a phone width. The jsdom tests in tests/unit cannot see the real layout, so anything
+// that depends on it is checked here; colour pairs are also checked from the stylesheets by
+// tests/unit/contrast.test.ts. The app keeps its light colours under a dark preference
+// (color-scheme: light), and the dark runs check that nothing breaks when a browser asks for dark.
 //
 // Chromium only: axe's results do not depend on the engine, and one run is enough to keep the
 // suite fast. A failing rule is reported with its selectors; it is never switched off.
