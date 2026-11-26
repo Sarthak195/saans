@@ -43,7 +43,16 @@ Two kinds of recording exist and neither is ever edited by hand. A hand-edited r
 
 ## Check your work
 
-`npm run verify` runs the type check, lint, format check, tests and the repository checks (no private paths tracked, no em-dashes or en-dashes in tracked text, size report). `npm run check:repo` reads `git ls-files`, so stage new files before running it. `npm run coverage` enforces the coverage thresholds, and `npm run build` makes the production build. Tests run offline: any unmocked network call fails. The OpenAQ tests read `tests/fixtures/openaq.json`, which is trimmed from real replies (its `note` says how); the app only calls OpenAQ when `OPENAQ_API_KEY` is set.
+`npm run verify` runs the type check, lint, format check, tests and the repository checks (no private paths tracked, no em-dashes or en-dashes in tracked text, size report). `npm run check:repo` reads `git ls-files`, so stage new files before running it. `npm run coverage` enforces the coverage thresholds, and `npm run build` makes the production build. The unit tests run offline: any unmocked network call fails. The OpenAQ tests read `tests/fixtures/openaq.json`, which is trimmed from real replies (its `note` says how); the app only calls OpenAQ when `OPENAQ_API_KEY` is set.
+
+The browser suite (Playwright, in `tests/e2e`) is separate and is not part of `npm run verify`. It drives the production build in Chromium and Firefox and runs axe-core over whole pages. One-time setup is `npx playwright install chromium firefox`. Then build and run it:
+
+```
+npm run build
+npm run test:e2e
+```
+
+The suite starts the app itself on port 3100 with throwaway keys and no API keys, so Gemini and OpenAQ are never called. The app may still call the live air service, but no test asserts anything that depends on it. Tests use only places listed in `src/data/places.json` and device coordinates set on the browser context, so no test makes a place search. Specs end in `.spec.ts` so that Vitest does not pick them up. A failed run leaves traces in `test-results` and a report in `playwright-report` (both ignored by git).
 
 Formatting is Prettier (`npm run format`).
 
